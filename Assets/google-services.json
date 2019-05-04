@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "428700261965",
+    "firebase_url": "https://comanda-3c059.firebaseio.com",
+    "project_id": "comanda-3c059",
+    "storage_bucket": "comanda-3c059.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:428700261965:android:0d2e520a103c812c",
+        "android_client_info": {
+          "package_name": "com.krodon.comanda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "428700261965-9pdnhsm6b9rqipmnu136i6ej1qndperp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAasPrEf4qAonf8acb-qXuA-AiEZygN0qM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "428700261965-9pdnhsm6b9rqipmnu136i6ej1qndperp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
