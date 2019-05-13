@@ -4,8 +4,20 @@ using UnityEngine;
 
 public class EasyAudioUtility : MonoBehaviour
 {
+    public enum Som
+    {
+        Background,
+        Click_OK,
+        Click_Cancel,
+        Error,
+        LevelUp,
+        LevelUp2,
+        Compra_Item,
+        Som_Camera
+    }
+
     //Static reference
-    public static EasyAudioUtility instance;
+    public static EasyAudioUtility Instance;
 
     //Master Audio Mixer
     public AudioMixerGroup mixerGroup;
@@ -16,13 +28,13 @@ public class EasyAudioUtility : MonoBehaviour
     void Awake()
     {
         //creating static instance so we don't need any physical reference
-        if (instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
         }
         else
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         //Adding audio source in all helpers
@@ -35,28 +47,32 @@ public class EasyAudioUtility : MonoBehaviour
             h.source.outputAudioMixerGroup = mixerGroup;
         }
 
+        Play(Som.Background);
+
     }
 
     /// <summary>
     /// Play an Audio Clip defined in the inspector
     /// </summary>
     /// <param name="sound"></param>
-    public void Play(string sound)
+    public void Play(Som som)
     {
+        string sound = som.ToString();
+
         EasyAudioUtility_Helper h = Array.Find(helper, item => item.name == sound);
         //randomizing volume by variation
-        h.source.volume = h.volume * (1f + UnityEngine.Random.Range(-h.volumeVariance / 2f, h.volumeVariance / 2f));
+        h.source.volume = h.volume;
         //randomizing pitch by variation
-        h.source.pitch = h.pitch * (1f + UnityEngine.Random.Range(-h.pitchVariance / 2f, h.pitchVariance / 2f));
-       
+        h.source.pitch = h.pitch;
+
         //playing it after setting all variations
-        if (h.source.enabled && h.canPlay)
+        if (h.source.enabled)
             h.source.Play();
     }
 
     public void AjustarSomBG(float volume){
         
-        EasyAudioUtility_Helper h = Array.Find(helper, item => item.name == SomController.Som.Background.ToString());
+        EasyAudioUtility_Helper h = Array.Find(helper, item => item.name == Som.Background.ToString());
 
         h.source.volume = volume * (1f + UnityEngine.Random.Range(-h.volumeVariance / 2f, h.volumeVariance / 2f));
     }
@@ -64,7 +80,7 @@ public class EasyAudioUtility : MonoBehaviour
     public void AjustarSomSFX(float volume){
         
         Array.ForEach(helper, item => {
-            if (item.name != SomController.Som.Background.ToString())   {
+            if (item.name != Som.Background.ToString())   {
                 item.volume = volume * (1f + UnityEngine.Random.Range(-item.volumeVariance / 2f, item.volumeVariance / 2f));
             }
         });

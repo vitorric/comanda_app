@@ -6,15 +6,20 @@ using FirebaseModel;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour
 {
-    public GameObject PnlPrincipal;
 
     public static Main Instance { get; set; }
+
+    [Header("Botoes")]
+    public Button BtnQrCode;
+
+    [Header("Objetos de referencia")]
+    public GameObject PnlPrincipal;
+    public GameObject ObjScript;
 
     [Header("Classes")]
     public MenuEstabelecimento MenuEstabelecimento;
@@ -35,9 +40,6 @@ public class Main : MonoBehaviour
     public GameObject PnlNaoEstaNoEstabelecimento;
     public GameObject PnlEstaNoEstabelecimento;
 
-    [Header("Esta No Estabelecimento")]
-    public Text TxtNomeEstabComanda;
-
     void Awake()
     {
         ConfigApp = new Configuracoes();
@@ -47,9 +49,16 @@ public class Main : MonoBehaviour
 
         Instance = this;
 
+        instanciarListener();
+
         iniciarWatchsFirebase();
 
         preencherInfoUsuario();
+    }
+
+    private void instanciarListener()
+    {
+        BtnQrCode.onClick.AddListener(() => btnAbrirQRCode());
     }
 
     public void BtnAdicionarExp()
@@ -132,7 +141,7 @@ public class Main : MonoBehaviour
 
             if (retornoAPI.sucesso)
             {
-                Main.Instance.MenuEstabelecimento.IniciarConquistas(conquistas, retornoAPI.retorno, _idEstabelecimento);
+                Instance.MenuEstabelecimento.IniciarConquistas(conquistas, retornoAPI.retorno, _idEstabelecimento);
             }
         },
         (error) =>
@@ -145,7 +154,6 @@ public class Main : MonoBehaviour
     #region Manipular Componentes
     public void ManipularMenus(string menuQueVaiAbrir)
     {
-
         LstBotoesMenu.ForEach(x =>
         {
             if (x.name != menuQueVaiAbrir)
@@ -153,24 +161,25 @@ public class Main : MonoBehaviour
                 switch (x.name)
                 {
                     //Menus que vao ser fechados automaticamente
-                    case "btnPerfil":
-                        this.gameObject.GetComponent<MenuUsuario>().BtnAbrirPnlUsuario(true);
+                    case "BtnPerfil":
+                        ObjScript.GetComponentInChildren<MenuUsuario>().BtnAbrirMenu(true);
                         break;
-                    case "btnConfiguracoes":
-                        this.gameObject.GetComponent<MenuConfig>().BtnAbrirConfiguracoes(true);
+                    case "BtnConfiguracoes":
+                        ObjScript.GetComponentInChildren<MenuConfig>().BtnAbrirConfiguracoes(true);
                         break;
-                    case "btnComanda":
+                    case "BtnComanda":
                         if (Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento)
-                            this.gameObject.GetComponent<MenuComanda>().BtnAbrirMenuComanda(true);
+                            ObjScript.GetComponentInChildren<MenuComanda>().BtnAbrirMenuComanda(true);
                         break;
-                    case "btnEstabelecimentoComanda":
+                    case "BtnEstabelecimentoComanda":
                         if (Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento)
-                            this.gameObject.GetComponent<MenuEstabComanda>().BtnAbrirMenuEstabelecimentoComanda(true);
+                            ObjScript.GetComponentInChildren<MenuEstabComanda>().BtnAbrirMenuEstabelecimentoComanda(true);
                         break;
                     default:
-                        this.gameObject.GetComponent<MenuConfig>().BtnAbrirConfiguracoes(true);
-                        this.gameObject.GetComponent<MenuUsuario>().BtnAbrirPnlUsuario(true);
-                        this.gameObject.GetComponent<MenuComanda>().BtnAbrirMenuComanda(true);
+                        Debug.Log(x.name);
+                        ObjScript.GetComponentInChildren<MenuConfig>().BtnAbrirConfiguracoes(true);
+                        ObjScript.GetComponentInChildren<MenuUsuario>().BtnAbrirMenu(true);
+                        ObjScript.GetComponentInChildren<MenuComanda>().BtnAbrirMenuComanda(true);
                         break;
                 }
             }
@@ -185,14 +194,14 @@ public class Main : MonoBehaviour
         if (abrirMenu)
         {
             if (!fecharAutomatico)
-                SomController.Tocar(SomController.Som.Click_OK);
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
         }
         else
         {
             valorScala = 0;
             tempoAnimacao = objAnimar.Count / 10f;
             if (!fecharAutomatico)
-                SomController.Tocar(SomController.Som.Click_Cancel);
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
         }
 
         if (!fecharAutomatico)
@@ -202,7 +211,6 @@ public class Main : MonoBehaviour
         {
             for (int i = 0; i < objAnimar.Count; i++)
             {
-
                 AnimacoesTween.AnimarObjeto(objAnimar[i], AnimacoesTween.TiposAnimacoes.Scala, null, tempoAnimacao, new Vector2(valorScala, valorScala));
 
                 tempoAnimacao = (abrirMenu) ? tempoAnimacao + 0.1f : tempoAnimacao - 0.1f;
@@ -212,29 +220,18 @@ public class Main : MonoBehaviour
 
     #endregion
 
-    #region QRCode
-    public void BtnAbrirQRCode()
+    #region btnAbrirQRCode
+    private void btnAbrirQRCode()
     {
-        SomController.Tocar(SomController.Som.Click_OK);
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
         AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
             StartCoroutine(permissaoCamera());
-            StartCoroutine(new SceneController().CarregarCenaAdditiveAsync("LeitorQRCode"));
-        });
+            SceneManager.LoadSceneAsync("LeitorQRCode", LoadSceneMode.Additive);
+        },
+        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
-
-
-    // IEnumerator Start()
-    // {
-    // 	// When the app start, ask for the authorization to use the webcam
-    // 	yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
-
-    // 	if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
-    // 	{
-    // 		throw new Exception("This Webcam library can't work without the webcam authorization");
-    // 	}
-    // }
 
     private IEnumerator permissaoCamera()
     {
@@ -270,7 +267,7 @@ public class Main : MonoBehaviour
                     }
                     else
                     {
-                        SomController.Tocar(SomController.Som.Error);
+                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                     }
                 },
                 (error) => { }));
@@ -287,11 +284,11 @@ public class Main : MonoBehaviour
 
                     if (retornoAPI.sucesso)
                     {
-                        
+
                     }
                     else
                     {
-                        SomController.Tocar(SomController.Som.Error);
+                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                     }
                 },
                 (error) => { }));
@@ -305,7 +302,6 @@ public class Main : MonoBehaviour
         {
             PnlEstaNoEstabelecimento.SetActive(true);
             PnlNaoEstaNoEstabelecimento.SetActive(false);
-            TxtNomeEstabComanda.text = Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento;
             return;
         }
 

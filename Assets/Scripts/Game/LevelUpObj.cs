@@ -21,7 +21,7 @@ public class LevelUpObj : MonoBehaviour {
 
 	private void animarPainel(){
 
-		SomController.Tocar(SomController.Som.LevelUp);
+		EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.LevelUp);
 		AnimacoesTween.AnimarObjeto(ImgCirculoCentral, AnimacoesTween.TiposAnimacoes.Scala, () => 
 		{
 			animarAsaDireita();
@@ -61,7 +61,7 @@ public class LevelUpObj : MonoBehaviour {
 	private void animarBandeira(){			
 		AnimacoesTween.AnimarObjeto(ImgBandeira, AnimacoesTween.TiposAnimacoes.Scala, () => 
 		{
-			SomController.Tocar(SomController.Som.LevelUp2);
+			EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.LevelUp2);
 			AnimacoesTween.AnimarObjeto(TxtLevel, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () => 
 			{},
 			0.2f,
@@ -77,7 +77,7 @@ public class LevelUpObj : MonoBehaviour {
 	}
 
 	public void BtnPnlFechar(){
-		SomController.Tocar(SomController.Som.Click_Cancel);
+		EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 		AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => 
 		{
 			Destroy(this.gameObject);

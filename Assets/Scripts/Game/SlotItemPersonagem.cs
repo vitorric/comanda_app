@@ -7,9 +7,9 @@ public class SlotItemPersonagem : MonoBehaviour
 {
     public RawImage ImgItem;
     private string modulo;
-    private GameObject pnlCharacter;
+    private AvatarObj pnlCharacter;
 
-    public void PreencherInfo(Texture2D textura, string modulo, GameObject pnlCharacter)
+    public void PreencherInfo(Texture2D textura, string modulo, AvatarObj pnlCharacter)
     {
         if (textura == null)
         {
@@ -26,13 +26,13 @@ public class SlotItemPersonagem : MonoBehaviour
 
     public void SelecionarItem()
     {
-        SomController.Tocar(SomController.Som.Click_OK);
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
         AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
             FindObjectsOfType<SlotItemPersonagem>().ToList().ForEach(x => x.gameObject.GetComponent<Outline>().enabled = false);
 
-            pnlCharacter.GetComponent<AvatarObj>().TrocarItem(ImgItem, modulo);
+            pnlCharacter.TrocarItem(ImgItem, modulo);
 
             gameObject.GetComponent<Outline>().enabled = true;
         });

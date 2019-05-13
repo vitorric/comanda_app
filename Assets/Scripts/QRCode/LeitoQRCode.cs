@@ -60,7 +60,7 @@ public class LeitoQRCode : MonoBehaviour {
 
 			PnlLoading.SetActive(true);
 			
-			SomController.Tocar(SomController.Som.Som_Camera);
+			EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
             
 			WWWForm form = new WWWForm();
 			form.AddField("_idCliente", Cliente.ClienteLogado._id);
@@ -89,7 +89,7 @@ public class LeitoQRCode : MonoBehaviour {
 						SceneManager.UnloadSceneAsync("LeitorQRCode");
 					}));
 				}else{
-					SomController.Tocar(SomController.Som.Error);
+					EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
 					PnlLoading.SetActive(false);
 				}
 				
@@ -155,7 +155,7 @@ public class LeitoQRCode : MonoBehaviour {
 
 	public void BtnFecharLeitor(){
 		
-		SomController.Tocar(SomController.Som.Click_Cancel);
+		EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 		AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => 
 		{
 			StartCoroutine(StopCamera(() => {

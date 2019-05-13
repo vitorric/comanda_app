@@ -295,6 +295,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 564e02c7daed3f44fbd518b0644bf5ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BtnAbrirInfo: {fileID: 114058576796839328}
+  BtnAbrirInfoLoja: {fileID: 114084163537243272}
   TxtNome: {fileID: 114834954631539512}
   TxtAtendimento: {fileID: 114134099977780716}
   TxtPessoas: {fileID: 114806246524268546}
@@ -338,18 +340,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114291398475198918}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 114039316787254582}
-        m_MethodName: BtnAbrirPnlInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114084163537243272
@@ -390,18 +381,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114359474833368710}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 114039316787254582}
-        m_MethodName: BtnAbrirPnlLoja
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &114112572191120526
@@ -1202,7 +1182,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1597983384071030}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 9.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224594488193247518}
@@ -1212,6 +1192,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 347.36328, y: 685.6307}
   m_SizeDelta: {x: 546.7, y: 232.89}
   m_Pivot: {x: 0.5, y: 0.5}

@@ -81,9 +81,14 @@ namespace APIModel
 
             public int RetornoGoldEstabelecimento(string idEstabelecimento)
             {
-                GoldPorEstabelecimento goldEstabelecimento = this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento);
+                if (this.goldPorEstabelecimento != null)
+                {
+                    GoldPorEstabelecimento goldEstabelecimento = this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento);
+                    Debug.Log(goldEstabelecimento);
+                    return (goldEstabelecimento != null) ? goldEstabelecimento.gold : 0;
+                }
 
-                return (goldEstabelecimento != null) ? goldEstabelecimento.gold : 0;
+                return 0;
             }
 
             public int AlterarGoldEstabelecimento(string idEstabelecimento, int quantidadeGold, bool adicionar)

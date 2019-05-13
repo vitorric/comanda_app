@@ -38,7 +38,7 @@ public class APITeste : MonoBehaviour {
                     Main.Instance.ClienteEstaNoEstabelecimento();     
 				
 				}else{
-					SomController.Tocar(SomController.Som.Error);
+					EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
 				}
 				
 				//StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));

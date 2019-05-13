@@ -50,7 +50,7 @@ public class PnlDecisao : MonoBehaviour
         BtnSim.onClick.AddListener(() =>
         {
 
-            SomController.Tocar(SomController.Som.Click_OK);
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
             AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, 
             AnimacoesTween.TiposAnimacoes.Button_Click, () =>
@@ -64,7 +64,7 @@ public class PnlDecisao : MonoBehaviour
 
         BtnNao.onClick.AddListener(() =>
         {
-            SomController.Tocar(SomController.Som.Click_Cancel);
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
             AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject,
             AnimacoesTween.TiposAnimacoes.Button_Click, () =>

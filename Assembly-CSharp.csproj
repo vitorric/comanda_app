@@ -60,8 +60,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Audio\EasyAudioUtility.cs" />
-    <Compile Include="Assets\Audio\EasyAudioUtility_Helper.cs" />
     <Compile Include="Assets\Scripts\API\API.cs" />
     <Compile Include="Assets\Scripts\API\AvatarAPI.cs" />
     <Compile Include="Assets\Scripts\API\ClienteAPI.cs" />
@@ -69,6 +67,8 @@
     <Compile Include="Assets\Scripts\APIModel\Cliente.cs" />
     <Compile Include="Assets\Scripts\APIModel\Estabelecimento.cs" />
     <Compile Include="Assets\Scripts\APIModel\HistoricoCompra.cs" />
+    <Compile Include="Assets\Scripts\Audio\EasyAudioUtility.cs" />
+    <Compile Include="Assets\Scripts\Audio\EasyAudioUtility_Helper.cs" />
     <Compile Include="Assets\Scripts\FirebaseModel\ClienteFirebase.cs" />
     <Compile Include="Assets\Scripts\Game\AvatarObj.cs" />
     <Compile Include="Assets\Scripts\Game\Configuracoes.cs" />
@@ -90,7 +90,6 @@
     <Compile Include="Assets\Scripts\Util\CoresUtil.cs" />
     <Compile Include="Assets\Scripts\Util\MaskField.cs" />
     <Compile Include="Assets\Scripts\Util\SceneController.cs" />
-    <Compile Include="Assets\Scripts\Util\SomController.cs" />
     <Compile Include="Assets\Scripts\Util\TimeUtilities.cs" />
     <Compile Include="Assets\Scripts\Util\Util.cs" />
     <Compile Include="Assets\Scripts\View\APITeste.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="Assets\Scripts\View\Main\MenuEstabComanda.cs" />
     <Compile Include="Assets\Scripts\View\Main\MenuEstabelecimento.cs" />
     <Compile Include="Assets\Scripts\View\Main\MenuUsuario.cs" />
-    <Compile Include="Assets\Scripts\View\Main\PnlEdicaoChar.cs" />
     <Compile Include="Assets\Scripts\View\PnlPopUp.cs" />
     <Compile Include="Assets\Third\ColorPick\Enums\ColorValues.cs" />
     <Compile Include="Assets\Third\ColorPick\Events\ColorChangedEvent.cs" />

@@ -337,7 +337,7 @@ GameObject:
   - component: {fileID: 57324845}
   - component: {fileID: 57324846}
   m_Layer: 5
-  m_Name: btnCorPele
+  m_Name: BtnCorPele
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -404,18 +404,7 @@ MonoBehaviour:
   m_Group: {fileID: 1467607059}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: ChkAlterarCor
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: pele
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 1
@@ -429,7 +418,7 @@ GameObject:
   - component: {fileID: 67056021}
   - component: {fileID: 67056022}
   m_Layer: 5
-  m_Name: btnCorBarba
+  m_Name: BtnCorBarba
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -496,18 +485,7 @@ MonoBehaviour:
   m_Group: {fileID: 1467607059}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: ChkAlterarCor
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: barba
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -851,14 +829,19 @@ Prefab:
       propertyPath: m_Color.b
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1260041797073774, guid: 907924d84dbd87e47a2de9790b9afb64, type: 2}
+      propertyPath: m_Name
+      value: PnlCharacter
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 907924d84dbd87e47a2de9790b9afb64, type: 2}
   m_IsPrefabAsset: 0
---- !u!1 &138882493 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1260041797073774, guid: 907924d84dbd87e47a2de9790b9afb64,
+--- !u!114 &138882493 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114999724951687558, guid: 907924d84dbd87e47a2de9790b9afb64,
     type: 2}
   m_PrefabInternal: {fileID: 138882492}
+  m_Script: {fileID: 11500000, guid: 314b663b5a196ee4ba4b7a0e462546ac, type: 3}
 --- !u!1 &176838064
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,7 +852,7 @@ GameObject:
   - component: {fileID: 176838065}
   - component: {fileID: 176838066}
   m_Layer: 5
-  m_Name: btnCabeloTraseiro
+  m_Name: BtnCabeloTraseiro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -937,18 +920,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: cabeloTraseiro
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -981,7 +953,7 @@ RectTransform:
   m_Children:
   - {fileID: 416749997}
   m_Father: {fileID: 372161843}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1032,7 +1004,7 @@ GameObject:
   - component: {fileID: 188124601}
   - component: {fileID: 188124602}
   m_Layer: 5
-  m_Name: btnBarba
+  m_Name: BtnBarba
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1099,21 +1071,89 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: barba
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
+--- !u!1 &201686270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1930976150358022, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 201686271}
+  - component: {fileID: 201686273}
+  - component: {fileID: 201686272}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &201686271
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 224386333050374000, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 201686270}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1745000008}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &201686272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 114742192903030588, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 201686270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 58529310243d0497ea50d86df41c60da, type: 3}
+    m_FontSize: 36
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 3
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Salvar
+--- !u!222 &201686273
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 222795733907851606, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 201686270}
+  m_CullTransparentMesh: 0
 --- !u!1 &229327515
 GameObject:
   m_ObjectHideFlags: 0
@@ -1301,6 +1341,35 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 259887185}
   m_CullTransparentMesh: 0
+--- !u!1 &278258347
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 278258348}
+  m_Layer: 0
+  m_Name: Scripts
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &278258348
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 278258347}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 426.333, y: 864.1684, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 505198614}
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &310470811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,7 +1449,7 @@ GameObject:
   - component: {fileID: 329955999}
   - component: {fileID: 329956000}
   m_Layer: 5
-  m_Name: btnNariz
+  m_Name: BtnNariz
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1447,18 +1516,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: nariz
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -1600,7 +1658,6 @@ GameObject:
   - component: {fileID: 372161843}
   - component: {fileID: 372161846}
   - component: {fileID: 372161845}
-  - component: {fileID: 372161844}
   m_Layer: 5
   m_Name: pnlEdicaoChar
   m_TagString: Untagged
@@ -1625,6 +1682,7 @@ RectTransform:
   - {fileID: 1700125944}
   - {fileID: 731249494}
   - {fileID: 728507550}
+  - {fileID: 1745000008}
   - {fileID: 185814136}
   m_Father: {fileID: 1100381131}
   m_RootOrder: 0
@@ -1634,21 +1692,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0.1000061, y: 0.5999756}
   m_SizeDelta: {x: 720, y: 1280}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &372161844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 114969960202825266, guid: d5cbab13d03dba5469831c287a390dce,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 372161842}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0cf44a3ab4a4a845a6a0179432eb5b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PnlEdicao: {fileID: 372161842}
-  AvatarHomem: {fileID: 0}
-  AvatarMulher: {fileID: 0}
 --- !u!114 &372161845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1798,10 +1841,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: 16b3f32253d334b57912cfe16521b49b, type: 3}
-    m_FontSize: 14
+    m_FontSize: 36
     m_FontStyle: 1
-    m_BestFit: 1
-    m_MinSize: 10
+    m_BestFit: 0
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -1809,7 +1852,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Edi\xE7\xE3o de Personagem"
+  m_Text: "Edi\xE7\xE3o de Avatar"
 --- !u!222 &416749999
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1817,6 +1860,74 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 416749996}
   m_CullTransparentMesh: 0
+--- !u!1 &505198613
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 505198614}
+  - component: {fileID: 505198615}
+  m_Layer: 0
+  m_Name: EdicaoChar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &505198614
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 505198613}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 278258348}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &505198615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 505198613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bff3169076666748ace27216f3b84b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BtnAleatorio: {fileID: 731249495}
+  BtnFechar: {fileID: 728507551}
+  BtnSalvar: {fileID: 1745000009}
+  BtnCabeca: {fileID: 1056676632}
+  BtnOlhos: {fileID: 1668141023}
+  BtnBoca: {fileID: 1125172220}
+  BtnNariz: {fileID: 329956000}
+  BtnBarba: {fileID: 188124602}
+  BtnCabeloFrontal: {fileID: 2058812335}
+  BtnCabeloTraseiro: {fileID: 176838066}
+  BtnSombrancelhas: {fileID: 2104111509}
+  BtnRoupa: {fileID: 1316586822}
+  BtnCorPele: {fileID: 57324846}
+  BtnCorBarba: {fileID: 926852242}
+  BtnCorCabelo: {fileID: 67056022}
+  BtnSexoMasc: {fileID: 1634169957}
+  BtnSexoFem: {fileID: 1671493848}
+  ScvEdicaoChar: {fileID: 1362026625}
+  SlotItemPers: {fileID: 114982637487032138, guid: dac38d084be53864bbf8025484492228,
+    type: 2}
+  PnlCharacter: {fileID: 138882493}
+  CorItemRef: {fileID: 1973640552765864, guid: afa527f03ce1dee4cbc40ed37fdab96d, type: 2}
+  PnlSexo: {fileID: 803456165}
+  BtnBarbaItem: {fileID: 188124600}
+  BtnBarbaCor: {fileID: 67056020}
+  PnlOpcaoPeleCor: {fileID: 368726968}
+  PnlOpcaoCabeloCor: {fileID: 404371878}
+  PnlOpcaoBarbaCor: {fileID: 749223147}
 --- !u!1 &514770505
 GameObject:
   m_ObjectHideFlags: 0
@@ -2383,93 +2494,6 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 663726112}
   m_CullTransparentMesh: 0
---- !u!1001 &668793730
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 426.333
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 864.1684
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4013363568318286, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114795366948819020, guid: 746424466f4995648bfdefda4f24dd91,
-        type: 2}
-      propertyPath: PnlPrincipal
-      value: 
-      objectReference: {fileID: 1100381127}
-    - target: {fileID: 1189978187514250, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-      propertyPath: m_Name
-      value: controller
-      objectReference: {fileID: 0}
-    - target: {fileID: 114795366948819020, guid: 746424466f4995648bfdefda4f24dd91,
-        type: 2}
-      propertyPath: PnlLoading
-      value: 
-      objectReference: {fileID: 1759528364}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 746424466f4995648bfdefda4f24dd91, type: 2}
-  m_IsPrefabAsset: 0
---- !u!1 &668793731 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1189978187514250, guid: 746424466f4995648bfdefda4f24dd91,
-    type: 2}
-  m_PrefabInternal: {fileID: 668793730}
---- !u!114 &668793732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 668793731}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bff3169076666748ace27216f3b84b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ScvEdicaoChar: {fileID: 1077683072}
-  ScvEdicaoCharContent: {fileID: 1362026624}
-  ImgItensRef: {fileID: 1420365850542158, guid: dac38d084be53864bbf8025484492228,
-    type: 2}
-  PnlCharacter: {fileID: 138882493}
-  CorItemRef: {fileID: 1973640552765864, guid: afa527f03ce1dee4cbc40ed37fdab96d, type: 2}
-  PnlSexo: {fileID: 803456165}
-  ChkMasculino: {fileID: 1634169957}
-  ChkFeminino: {fileID: 1671493848}
-  BtnBarbaItem: {fileID: 188124600}
-  BtnBarbaCor: {fileID: 67056020}
-  PnlOpcaoPeleCor: {fileID: 368726968}
-  PnlOpcaoCabeloCor: {fileID: 404371878}
-  PnlOpcaoBarbaCor: {fileID: 749223147}
-  ChkCorPele: {fileID: 57324846}
 --- !u!1 &702605060
 GameObject:
   m_ObjectHideFlags: 0
@@ -2723,8 +2747,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 91.6, y: -522}
-  m_SizeDelta: {x: 433.1, y: 70}
+  m_AnchoredPosition: {x: -19.975, y: -525}
+  m_SizeDelta: {x: 210, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &728507551
 MonoBehaviour:
@@ -2766,7 +2790,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 668793732}
+      - m_Target: {fileID: 0}
         m_MethodName: BtnFechar
         m_Mode: 1
         m_Arguments:
@@ -2799,7 +2823,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 36267bcf5b2d343cdadf8a4766598974, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4f27cdb744c7b4f4aba46139d40a63f1, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2851,7 +2875,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 91.57495, y: 221}
+  m_AnchoredPosition: {x: 91.57, y: 212}
   m_SizeDelta: {x: 433.1, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &731249495
@@ -2893,18 +2917,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 731249496}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnAleatorio
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &731249496
@@ -2927,7 +2940,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 4f27cdb744c7b4f4aba46139d40a63f1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 36267bcf5b2d343cdadf8a4766598974, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3039,7 +3052,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 122.35, y: 463.1}
+  m_AnchoredPosition: {x: 122.87, y: 467.36}
   m_SizeDelta: {x: 245.75, y: 69.39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &803456167
@@ -3570,7 +3583,7 @@ GameObject:
   - component: {fileID: 926852241}
   - component: {fileID: 926852242}
   m_Layer: 5
-  m_Name: btnCorCabelo
+  m_Name: BtnCorCabelo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3637,18 +3650,7 @@ MonoBehaviour:
   m_Group: {fileID: 1467607059}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: ChkAlterarCor
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: cabelo
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -3731,7 +3733,7 @@ GameObject:
   - component: {fileID: 1056676631}
   - component: {fileID: 1056676632}
   m_Layer: 5
-  m_Name: btnCabeca
+  m_Name: BtnCabeca
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3798,18 +3800,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: cabeca
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 1
@@ -3952,7 +3943,7 @@ GameObject:
   - component: {fileID: 1125172219}
   - component: {fileID: 1125172220}
   m_Layer: 5
-  m_Name: btnBoca
+  m_Name: BtnBoca
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4019,18 +4010,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: boca
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -4217,7 +4197,7 @@ GameObject:
   - component: {fileID: 1316586821}
   - component: {fileID: 1316586822}
   m_Layer: 5
-  m_Name: btnRoupa
+  m_Name: BtnRoupa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4284,18 +4264,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: roupa
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -5177,7 +5146,7 @@ GameObject:
   - component: {fileID: 1634169956}
   - component: {fileID: 1634169957}
   m_Layer: 5
-  m_Name: btnSexoMasculino
+  m_Name: BtnSexoMasculino
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5244,18 +5213,7 @@ MonoBehaviour:
   m_Group: {fileID: 803456167}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: ChkAlterarSexo
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: Masculino
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 1
@@ -5477,7 +5435,7 @@ GameObject:
   - component: {fileID: 1668141022}
   - component: {fileID: 1668141023}
   m_Layer: 5
-  m_Name: btnOlhos
+  m_Name: BtnOlhos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5544,18 +5502,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: olhos
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -5569,7 +5516,7 @@ GameObject:
   - component: {fileID: 1671493847}
   - component: {fileID: 1671493848}
   m_Layer: 5
-  m_Name: btnSexoFeminino
+  m_Name: BtnSexoFeminino
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5636,18 +5583,7 @@ MonoBehaviour:
   m_Group: {fileID: 803456167}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: ChkAlterarSexo
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: Feminino
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -5804,6 +5740,134 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1714479591}
   m_CullTransparentMesh: 0
+--- !u!1 &1745000007
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1161530425575484, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1745000008}
+  - component: {fileID: 1745000011}
+  - component: {fileID: 1745000010}
+  - component: {fileID: 1745000009}
+  m_Layer: 5
+  m_Name: btnSalvar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1745000008
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 224649845964669282, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1745000007}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 201686271}
+  m_Father: {fileID: 372161843}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 203.15002, y: -525}
+  m_SizeDelta: {x: 210, y: 70}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1745000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 114485966058437546, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1745000007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1392445389, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1745000010}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: BtnFechar
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &1745000010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 114681412818989000, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1745000007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300000, guid: 753dfeb83a72f4d84a7aa1ab1245fff3, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+--- !u!222 &1745000011
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 222885741012581590, guid: d5cbab13d03dba5469831c287a390dce,
+    type: 2}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1745000007}
+  m_CullTransparentMesh: 0
 --- !u!1001 &1759528362
 Prefab:
   m_ObjectHideFlags: 0
@@ -5911,11 +5975,6 @@ Prefab:
 --- !u!224 &1759528363 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224678906476498294, guid: 1271f7521947dc64494706b0dd3ba361,
-    type: 2}
-  m_PrefabInternal: {fileID: 1759528362}
---- !u!1 &1759528364 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1351425475782440, guid: 1271f7521947dc64494706b0dd3ba361,
     type: 2}
   m_PrefabInternal: {fileID: 1759528362}
 --- !u!1 &1812570039
@@ -6372,7 +6431,7 @@ GameObject:
   - component: {fileID: 2058812334}
   - component: {fileID: 2058812335}
   m_Layer: 5
-  m_Name: btnCabeloFrontal
+  m_Name: BtnCabeloFrontal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6440,18 +6499,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: cabeloFrontal
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
@@ -6609,7 +6657,7 @@ GameObject:
   - component: {fileID: 2104111508}
   - component: {fileID: 2104111509}
   m_Layer: 5
-  m_Name: btnSombrancelhas
+  m_Name: BtnSombrancelhas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6676,18 +6724,7 @@ MonoBehaviour:
   m_Group: {fileID: 1700125945}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 668793732}
-        m_MethodName: BtnCarregarImagem
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: sombrancelhas
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0

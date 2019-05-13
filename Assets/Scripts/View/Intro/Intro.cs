@@ -52,8 +52,8 @@ public class Intro : MonoBehaviour
         {
             if (estaLogado)
             {
-                SceneManager.LoadScene("Main");
                 yield return StartCoroutine(relogar());
+                SceneManager.LoadScene("Main");
                 yield break;
             }
 
@@ -110,7 +110,7 @@ public class Intro : MonoBehaviour
         (error) =>
         {
             Debug.Log(error);
-            SomController.Tocar(SomController.Som.Error);
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
             //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(error, comunicadorAPI.PnlPrincipal));
         }));
     }

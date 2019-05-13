@@ -1,18 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using APIModel;
 using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuConfig : MonoBehaviour
 {
-    public GameObject BtnAppSetting;
-    public GameObject BtnPerfilSetting;
-    public GameObject BtnSairSetting;
+    [Header("Botoes")]
+    public Button BtnMenuConfig;
+    public Button BtnAppConfig;
+    public Button BtnPerfilConfig;
+    public Button BtnSairApp;
+    public Button BtnFecharPnlConfigApp;
+    public Button BtnSalvarConfigApp;
 
     public GameObject PnlConfigApp;
     public GameObject PnlConfigPerfil;
@@ -26,6 +27,19 @@ public class MenuConfig : MonoBehaviour
     [HideInInspector]
     public bool MenuAtivo = false;
 
+    private List<GameObject> lstMenu;
+
+    private void Awake()
+    {
+        configurarListener();
+        lstMenu = new List<GameObject>
+        {
+            BtnPerfilConfig.gameObject,
+            BtnAppConfig.gameObject,
+            BtnSairApp.gameObject
+        };
+    }
+
     void Start()
     {
         SliderSomFundo.onValueChanged.AddListener(changeValueFundo);
@@ -34,124 +48,114 @@ public class MenuConfig : MonoBehaviour
         configurarSom();
     }
 
-    #region "ManipularMenus"
-
-    public void BtnAbrirConfiguracoes(bool fecharAutomatico = false)
+    #region configurarListener
+    private void configurarListener()
     {
+        BtnMenuConfig.onClick.AddListener(() => BtnAbrirConfiguracoes());
+        BtnAppConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigApp, null));
+        BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
+        BtnSairApp.onClick.AddListener(() => btnDeslogar());
 
-        MenuAtivo = (fecharAutomatico) ? false : !MenuAtivo;
-
-        Main.Instance.AbrirMenu("btnConfiguracoes", (fecharAutomatico) ? false : MenuAtivo, new List<GameObject>{
-                BtnPerfilSetting,
-                BtnAppSetting,
-                BtnSairSetting
-            }, fecharAutomatico);
-    }
-
-    public void BtnAbrirPnlAppConfig()
-    {
-        SomController.Tocar(SomController.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
+        BtnFecharPnlConfigApp.onClick.AddListener(() => PnlPopUp.FecharPopUp(PnlConfigApp, () =>
         {
-            Main.Instance.PnlPopUp.SetActive(true);
-            PnlConfigApp.SetActive(true);
-            AnimacoesTween.AnimarObjeto(PnlConfigApp, AnimacoesTween.TiposAnimacoes.Scala, null, 0.5f, new Vector2(1, 1));
-        },
-        0.1f);
-    }
+            configurarSom();
+        }));
 
-    public void BtnAbrirPnlPerfilConfig()
-    {
-        SomController.Tocar(SomController.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
-        {
-            Main.Instance.PnlPopUp.SetActive(true);
-            PnlConfigPerfil.SetActive(true);
-            AnimacoesTween.AnimarObjeto(PnlConfigPerfil, AnimacoesTween.TiposAnimacoes.Scala, null, 0.5f, new Vector2(1, 1));
-        },
-        0.1f);
-    }
-
-    public void BtnDeslogar()
-    {
-        SomController.Tocar(SomController.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
-        {
-            SomController.AjustarSomSFX(1);
-            SomController.AjustarSomBG(1);
-            PlayerPrefs.DeleteAll();
-            SceneManager.LoadScene("Login");
-        },
-        0.1f);
+        BtnSalvarConfigApp.onClick.AddListener(() => btnAplicarConfigApp());
     }
     #endregion
 
-    #region "Painel Config App"
-    private void changeValueFundo(float value)
+    #region BtnAbrirConfiguracoes
+    public void BtnAbrirConfiguracoes(bool fecharAutomatico = false)
     {
-        TxtPctSomFundo.text = Mathf.FloorToInt(value * 100) + "%";
+        MenuAtivo = (fecharAutomatico) ? false : !MenuAtivo;
 
-        SomController.AjustarSomBG(value);
+        Main.Instance.AbrirMenu("BtnConfiguracoes", (fecharAutomatico) ? false : MenuAtivo, lstMenu, fecharAutomatico);
     }
-    private void changeValueGeral(float value)
+    #endregion
+
+    #region btnDeslogar
+    private void btnDeslogar()
     {
-        TxtPctSomGeral.text = Mathf.FloorToInt(value * 100) + "%";
-
-        SomController.AjustarSomSFX(value);
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        AnimacoesTween.AnimarObjeto(BtnSairApp.gameObject,
+        AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
+        {
+            EasyAudioUtility.Instance.AjustarSomSFX(1);
+            EasyAudioUtility.Instance.AjustarSomBG(1);
+            PlayerPrefs.DeleteAll();
+            SceneManager.LoadScene("Login");
+        },
+        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
+    #endregion
 
+    #region btnAplicarConfigApp
+    private void btnAplicarConfigApp()
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+        AnimacoesTween.AnimarObjeto(BtnSalvarConfigApp.gameObject,
+        AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        {
+            Cliente.ClienteLogado.configApp.somFundo = SliderSomFundo.value;
+            Cliente.ClienteLogado.configApp.somGeral = SliderSomGeral.value;
+
+            WWWForm form = new WWWForm();
+            form.AddField("_id", Cliente.ClienteLogado._id);
+            form.AddField("configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp));
+
+            StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteAlterarConfigApp, form, (response) =>
+            {
+                APIManager.Retorno<string> retornoAPI =
+                        JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+
+                if (retornoAPI.sucesso)
+                {
+                    //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
+
+                    Main.Instance.PnlPopUp.SetActive(false);
+                    PnlConfigApp.SetActive(false);
+                }
+                else
+                {
+                    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+                    //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
+                }
+            },
+            (error) =>
+            {
+                //TODO: Tratar Error
+            }));
+        },
+        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+    }
+    #endregion
+
+    #region configurarSom
     private void configurarSom()
     {
         SliderSomFundo.value = Cliente.ClienteLogado.configApp.somFundo;
         SliderSomGeral.value = Cliente.ClienteLogado.configApp.somGeral;
     }
-
-    public void BtnAplicarConfigApp()
-    {
-
-        SomController.Tocar(SomController.Som.Click_OK);
-
-        Cliente.ClienteLogado.configApp.somFundo = SliderSomFundo.value;
-        Cliente.ClienteLogado.configApp.somGeral = SliderSomGeral.value;
-
-        WWWForm form = new WWWForm();
-        form.AddField("_id", Cliente.ClienteLogado._id);
-        form.AddField("configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp));
-
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteAlterarConfigApp, form, (response) =>
-        {
-            APIManager.Retorno<string> retornoAPI = 
-                    JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-
-            if (retornoAPI.sucesso)
-            {
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-
-                Main.Instance.PnlPopUp.SetActive(false);
-                PnlConfigApp.SetActive(false);
-            }
-            else
-            {
-                SomController.Tocar(SomController.Som.Error);
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-            }
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
-        }));
-    }
-
-    public void BtnFecharPnlConfigApp()
-    {
-        SomController.Tocar(SomController.Som.Click_Cancel);
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            configurarSom();
-            Main.Instance.PnlPopUp.SetActive(false);
-            PnlConfigApp.SetActive(false);
-        });
-    }
-
     #endregion
+
+    #region changeValueFundo
+    private void changeValueFundo(float value)
+    {
+        TxtPctSomFundo.text = Mathf.FloorToInt(value * 100) + "%";
+
+        EasyAudioUtility.Instance.AjustarSomBG(value);
+    }
+    #endregion
+
+    #region changeValueGeral
+    private void changeValueGeral(float value)
+    {
+        TxtPctSomGeral.text = Mathf.FloorToInt(value * 100) + "%";
+
+        EasyAudioUtility.Instance.AjustarSomSFX(value);
+    }
+    #endregion
+
 }

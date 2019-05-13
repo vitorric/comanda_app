@@ -19,7 +19,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4013363568318286}
-  - component: {fileID: 114795366948819020}
   - component: {fileID: 114781545069764922}
   m_Layer: 0
   m_Name: controller
@@ -55,17 +54,3 @@ MonoBehaviour:
   PnlAlertaRef: {fileID: 1330686183461946, guid: 88730e18c6779834586cc3444ed4c79b,
     type: 2}
   MsgAlertas: 0
---- !u!114 &114795366948819020
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1189978187514250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf90392b26c8d9f4da293d13a995e55d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PnlLoading: {fileID: 1351425475782440, guid: 1271f7521947dc64494706b0dd3ba361, type: 2}
-  PnlPrincipal: {fileID: 0}
-  Alerta: {fileID: 114781545069764922}
