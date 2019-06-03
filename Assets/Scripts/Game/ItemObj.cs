@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using APIModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -29,8 +30,8 @@ public class ItemObj : MonoBehaviour
     public GameObject PnlTempo;
     public GameObject PnlHotSale;
     public Text TxtTempo;
-    private Estabelecimento.ItensLoja itemLoja;
-    private string _idEstabelecimento;
+    private ItemLoja itemLoja;
+    private string estabelecimentoId;
     private bool pararConferenciaTempo = false;
     private bool lojaAberta = false;
 
@@ -55,16 +56,16 @@ public class ItemObj : MonoBehaviour
     #endregion
 
     #region PreencherInfo
-    public void PreencherInfo(Estabelecimento.ItensLoja itemLoja, bool lojaAberta, string _idEstabelecimento)
+    public void PreencherInfo(ItemLoja itemLoja, bool lojaAberta, string _idEstabelecimento)
     {
         this.lojaAberta = lojaAberta;
         PnlHotSale.SetActive(itemLoja.hotSale);
 
         this.itemLoja = itemLoja;
-        this._idEstabelecimento = _idEstabelecimento;
+        this.estabelecimentoId = _idEstabelecimento;
 
-        TxtNome.text = itemLoja.item.nome;
-        TxtPreco.text = Util.FormatarValorDisponivel(itemLoja.item.preco);
+        TxtNome.text = itemLoja.nome;
+        TxtPreco.text = Util.FormatarValorDisponivel(itemLoja.preco);
 
         configurarPainelAlerta();
 
@@ -90,7 +91,7 @@ public class ItemObj : MonoBehaviour
 
         AnimacoesTween.AnimarObjeto(BtnSelecionarItem.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
-            Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(itemLoja.item.descricao);
+            Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(itemLoja.descricao);
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -119,7 +120,7 @@ public class ItemObj : MonoBehaviour
             alerta = "Tempo de Compra Esgotado";
             corAlerta = 1;
         }
-        else if (!Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento && Cliente.ClienteLogado.configClienteAtual.estabelecimento != _idEstabelecimento)
+        else if (!Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento && Cliente.ClienteLogado.configClienteAtual.estabelecimento != estabelecimentoId)
         {
             alerta = "É necessário estar no estabelecimento";
             corAlerta = 3;
@@ -149,9 +150,9 @@ public class ItemObj : MonoBehaviour
 
         AnimacoesTween.AnimarObjeto(BtnComprarItem.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
-            int gold = Cliente.ClienteLogado.RetornoGoldEstabelecimento(_idEstabelecimento);
+            int gold = Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimentoId);
 
-            if (itemLoja.item.preco > gold)
+            if (itemLoja.preco > gold)
             {
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                 return;
@@ -162,7 +163,7 @@ public class ItemObj : MonoBehaviour
             btnConfirmarCompra.onClick.RemoveAllListeners();
             btnConfirmarCompra.onClick.AddListener(() => confirmarCompraItem(btnConfirmarCompra.gameObject));
 
-            Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(itemLoja.item, gold);
+            Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(itemLoja, gold);
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -178,26 +179,27 @@ public class ItemObj : MonoBehaviour
             Main.Instance.MenuEstabelecimento.PnlConfirmarItemCompra.SetActive(false);
             Cliente.Dados usuario = Cliente.ClienteLogado;
 
-            WWWForm form = new WWWForm();
-            form.AddField("cliente", usuario._id);
-            form.AddField("estabelecimento", _idEstabelecimento);
-            form.AddField("itemLoja", itemLoja._id);
+            Dictionary<string, string> data = new Dictionary<string, string>
+            {
+                { "estabelecimento", estabelecimentoId },
+                { "itemLoja", itemLoja._id }
+            };
 
-            StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteComprarItem, form,
-            (response) =>
+            StartCoroutine(ClienteAPI.ClienteComprarItem(data,
+            (response, error) =>
             {
                 APIManager.Retorno<string> retornoAPI =
                     JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
 
                 if (retornoAPI.sucesso)
                 {
-                    int novoGold = usuario.AlterarGoldEstabelecimento(_idEstabelecimento, (int)itemLoja.item.preco, false);
+                    int novoGold = usuario.AlterarGoldEstabelecimento(estabelecimentoId, (int)itemLoja.preco, false);
                     Cliente.ClienteLogado = usuario;
 
-                    Main.Instance.MenuEstabelecimento.AtualizarInfoGold(_idEstabelecimento, novoGold);
+                    Main.Instance.MenuEstabelecimento.AtualizarInfoGold(estabelecimentoId, novoGold);
 
                     itemLoja.quantidadeDisponivel -= 1;
-                    Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)itemLoja.item.preco);
+                    Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)itemLoja.preco);
                     configurarPainelAlerta();
                 }
                 else
@@ -207,10 +209,6 @@ public class ItemObj : MonoBehaviour
 
                 //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
 
-            },
-            (error) =>
-            {
-                //TODO: Tratar Error
             }));
         }, AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }

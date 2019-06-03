@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using APIModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -43,7 +44,7 @@ public class MenuEstabelecimento : MonoBehaviour
 
     [Header("Estabelecimento Info Conquista")]
     public Transform ScvConquista;
-    public ConquistaObj ConquistaRef;
+    public DesafioObj ConquistaRef;
     public GameObject TxtCarregandoConquista;
 
     [Header("Estabelecimento Info Shop")]
@@ -59,6 +60,11 @@ public class MenuEstabelecimento : MonoBehaviour
     public Text TxtCustoCompraItem;
     public Text TxtSaldoCompraItem;
     public Button BtnConfirmarCompraItem;
+
+    public DesafioInfo DesafioInfo;
+
+    private EstabelecimentoFirebase estabelecimentoFirebase;
+    private string estabelecimentoId_aberto;
 
     private void Awake()
     {
@@ -110,26 +116,10 @@ public class MenuEstabelecimento : MonoBehaviour
     #region listarEstabelecimento
     private void listarEstabelecimento(Action<List<Estabelecimento>> callback)
     {
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ListarEstabelecimento, null,
-        (response) =>
+        StartCoroutine(EstabelecimentoAPI.ListarEstabelecimento(null,
+        (response, error) =>
         {
-            APIManager.Retorno<List<Estabelecimento>> retornoAPI =
-                JsonConvert.DeserializeObject<APIManager.Retorno<List<Estabelecimento>>>(response);
-
-            if (retornoAPI.sucesso)
-            {
-                callback(retornoAPI.retorno);
-            }
-            else
-            {
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                callback(new List<Estabelecimento>());
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-            }
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
+            callback(response);
         }));
     }
     #endregion    
@@ -155,6 +145,7 @@ public class MenuEstabelecimento : MonoBehaviour
     {
         try
         {
+            estabelecimentoId_aberto = estabelecimento._id;
 
             BtnAbaInfo.isOn = false;
             BtnAbaConquista.isOn = false;
@@ -208,9 +199,29 @@ public class MenuEstabelecimento : MonoBehaviour
             PnlPopUp.AbrirPopUp(PnlEstabInfo,
             () =>
             {
-                iniciarShop(estabelecimento.itensLoja, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
+                estabelecimentoFirebase = new EstabelecimentoFirebase
+                {
+                    AcaoItemLoja = (itens, tipoAcao) =>
+                    {
+                        if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Adicionar)
+                        {
+                            iniciarShop(itens, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
+                            return;
+                        }
 
-                Main.Instance.ResgatarConquistasUsuario(estabelecimento.conquistas, estabelecimento._id);
+                        if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Modificar)
+                        {
+                            ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
+
+                            iniciarShop(itens, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
+                            return;
+                        }
+                    }
+                };
+
+                estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimento._id, true);
+
+                //Main.Instance.ResgatarConquistasUsuario(estabelecimento.conquistas, estabelecimento._id);
             });
         }
         catch (Exception e)
@@ -240,17 +251,21 @@ public class MenuEstabelecimento : MonoBehaviour
     }
     #endregion
 
+    #region limparPnlEstabInfo
     private void limparPnlEstabInfo()
     {
+        estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimentoId_aberto, false);
+        estabelecimentoId_aberto = string.Empty;
         ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
-        ScvConquista.GetComponentsInChildren<ConquistaObj>().ToList().ForEach(x => Destroy(x.gameObject));
+        ScvConquista.GetComponentsInChildren<DesafioObj>().ToList().ForEach(x => Destroy(x.gameObject));
         TxtCarregandoConquista.SetActive(true);
     }
+    #endregion
 
     #region iniciarShop
-    private void iniciarShop(List<Estabelecimento.ItensLoja> lojaItens, bool lojaAberta, string _idEstabelecimento)
+    private void iniciarShop(List<ItemLoja> lojaItens, bool lojaAberta, string _idEstabelecimento)
     {
-        foreach (Estabelecimento.ItensLoja item in lojaItens)
+        foreach (ItemLoja item in lojaItens)
         {
             if (item._id != null)
             {
@@ -262,16 +277,16 @@ public class MenuEstabelecimento : MonoBehaviour
     #endregion
 
     #region IniciarConquistas
-    public void IniciarConquistas(List<Estabelecimento.Conquista> conquistas, List<Cliente.Conquista> conquistasUsuario, string _idEstabelecimento)
+    public void IniciarConquistas(List<Desafio> desafios, List<Cliente.Conquista> conquistasUsuario, string _idEstabelecimento)
     {
         TxtCarregandoConquista.SetActive(false);
 
-        foreach (Estabelecimento.Conquista conquista in conquistas)
+        foreach (Desafio desafio in desafios)
         {
-            if (conquista._id != null)
+            if (desafio._id != null)
             {
-                ConquistaObj objConquista = Instantiate(ConquistaRef, ScvConquista);
-                objConquista.PreencherInfo(conquista, conquistasUsuario.FirstOrDefault(x => x.conquista == conquista._id), _idEstabelecimento);
+                DesafioObj objConquista = Instantiate(ConquistaRef, ScvConquista);
+                objConquista.PreencherInfo(desafio, conquistasUsuario.FirstOrDefault(x => x.conquista == desafio._id), _idEstabelecimento);
             }
         }
     }
@@ -285,7 +300,7 @@ public class MenuEstabelecimento : MonoBehaviour
     #endregion
 
     #region PreencherInfoConfirmacaoItem
-    public void PreencherInfoConfirmacaoItem(Estabelecimento.Item item, float dinheiroEstab)
+    public void PreencherInfoConfirmacaoItem(ItemLoja item, float dinheiroEstab)
     {
         // IconItem;
         PnlConfirmarItemCompra.SetActive(true);
@@ -304,4 +319,6 @@ public class MenuEstabelecimento : MonoBehaviour
         TxtGoldEstabInfo.text = gold;
     }
     #endregion
+
+
 }

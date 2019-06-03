@@ -52,7 +52,7 @@ public class FirebaseManager : MonoBehaviour
     }
 
     private void OnDestroy()
-    {
+    {        
         FirebaseDatabase.DefaultInstance.App.Dispose();        
     }    
 }

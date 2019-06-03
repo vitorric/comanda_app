@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class AppManager : MonoBehaviour
 {
@@ -7,7 +8,6 @@ public class AppManager : MonoBehaviour
     public const float TEMPO_ANIMACAO_ABRIR_MODEL = 0.2f;
     public const float TEMPO_ANIMACAO_FECHAR_MODAL = 0.1f;
     public const float TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO = 0.1f;
-
 
     public GameObject Loader;
 
@@ -19,14 +19,19 @@ public class AppManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         Instance = this;
-    }    
+    }
 
     public void AtivarLoader()
     {
         Loader.SetActive(true);
     }
 
-    public void DesativarLoader()
+    public IEnumerator DesativarLoader()
+    {
+        yield return new WaitForSeconds(0.5f);
+        Loader.SetActive(false);
+    }
+    public void DesativarLoaderAsync()
     {
         Loader.SetActive(false);
     }

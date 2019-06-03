@@ -1,5 +1,6 @@
 ﻿using APIModel;
 using FirebaseModel;
+using Network;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ public class Intro : MonoBehaviour
 
     private void Start()
     {
+        //PlayerPrefs.DeleteAll();
         AlterarProgressoSlider(0.5f);
         StartCoroutine(aguardarFireBase());
     }
@@ -89,29 +91,19 @@ public class Intro : MonoBehaviour
     {
         Cliente.Credenciais credenciais = Cliente.ObterCredenciais();
 
-        WWWForm form = new WWWForm();
-        form.AddField("email", credenciais.email);
-        form.AddField("password", credenciais.password);
-
-        yield return StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteLogin, form,
-        (response) =>
+        Dictionary<string, string> data = new Dictionary<string, string>
         {
-            APIManager.Retorno<Cliente.SessaoCliente> retornoAPI = 
-                JsonConvert.DeserializeObject<APIManager.Retorno<Cliente.SessaoCliente>>(response);
+            { "email", credenciais.email },
+            { "password", credenciais.password }
+        };
 
-            if (retornoAPI.sucesso)
-            {
-                Cliente.RefazerToken(retornoAPI.retorno.token);
-            }
+        yield return StartCoroutine(ClienteAPI.ClienteLogin(data,
+        (response, error) =>
+        {
+            Cliente.RefazerToken(response.token);
 
-            AppManager.Instance.DesativarLoader();
+            StartCoroutine(AppManager.Instance.DesativarLoader());
             //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-        },
-        (error) =>
-        {
-            Debug.Log(error);
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(error, comunicadorAPI.PnlPrincipal));
         }));
     }
     #endregion

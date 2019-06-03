@@ -13,11 +13,12 @@ namespace Network
     {
         public const string CONTENT_TYPE_JSON = "application/json";
         private const string urlBase = "http://localhost:3000/api/";
+        internal const string msgErro = "Solicitação inválida, tente novamente!";
 
         public partial class Retorno<T>
         {
             public bool sucesso;
-            public string msg;
+            public string mensagem;
             public T retorno;
         }
 
@@ -44,6 +45,11 @@ namespace Network
 
             if (propriedades != null)
                 Debug.LogError(JsonConvert.SerializeObject(propriedades));
+
+            if (request.isHttpError)
+            {
+                bug = "Solicitação inválida, tente novamente!";
+            }
 
             if (request.responseCode == 401)
             {
@@ -82,62 +88,24 @@ namespace Network
                             Dictionary<string, string> data,
                             Action<UnityWebRequest> doneCallback = null)
         {
-            bool sucesso = false;
-            string response = string.Empty;
             string urlPost = urlBase + url;
-            string dataSerialize = JsonConvert.SerializeObject(data);
+            string dataSerialize = (data != null) ? JsonConvert.SerializeObject(data) : string.Empty;
 
-
-            for (int i = 0; i < 3; i++)
+            using (UnityWebRequest request = UnityWebRequest.Post(urlPost, dataSerialize))
             {
-                using (UnityWebRequest request = UnityWebRequest.Post(urlPost, dataSerialize))
-                {
-                    request.method = UnityWebRequest.kHttpVerbPOST;
-                    request.downloadHandler = new DownloadHandlerBuffer();
+                request.method = UnityWebRequest.kHttpVerbPOST;
+                request.downloadHandler = new DownloadHandlerBuffer();
+                if (!string.IsNullOrEmpty(dataSerialize))
                     request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(dataSerialize));
 
-                    request.SetRequestHeader("Content-Type", CONTENT_TYPE_JSON);
-                    request.SetRequestHeader("Accept", CONTENT_TYPE_JSON);
-                    request.SetRequestHeader("Authorization", Cliente.ObterToken());
+                request.SetRequestHeader("Content-Type", CONTENT_TYPE_JSON);
+                request.SetRequestHeader("Accept", CONTENT_TYPE_JSON);
+                request.SetRequestHeader("Authorization", Cliente.ObterToken());
 
-                    yield return request.SendWebRequest();
-                    try
-                    {
-                        if (request.isNetworkError || request.isHttpError)
-                        {
-                            response = "Erro ao acessar o servidor!";
+                yield return request.SendWebRequest();
 
-                            if (request.responseCode == 401)
-                            {
-                                response = "Usuário ou senha inválido!";
-                                break;
-                            }
-                        }
-
-                        if (request.downloadHandler != null &&
-                            !string.IsNullOrEmpty(request.downloadHandler.text))
-                        {
-                            sucesso = true;
-                            response = request.downloadHandler.text;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log(Util.GetExceptionDetails(e));
-                        doneCallback(request);
-                        break;
-                    }
-
-                    if (sucesso)
-                    {
-                        doneCallback(request);
-                        break;
-                    }
-                }
+                doneCallback(request);
             }
-
-            if (!sucesso)
-                doneCallback(null);
         }
         #endregion
 

@@ -30,7 +30,6 @@ public class PnlPopUp : MonoBehaviour
     }
     #endregion
 
-
     #region FecharPopUp
     public static void FecharPopUpSemDesligarPopUP(GameObject pnl,
                                    Action acaoFechar)

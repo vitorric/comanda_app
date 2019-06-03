@@ -9,8 +9,6 @@ namespace FirebaseModel
 {
     public class ClienteFirebase
     {
-        public static DataSnapshot dsCliente;
-
         #region ObterUsuario
         public async Task<Cliente.Dados> ObterUsuario(string _id)
         {
@@ -21,9 +19,7 @@ namespace FirebaseModel
                                                   .GetValueAsync() //obtem os dados
                                                   .ContinueWith(task =>
                                                   {
-                                                      dsCliente = task.Result;
-
-                                                      cliente = JsonConvert.DeserializeObject<Cliente.Dados>(dsCliente.GetRawJsonValue());
+                                                      cliente = JsonConvert.DeserializeObject<Cliente.Dados>(task.Result.GetRawJsonValue());
 
                                                       //if (usuario != null)
                                                       //{
@@ -39,13 +35,19 @@ namespace FirebaseModel
 
         #region IniciarWatch
 
-        public void IniciarWatch()
+        public async void IniciarWatch(string clienteId)
         {
-            dsCliente.Child("configClienteAtual")
-                         .Reference
-                         .ValueChanged += configClienteAtual;
+            await FirebaseDatabase.DefaultInstance.GetReference("clientes")
+                                                     .Child(clienteId)//nome da collection
+                                                     .GetValueAsync() //obtem os dados
+                                                     .ContinueWith(task =>
+                                                     {
+                                                         task.Result.Child("configClienteAtual")
+                                                                      .Reference
+                                                                      .ValueChanged += configClienteAtual;
 
-            dsCliente = null;
+                                                     });
+
         }
 
         #endregion
@@ -78,5 +80,6 @@ namespace FirebaseModel
 
         #region Watch - Status
         #endregion
+        
     }
 }

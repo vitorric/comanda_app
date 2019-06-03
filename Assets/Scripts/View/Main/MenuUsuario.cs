@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using APIModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -22,6 +23,7 @@ public class MenuUsuario : MonoBehaviour
     public Button BtnAbrirHistorico;
     public Button BtnFecharHistorico;
     public Button BtnVoltarInfo;
+    public Button BtnSalvarInfo;
     public Button BtnAbrirEdicaoAvatar;
 
     [Header("Toggle")]
@@ -34,19 +36,20 @@ public class MenuUsuario : MonoBehaviour
     public Text TxtTitulo;
 
     [Header("Avatar")]
-    public GameObject PnlAvatar;
+    public AvatarObj PnlAvatar;
 
     [Header("Perfil")]
     public GameObject PnlPerfilGeral;
-    public GameObject PnlAvatarInfo;
+    public AvatarObj PnlAvatarInfo;
     public Text LblPerfilApelido;
     public Text LblPerfilLevel;
     public Text LblPerfilExp;
     public Text LblPerfilPontos;
     public Text LblPerfilGold;
+    public Text LblChaveAmigavel;
 
     [Header("Perfil Edicao")]
-    public GameObject PnlAvatarEdicao;
+    public AvatarObj PnlAvatarEdicao;
     public GameObject PnlPerfilEdicao;
     public List<GameObject> PnlAbasEdicao;
     public InputField TxtEmailInfo;
@@ -57,7 +60,6 @@ public class MenuUsuario : MonoBehaviour
     public InputField TxtIdadeInfo;
     public InputField TxtApelidoInfo;
     public Text TxtSexoInfo;
-    public Cliente.Avatar AvatarEditado;
 
     [Header("Amigos")]
     public GameObject PnlAmigos;
@@ -93,6 +95,7 @@ public class MenuUsuario : MonoBehaviour
         BtnPerfil.onClick.AddListener(() => btnAbrirPerfil());
         BtnInfoPerfil.onClick.AddListener(() => btnAbrirInfoPerfil());
         BtnFechar.onClick.AddListener(() => PnlPopUp.FecharPopUp(PnlPerfil, null));
+        BtnSalvarInfo.onClick.AddListener(() => salvarPerfil());
 
         BtnVoltarInfo.onClick.AddListener(() => PnlPopUp.FecharPnl(PnlPerfilEdicao, () =>
         {
@@ -101,6 +104,7 @@ public class MenuUsuario : MonoBehaviour
 
         BtnFecharHistorico.onClick.AddListener(() => PnlPopUp.FecharPnl(PnlHistoricoCompra, () =>
         {
+            ScvHistoricoCompra.GetComponentsInChildren<HistoricoCompraObj>().ToList().ForEach(x => Destroy(x.gameObject));
             TxtTitulo.text = "Perfil";
             BtnFechar.gameObject.SetActive(true);
             PnlPerfilGeral.SetActive(true);
@@ -154,8 +158,6 @@ public class MenuUsuario : MonoBehaviour
     #region btnAbrirInfoPerfil
     private void btnAbrirInfoPerfil()
     {
-        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
         PnlPopUp.AbrirPopUp(PnlPerfilEdicao, () =>
         {
             BtnPerfilDados.isOn = true;
@@ -200,29 +202,19 @@ public class MenuUsuario : MonoBehaviour
     #region buscarHistorico
     private void buscarHistorico(Action<List<HistoricoCompra>> callback)
     {
-        WWWForm form = new WWWForm();
-        form.AddField("_idCliente", Cliente.ClienteLogado._id);
-
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ListarHistoricoCompra, form, (response) =>
+        StartCoroutine(ClienteAPI.ListarHistoricoCompra(
+        (response, error) =>
         {
-            APIManager.Retorno<List<HistoricoCompra>> retornoAPI =
-                JsonConvert.DeserializeObject<APIManager.Retorno<List<HistoricoCompra>>>(response);
+            if (error != null)
+            {
+                Debug.Log(error);
+                StartCoroutine(AppManager.Instance.DesativarLoader());
 
-            if (retornoAPI.sucesso)
-            {
-                callback(retornoAPI.retorno);
-            }
-            else
-            {
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                callback(new List<HistoricoCompra>());
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
             }
 
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
+            callback(response);
         }));
     }
     #endregion
@@ -232,11 +224,14 @@ public class MenuUsuario : MonoBehaviour
     {
         try
         {
+            PnlAvatarInfo.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
+
             LblPerfilApelido.text = Cliente.ClienteLogado.apelido;
             LblPerfilExp.text = Cliente.ClienteLogado.avatar.exp + "/" + Cliente.ClienteLogado.avatar.expProximoLevel;
             LblPerfilLevel.text = Cliente.ClienteLogado.avatar.level.ToString();
             LblPerfilPontos.text = Cliente.ClienteLogado.pontos.ToString();
             LblPerfilGold.text = Cliente.ClienteLogado.RetornarGoldTotal().ToString();
+            LblChaveAmigavel.text = Cliente.ClienteLogado.chaveAmigavel;
         }
         catch (Exception e)
         {
@@ -248,97 +243,85 @@ public class MenuUsuario : MonoBehaviour
     #region configurarEdicaoPerfil
     private void configurarEdicaoPerfil()
     {
-        PnlAvatarEdicao.GetComponent<AvatarObj>().PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
-        AvatarEditado = null;
+        PnlAvatarEdicao.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
         TxtEmailInfo.text = Cliente.ClienteLogado.email;
         TxtSenhaInfo.text = string.Empty;
         TxtSenhaInfoConfirmar.text = string.Empty;
         TxtNomeInfo.text = Cliente.ClienteLogado.nome;
         TxtCPFInfo.text = Cliente.ClienteLogado.cpf;
-        TxtIdadeInfo.text = Cliente.ClienteLogado.dataNascimento.ToString("dd/MM/yyyy");
+        TxtIdadeInfo.text = (Cliente.ClienteLogado.dataNascimento != null) ? Convert.ToDateTime(Cliente.ClienteLogado.dataNascimento).ToString("dd/MM/yyyy") : "";
         TxtApelidoInfo.text = Cliente.ClienteLogado.apelido;
         TxtSexoInfo.text = Cliente.ClienteLogado.sexo;
     }
     #endregion
 
     #region MudarAba
-    public void MudarAba(int numeroAba,bool tocarSom = false, GameObject objClicado = null)
+    public void MudarAba(int numeroAba, bool tocarSom = false, GameObject objClicado = null)
     {
-        if (tocarSom)
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
-        AnimacoesTween.AnimarObjeto(
-            objClicado, 
-            AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        if (EventSystem.current.currentSelectedGameObject == objClicado)
         {
+            if (tocarSom)
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+            BtnSalvarInfo.gameObject.SetActive((numeroAba == 0) ? true : false);
             PnlAbasEdicao.ForEach(x => x.SetActive(false));
             PnlAbasEdicao[numeroAba].SetActive(true);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+
+            AnimacoesTween.AnimarObjeto(
+                objClicado,
+                AnimacoesTween.TiposAnimacoes.Button_Click, null,
+                AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        }
+        else
+        {
+            PnlAbasEdicao.ForEach(x => x.SetActive(false));
+            PnlAbasEdicao[0].SetActive(true);
+        }
     }
     #endregion
 
+    #region PreencherAvatares
+    public void PreencherAvatares()
+    {
+        PnlAvatar.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
+        PnlAvatarInfo.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
+        PnlAvatarEdicao.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
+    }
+    #endregion
 
 
 
     //------------------------------------------------------------------------------------
     #region "TO DO - ARRUMAR"
 
-    public void PreencherAvatares()
-    {
-        PnlAvatar.GetComponent<AvatarObj>().PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
-        PnlAvatarInfo.GetComponent<AvatarObj>().PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
-    }
-
-    public void BtnSalvarEdicaoPerfil()
-    {
-        salvarPerfil();
-    }
-
-    public void AlterarAvatar(Cliente.Avatar avatar)
-    {
-        AvatarEditado = avatar;
-
-        PnlAvatarEdicao.GetComponent<AvatarObj>().PreencherInfo(TxtSexoInfo.text, AvatarEditado);
-    }
-
     private void salvarPerfil()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        Cliente.ClienteLogado.dataNascimento = Convert.ToDateTime(Util.formatarDataParaAPI(TxtIdadeInfo.text));
-        Cliente.ClienteLogado.nome = TxtNomeInfo.text;
-
-        Cliente.ClienteLogado.avatar = AvatarEditado ?? Cliente.ClienteLogado.avatar;
-
-        WWWForm form = new WWWForm();
-        form.AddField("_id", Cliente.ClienteLogado._id);
-        form.AddField("password", Cliente.ClienteLogado.password);
-        form.AddField("dataNascimento", Util.formatarDataParaAPI(TxtIdadeInfo.text));
-        form.AddField("nome", Cliente.ClienteLogado.nome);
-        form.AddField("endereco", JsonConvert.SerializeObject(Cliente.ClienteLogado.endereco));
-        form.AddField("avatar", JsonConvert.SerializeObject(Cliente.ClienteLogado.avatar));
-
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteAlterar, form,
-        (response) =>
+        Dictionary<string, string> data = new Dictionary<string, string>
         {
-            APIManager.Retorno<string> retornoAPI = new APIManager.Retorno<string>();
-            retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+            { "nome", TxtNomeInfo.text },
+            { "cpf", TxtCPFInfo.text },
+            { "dataNascimento", Util.formatarDataParaAPI(TxtIdadeInfo.text) }
+        };
 
-            if (retornoAPI.sucesso)
-            {
-                PreencherAvatares();
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-            }
-            else
-            {
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-            }
-        },
-        (error) =>
+        StartCoroutine(ClienteAPI.ClienteAlterar(data,
+        (response, error) =>
         {
-            //TODO: Tratar Error
+            if (error != null)
+            {
+                Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+
+                return;
+            }
+
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaResponse(response));
+
+            Cliente.ClienteLogado.cpf = TxtCPFInfo.text;
+            Cliente.ClienteLogado.dataNascimento = Convert.ToDateTime(Util.formatarDataParaAPI(TxtIdadeInfo.text));
+            Cliente.ClienteLogado.nome = TxtNomeInfo.text;
+
         }));
     }
 

@@ -1,4 +1,6 @@
 ﻿using APIModel;
+using Network;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,6 +13,7 @@ public class EdicaoChar : MonoBehaviour
     [Header("Button")]
     public Button BtnAleatorio;
     public Button BtnFechar;
+    public Button BtnFecharCriacao;
     public Button BtnSalvar;
 
     [Header("Toggle")]
@@ -51,7 +54,6 @@ public class EdicaoChar : MonoBehaviour
 
     private string cenaAtiva;
     private string sexo;
-    private Cliente.Avatar avatar;
 
     private void Awake()
     {
@@ -63,7 +65,7 @@ public class EdicaoChar : MonoBehaviour
         preencherCoresPele();
         carregarDados();
 
-        PnlCharacter.PreencherInfo(sexo, avatar);
+        PnlCharacter.PreencherInfo(sexo, Cliente.ClienteLogado.avatar);
 
         if (sexo == "Masculino")
             BtnSexoMasc.isOn = true;
@@ -77,17 +79,19 @@ public class EdicaoChar : MonoBehaviour
     private void configurarListener()
     {
         BtnAleatorio.onClick.AddListener(() => btnAleatorio());
-        BtnFechar.onClick.AddListener(() => btnFechar());
+        BtnFechar.onClick.AddListener(() => btnFechar(false));
+        BtnFecharCriacao.onClick.AddListener(() => btnFechar(true));
+        BtnSalvar.onClick.AddListener(() => btnSalvarAlteracao());
 
-        BtnCabeca.onValueChanged.AddListener((result) => btnTrocarItem("cabeca", BtnCabeca.gameObject));
-        BtnOlhos.onValueChanged.AddListener((result) => btnTrocarItem("olhos", BtnOlhos.gameObject));
-        BtnBoca.onValueChanged.AddListener((result) => btnTrocarItem("boca", BtnBoca.gameObject));
-        BtnNariz.onValueChanged.AddListener((result) => btnTrocarItem("nariz", BtnNariz.gameObject));
-        BtnBarba.onValueChanged.AddListener((result) => btnTrocarItem("barba", BtnBarba.gameObject));
-        BtnCabeloFrontal.onValueChanged.AddListener((result) => btnTrocarItem("cabeloFrontal", BtnCabeloFrontal.gameObject));
-        BtnCabeloTraseiro.onValueChanged.AddListener((result) => btnTrocarItem("cabeloTraseiro", BtnCabeloTraseiro.gameObject));
-        BtnSombrancelhas.onValueChanged.AddListener((result) => btnTrocarItem("sombrancelhas", BtnSombrancelhas.gameObject));
-        BtnRoupa.onValueChanged.AddListener((result) => btnTrocarItem("roupa", BtnRoupa.gameObject));
+        BtnOlhos.onValueChanged.AddListener((result) => btnTrocarItem("olhos", BtnOlhos.gameObject, true));
+        BtnBoca.onValueChanged.AddListener((result) => btnTrocarItem("boca", BtnBoca.gameObject, true));
+        BtnNariz.onValueChanged.AddListener((result) => btnTrocarItem("nariz", BtnNariz.gameObject, true));
+        BtnBarba.onValueChanged.AddListener((result) => btnTrocarItem("barba", BtnBarba.gameObject, true));
+        BtnCabeloFrontal.onValueChanged.AddListener((result) => btnTrocarItem("cabeloFrontal", BtnCabeloFrontal.gameObject, true));
+        BtnCabeloTraseiro.onValueChanged.AddListener((result) => btnTrocarItem("cabeloTraseiro", BtnCabeloTraseiro.gameObject, true));
+        BtnSombrancelhas.onValueChanged.AddListener((result) => btnTrocarItem("sombrancelhas", BtnSombrancelhas.gameObject, true));
+        BtnRoupa.onValueChanged.AddListener((result) => btnTrocarItem("roupa", BtnRoupa.gameObject, true));
+        BtnCabeca.onValueChanged.AddListener((result) => btnTrocarItem("cabeca", BtnCabeca.gameObject, true));
 
         BtnCorPele.onValueChanged.AddListener((result) => btnAlterarCor("pele", true, BtnCorPele.gameObject));
         BtnCorBarba.onValueChanged.AddListener((result) => btnAlterarCor("cabelo", true, BtnCorBarba.gameObject));
@@ -157,18 +161,33 @@ public class EdicaoChar : MonoBehaviour
 
         if (cenaAtiva == "Login")
         {
-            sexo = FindObjectOfType<Login>().PnlAvatar.Sexo;
-            avatar = FindObjectOfType<Login>().PnlAvatar.Avatar;
+            Login login = FindObjectOfType<Login>();
+            sexo = login.PnlAvatar.Sexo;
+
+            Cliente.ClienteLogado = new Cliente.Dados
+            {
+                avatar = login.PnlAvatar.Avatar
+            };
+
+            BtnFecharCriacao.gameObject.SetActive(true);
+            BtnFechar.gameObject.SetActive(false);
+            BtnSalvar.gameObject.SetActive(false);
 
             return;
         }
 
         if (cenaAtiva == "Main")
         {
+
             PnlSexo.SetActive(false);
-            Cliente.Avatar novoAvatar = FindObjectOfType<MenuUsuario>().AvatarEditado;
             sexo = Cliente.ClienteLogado.sexo;
-            avatar = novoAvatar ?? Cliente.ClienteLogado.avatar;
+
+            BtnFecharCriacao.gameObject.SetActive(false);
+            BtnFechar.gameObject.SetActive(true);
+            BtnSalvar.gameObject.SetActive(true);
+
+            BtnBarbaItem.SetActive((sexo == "Masculino") ? true : false);
+            BtnBarbaCor.SetActive((sexo == "Masculino") ? true : false);
             return;
         }
     }
@@ -177,17 +196,17 @@ public class EdicaoChar : MonoBehaviour
     #region descarregaDados
     private void descarregaDados()
     {
-        this.avatar = PnlCharacter.Avatar;
-
         if (cenaAtiva == "Login")
         {
-            FindObjectOfType<Login>().AlterarAvatar(sexo, avatar);
+            Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
+
+            FindObjectOfType<Login>().AlterarAvatar(sexo, Cliente.ClienteLogado.avatar);
             return;
         }
 
         if (cenaAtiva == "Main")
         {
-            FindObjectOfType<MenuUsuario>().AlterarAvatar(avatar);
+            FindObjectOfType<MenuUsuario>().PreencherAvatares();
             return;
         }
     }
@@ -196,62 +215,77 @@ public class EdicaoChar : MonoBehaviour
     #region btnAlterarSexo
     private void btnAlterarSexo(string sexo, bool tocarSom = false, GameObject objClicado = null)
     {
-        if (tocarSom)
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        BtnBarbaItem.SetActive((sexo == "Masculino") ? true : false);
+        BtnBarbaCor.SetActive((sexo == "Masculino") ? true : false);
 
-        AnimacoesTween.AnimarObjeto(objClicado,
-            AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-            {
-                this.sexo = sexo;
-                BtnCorPele.isOn = true;
-                BtnBarbaItem.SetActive((sexo == "Masculino") ? true : false);
-                BtnBarbaCor.SetActive((sexo == "Masculino") ? true : false);
-                PnlCharacter.PreencherInfo(sexo, avatar);
-                carregarItensDoPersonagem(_modulo, true);
-            },
-            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        if (EventSystem.current.currentSelectedGameObject == objClicado)
+        {
+            if (tocarSom)
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+            AnimacoesTween.AnimarObjeto(objClicado,
+                AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+                {
+                    this.sexo = sexo;
+                    BtnCorPele.isOn = true;
+                    PnlCharacter.PreencherInfo(sexo, PnlCharacter.Avatar);
+
+                    carregarItensDoPersonagem(_modulo, true);
+                },
+                AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        }
     }
     #endregion
 
     #region btnAlterarCor
     private void btnAlterarCor(string opcao, bool tocarSom = false, GameObject objClicado = null)
     {
-        if (tocarSom)
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        if (EventSystem.current.currentSelectedGameObject == objClicado)
         {
-            PnlOpcaoPeleCor.SetActive((opcao == "pele") ? true : false);
-            PnlOpcaoCabeloCor.SetActive((opcao == "cabelo") ? true : false);
-            PnlOpcaoBarbaCor.SetActive((opcao == "barba" && sexo == "Masculino") ? true : false);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            if (tocarSom)
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+            AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+            {
+                PnlOpcaoPeleCor.SetActive((opcao == "pele") ? true : false);
+                PnlOpcaoCabeloCor.SetActive((opcao == "cabelo") ? true : false);
+                PnlOpcaoBarbaCor.SetActive((opcao == "barba" && sexo == "Masculino") ? true : false);
+            },
+            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        }
     }
     #endregion
 
     #region btnTrocarCor
     private void btnTrocarCor(string modulo, string nomeCor, GameObject objClicado)
     {
-        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
+        if (EventSystem.current.currentSelectedGameObject == objClicado)
         {
-            PnlCharacter.TrocarCor(objClicado.GetComponent<Image>().color, nomeCor, modulo);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+            AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
+            {
+                PnlCharacter.TrocarCor(objClicado.GetComponent<Image>().color, nomeCor, modulo);
+            },
+            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        }
     }
     #endregion
 
     #region btnTrocarItem
-    private void btnTrocarItem(string modulo, GameObject objClicado)
+    private void btnTrocarItem(string modulo, GameObject objClicado, bool tocarSom = false)
     {
-        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
-        AnimacoesTween.AnimarObjeto(objClicado.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        if (EventSystem.current.currentSelectedGameObject == objClicado)
         {
-            carregarItensDoPersonagem(modulo);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            if (tocarSom)
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+            AnimacoesTween.AnimarObjeto(objClicado.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+            {
+                carregarItensDoPersonagem(modulo);
+            },
+            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        }
     }
     #endregion
 
@@ -263,24 +297,84 @@ public class EdicaoChar : MonoBehaviour
         AnimacoesTween.AnimarObjeto(BtnAleatorio.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
             PnlCharacter.PreencherInfo(sexo, null);
-            avatar = PnlCharacter.Avatar;
+
             carregarItensDoPersonagem((_modulo == string.Empty) ? "cabeca" : _modulo);
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
     #endregion
 
-    #region btnfechar
-    private void btnFechar()
+    #region btnSalvarAlteracao
+    private void btnSalvarAlteracao()
     {
+
+        Dictionary<string, string> data = new Dictionary<string, string>
+        {
+            {   "corpo", PnlCharacter.Avatar.corpo  },
+            {   "cabeca", PnlCharacter.Avatar.cabeca },
+            {   "nariz", PnlCharacter.Avatar.nariz  },
+            {   "olhos", PnlCharacter.Avatar.olhos  },
+            {   "boca", PnlCharacter.Avatar.boca },
+            {   "roupa", PnlCharacter.Avatar.roupa },
+            {   "cabeloTraseiro", PnlCharacter.Avatar.cabeloTraseiro },
+            {   "cabeloFrontal", PnlCharacter.Avatar.cabeloFrontal },
+            {   "barba", PnlCharacter.Avatar.barba },
+            {   "sombrancelhas", PnlCharacter.Avatar.sombrancelhas },
+            {   "orelha", PnlCharacter.Avatar.orelha },
+            {   "corPele", PnlCharacter.Avatar.corPele },
+            {   "corCabelo", PnlCharacter.Avatar.corCabelo },
+            {   "corBarba", PnlCharacter.Avatar.corBarba }
+        };
+
+        StartCoroutine(AvatarAPI.AvatarAlterar(data,
+        (response, error) =>
+        {
+
+            if (error != null)
+            {
+                Debug.Log(error);
+
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
+            }
+
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Success);
+
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaResponse(response));
+
+            PnlCharacter.Avatar.level = Cliente.ClienteLogado.avatar.level;
+            PnlCharacter.Avatar.exp = Cliente.ClienteLogado.avatar.exp;
+            PnlCharacter.Avatar.expProximoLevel = Cliente.ClienteLogado.avatar.expProximoLevel;
+
+            Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
+
+            fecharCena(true);
+
+        }));
+    }
+    #endregion
+
+    #region btnfechar
+    private void btnFechar(bool estaAlterando)
+    {
+        //Debug.Log(avatar.barba);
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
         AnimacoesTween.AnimarObjeto(BtnFechar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
-            descarregaDados();
-            SceneManager.UnloadSceneAsync("EdicaoChar");
+            fecharCena(estaAlterando);
         },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        AppManager.TEMPO_ANIMACAO_FECHAR_MODAL);
+    }
+    #endregion
+
+    #region fecharCena
+    private void fecharCena(bool estaAlterando)
+    {
+        if (estaAlterando)
+            descarregaDados();
+
+        SceneManager.UnloadSceneAsync("EdicaoChar");
     }
     #endregion
 

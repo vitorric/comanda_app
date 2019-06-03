@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using APIModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -16,11 +17,14 @@ public class APITeste : MonoBehaviour {
 	public void EntrarNoEstabelecimento(){
         Main.Instance.ClienteEstaNoEstabelecimento();
 
-			WWWForm form = new WWWForm();
-			form.AddField("_idCliente", Cliente.ClienteLogado._id);
-			form.AddField("_idEstabelecimento", "5bfd45728ca64e29c8fd7a78"); //na web
+        Dictionary<string, string> data = new Dictionary<string, string>
+        {
+            { "_idCliente", Cliente.ClienteLogado._id },
+            { "_idEstabelecimento", "5bfd45728ca64e29c8fd7a78" } //na web
+        };
 
-            StartCoroutine(APIManager.Instance.Post(APIManager.URLs.EntrarNoEstabelecimento,form, (response) =>
+        StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data, 
+            (response, error) =>
 			{
                 APIManager.Retorno<string> retornoAPI = 
                         JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
@@ -43,11 +47,7 @@ public class APITeste : MonoBehaviour {
 				
 				//StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
 
-			},
-            (error) =>
-            {
-                //TODO: Tratar Error
-            }));
+			}));
     }
 	
 }

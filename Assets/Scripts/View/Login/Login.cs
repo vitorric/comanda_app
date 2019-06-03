@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using APIModel;
 using FirebaseModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -48,8 +49,6 @@ public class Login : MonoBehaviour
     [Header("Cadastro Etapa - 2")]
     public AvatarObj PnlAvatar;
 
-    private Cliente.Avatar avatar;
-
     #region Awake
     void Awake()
     {
@@ -87,10 +86,9 @@ public class Login : MonoBehaviour
 
     #region BtnLogar
     public void BtnLogar()
-    {
+    {       
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
         AnimacoesTween.AnimarObjeto(BtnEntrar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => logar(), AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
-
     }
     #endregion
 
@@ -114,7 +112,7 @@ public class Login : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
-        AnimacoesTween.AnimarObjeto(BtnRecupSenhaVoltar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, 
+        AnimacoesTween.AnimarObjeto(BtnRecupSenhaVoltar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click,
         () => fecharPnlRecuperarSenha(),
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -124,7 +122,7 @@ public class Login : MonoBehaviour
     public void BtnRecuperarSenha()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(BtnRecupSenhaEnviar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, 
+        AnimacoesTween.AnimarObjeto(BtnRecupSenhaEnviar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click,
         () => recuperarSenha(),
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -134,8 +132,8 @@ public class Login : MonoBehaviour
     public void BtnCadastrarAvantarEtapa(int etapa, GameObject objClicado)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click, 
-            () => avancarEtapa(etapa), 
+        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click,
+            () => avancarEtapa(etapa),
             AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
     #endregion
@@ -144,7 +142,7 @@ public class Login : MonoBehaviour
     public void BtnCadastrarVoltar(int etapa, GameObject objClicado)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click, 
+        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click,
         () => voltarEtapa(etapa),
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -154,7 +152,7 @@ public class Login : MonoBehaviour
     public void BtnConfirmarCadastro()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(BtnEtapa2Confirmar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, 
+        AnimacoesTween.AnimarObjeto(BtnEtapa2Confirmar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click,
             () => StartCoroutine(cadastrar()),
             AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -164,8 +162,14 @@ public class Login : MonoBehaviour
     public void BtnAbrirEdicaoAvatar()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
         AnimacoesTween.AnimarObjeto(BtnEdicaoAvatar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
+            if (SceneManager.GetSceneByName("EdicaoChar").isLoaded)
+            {
+                return;
+            }
+
             SceneManager.LoadSceneAsync("EdicaoChar", LoadSceneMode.Additive);
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
@@ -179,11 +183,14 @@ public class Login : MonoBehaviour
     #region ChkChanged
     public void ChkChanged(GameObject objClicado, bool tocarSom = false)
     {
-        if (tocarSom)
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        if (UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == objClicado)
+        {
+            if (tocarSom)
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        PnlAvatar.PreencherInfo((BtnSexoMasc.isOn) ? "Masculino" : "Feminino", avatar);
-        avatar = PnlAvatar.Avatar;
+            PnlAvatar.PreencherInfo((BtnSexoMasc.isOn) ? "Masculino" : "Feminino", PnlAvatar.Avatar);
+            //avatar = PnlAvatar.Avatar;
+        }
     }
     #endregion
 
@@ -196,44 +203,37 @@ public class Login : MonoBehaviour
     {
         if (TxtEmail.text == string.Empty || TxtSenha.text == string.Empty)
         {
-            Debug.Log("vazios campos");
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(Alerta.MsgAlerta.PreenchaOsCampos, comunicadorAPI.PnlPrincipal));
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
             return;
         }
-        Debug.Log(Util.GerarHashMd5(TxtSenha.text));
-        WWWForm form = new WWWForm();
-        form.AddField("email", TxtEmail.text);
-        form.AddField("password", Util.GerarHashMd5(TxtSenha.text));
+
+        Dictionary<string, string> form = new Dictionary<string, string>
+        {
+            { "email", TxtEmail.text },
+            { "password", Util.GerarHashMd5(TxtSenha.text) }
+        };
 
         AppManager.Instance.AtivarLoader();
 
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteLogin, form,
-        (response) =>
+        StartCoroutine(ClienteAPI.ClienteLogin(form,
+        (response, error) =>
         {
-            APIManager.Retorno<Cliente.SessaoCliente> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<Cliente.SessaoCliente>>(response);
-
-            if (retornoAPI.sucesso)
+            if (error != null)
             {
-                Cliente.GravarSession(retornoAPI.retorno.token, retornoAPI.retorno._id,
-                    JsonConvert.SerializeObject(new Cliente.Credenciais
-                    {
-                        email = TxtEmail.text,
-                        password = Util.GerarHashMd5(TxtSenha.text)
-                    }));
-
-                buscarClienteNoFireBase();
+                Debug.Log(error);
+                AppManager.Instance.DesativarLoaderAsync();
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
                 return;
             }
 
-            AppManager.Instance.DesativarLoader();
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-        },
-        (error) =>
-        {
-            AppManager.Instance.DesativarLoader();
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(error, comunicadorAPI.PnlPrincipal));
+            Cliente.GravarSession(response.token, response._id,
+                JsonConvert.SerializeObject(new Cliente.Credenciais
+                {
+                    email = TxtEmail.text,
+                    password = Util.GerarHashMd5(TxtSenha.text)
+                }));
+
+            buscarClienteNoFireBase();
         }));
 
     }
@@ -245,29 +245,32 @@ public class Login : MonoBehaviour
 
         if (TxtEmailRecSenha.text == string.Empty)
         {
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(Alerta.MsgAlerta.PreenchaOsCampos, comunicadorAPI.PnlPrincipal));
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
             return;
         }
 
-        WWWForm form = new WWWForm();
-        form.AddField("email", TxtEmailRecSenha.text);
-
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteRecuperarSenha, form,
-        (response) =>
+        Dictionary<string, string> form = new Dictionary<string, string>
         {
-            APIManager.Retorno<string> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+            { "email", TxtEmailRecSenha.text }
+        };
 
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-
-            if (retornoAPI.sucesso)
+        StartCoroutine(ClienteAPI.ClienteRecuperarSenha(form,
+        (response, error) =>
+        {
+            if (error != null)
             {
-                fecharPnlRecuperarSenha();
+
+                Debug.Log(error);
+                AppManager.Instance.DesativarLoaderAsync();
+
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
             }
 
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(response, true));
+
+            fecharPnlRecuperarSenha();
+
         }));
     }
     #endregion
@@ -292,13 +295,13 @@ public class Login : MonoBehaviour
                         TxtApelidoCadastro.text == string.Empty ||
                         TxtNomeCadastro.text == string.Empty)
             {
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(Alerta.MsgAlerta.PreenchaOsCampos, comunicadorAPI.PnlPrincipal));
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
                 return;
             }
 
             if (ValidarSenhas() == false)
             {
-                //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(Alerta.MsgAlerta.SenhasNaoConferem, comunicadorAPI.PnlPrincipal));
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhasNaoConferem, false));
                 return;
             }
         }
@@ -335,44 +338,39 @@ public class Login : MonoBehaviour
     private IEnumerator cadastrar()
     {
         string senha = Util.GerarHashMd5(TxtSenhaCadastro.text);
-        WWWForm form = new WWWForm();
-        form.AddField("email", TxtEmailCadastro.text);
-        form.AddField("password", senha);
-        form.AddField("apelido", TxtApelidoCadastro.text);
-        form.AddField("nome", TxtNomeCadastro.text);
-        form.AddField("sexo", (BtnSexoMasc.isOn) ? "Masculino" : "Feminino");
-        form.AddField("avatar", JsonConvert.SerializeObject(prepararAvatarCadastro()));
+        Dictionary<string, string> data = new Dictionary<string, string>
+        {
+            { "email", TxtEmailCadastro.text },
+            { "password", senha },
+            { "apelido", TxtApelidoCadastro.text },
+            { "nome", TxtNomeCadastro.text },
+            { "sexo", (BtnSexoMasc.isOn) ? "Masculino" : "Feminino" },
+            { "avatar", JsonConvert.SerializeObject(prepararAvatarCadastro()) }
+        };
 
         AppManager.Instance.AtivarLoader();
 
-        yield return StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteCadastrar, form,
-        (response) =>
+        yield return StartCoroutine(ClienteAPI.ClienteCadastrar(data,
+        (response, error) =>
         {
-            APIManager.Retorno<Cliente.SessaoCliente> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<Cliente.SessaoCliente>>(response);
-            Debug.Log(response);
-            if (retornoAPI.sucesso)
+            if (error != null)
             {
-                Cliente.GravarSession(retornoAPI.retorno.token, retornoAPI.retorno._id,
-                JsonConvert.SerializeObject(new Cliente.Credenciais
-                {
-                    email = TxtEmail.text,
-                    password = senha
-                }));
+                Debug.Log(error);
+                AppManager.Instance.DesativarLoaderAsync();
 
-                buscarClienteNoFireBase();
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
                 return;
             }
 
-            AppManager.Instance.DesativarLoader();
+            Cliente.GravarSession(response.token, response._id,
+                JsonConvert.SerializeObject(new Cliente.Credenciais
+                {
+                    email = TxtEmailCadastro.text,
+                    password = senha
+                }));
 
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-        },
-        (error) =>
-        {
-            AppManager.Instance.DesativarLoader();
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(error, comunicadorAPI.PnlPrincipal));
+            buscarClienteNoFireBase();
+            return;
         }));
     }
     #endregion
@@ -383,7 +381,7 @@ public class Login : MonoBehaviour
         ClienteFirebase cliente = new ClienteFirebase();
         Cliente.ClienteLogado = await cliente.ObterUsuario(Cliente.Obter());
 
-        AppManager.Instance.DesativarLoader();
+        AppManager.Instance.DesativarLoaderAsync();
 
         SceneManager.LoadSceneAsync("Main");
     }
@@ -393,20 +391,20 @@ public class Login : MonoBehaviour
     {
         Dictionary<string, object> avatarDic = new Dictionary<string, object>
         {
-            { "corpo", avatar.corpo },
-            { "cabeca", avatar.cabeca },
-            { "nariz", avatar.nariz },
-            { "olhos", avatar.olhos },
-            { "boca", avatar.boca },
-            { "roupa", avatar.roupa },
-            { "cabeloTraseiro", avatar.cabeloTraseiro },
-            { "cabeloFrontal", avatar.cabeloFrontal },
-            { "barba", avatar.barba },
-            { "sombrancelhas", avatar.sombrancelhas },
-            { "orelha", avatar.orelha },
-            { "corPele", avatar.corPele },
-            { "corCabelo", avatar.corCabelo },
-            { "corBarba", avatar.corBarba }
+            { "corpo", PnlAvatar.Avatar.corpo },
+            { "cabeca", PnlAvatar.Avatar.cabeca },
+            { "nariz", PnlAvatar.Avatar.nariz },
+            { "olhos", PnlAvatar.Avatar.olhos },
+            { "boca", PnlAvatar.Avatar.boca },
+            { "roupa", PnlAvatar.Avatar.roupa },
+            { "cabeloTraseiro", PnlAvatar.Avatar.cabeloTraseiro },
+            { "cabeloFrontal", PnlAvatar.Avatar.cabeloFrontal },
+            { "barba", PnlAvatar.Avatar.barba },
+            { "sombrancelhas", PnlAvatar.Avatar.sombrancelhas },
+            { "orelha", PnlAvatar.Avatar.orelha },
+            { "corPele", PnlAvatar.Avatar.corPele },
+            { "corCabelo", PnlAvatar.Avatar.corCabelo },
+            { "corBarba", PnlAvatar.Avatar.corBarba }
         };
 
         return avatarDic;
@@ -430,9 +428,7 @@ public class Login : MonoBehaviour
         BtnSexoMasc.isOn = true;
         BtnSexoFem.isOn = false;
 
-        avatar = null;
         PnlAvatar.PreencherInfo("Masculino", null);
-        avatar = PnlAvatar.Avatar;
     }
     #endregion
 
@@ -449,7 +445,6 @@ public class Login : MonoBehaviour
     #region AlterarAvatar
     public void AlterarAvatar(string sexo, Cliente.Avatar avatar)
     {
-        this.avatar = avatar;
         PnlAvatar.PreencherInfo(sexo, avatar);
 
         if (sexo == "Masculino")

@@ -10,6 +10,7 @@ public class EasyAudioUtility : MonoBehaviour
         Click_OK,
         Click_Cancel,
         Error,
+        Success,
         LevelUp,
         LevelUp2,
         Compra_Item,

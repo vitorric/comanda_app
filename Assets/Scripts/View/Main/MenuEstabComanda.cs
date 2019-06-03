@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using APIModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -61,27 +62,18 @@ public class MenuEstabComanda : MonoBehaviour
     #region obterEstabelecimento
     private void obterEstabelecimento(int aba)
     {
-        WWWForm form = new WWWForm();
-        form.AddField("_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento);
-
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ObterEstabelecimento, form, (response) =>
+        Dictionary<string, string> form = new Dictionary<string, string>
         {
-            APIManager.Retorno<Estabelecimento> retornoAPI =
-                       JsonConvert.DeserializeObject<APIManager.Retorno<Estabelecimento>>(response);
+            { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
+        };
 
-            if (retornoAPI.sucesso)
-            {
-                Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(retornoAPI.retorno, false, aba);
-            }
-            else
-            {
+        StartCoroutine(EstabelecimentoAPI.ObterEstabelecimento(form, 
+        (response, error) =>
+        {
+                Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(response, false, aba);
+            
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                 //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-            }
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
         }));
     }
     #endregion
@@ -93,12 +85,15 @@ public class MenuEstabComanda : MonoBehaviour
 
         AnimacoesTween.AnimarObjeto(BtnSairEstabelecimento.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
-            WWWForm form = new WWWForm();
-            form.AddField("_idCliente", Cliente.ClienteLogado._id);
-            form.AddField("_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento);
+            Dictionary<string, string> form = new Dictionary<string, string>
+            {
+                { "_idCliente", Cliente.ClienteLogado._id },
+                { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
+            };
 
-            StartCoroutine(APIManager.Instance.Post(APIManager.URLs.SairDoEstabelecimento, form,
-            (response) =>
+            StartCoroutine(ClienteAPI.SairDoEstabelecimento(
+            form,
+            (response, error) =>
             {
                 APIManager.Retorno<string> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
 
@@ -115,10 +110,6 @@ public class MenuEstabComanda : MonoBehaviour
                     EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                     //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
                 }
-            },
-            (error) =>
-            {
-                //TODO: Tratar Error
             }));
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using APIModel;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -55,7 +56,6 @@ namespace Network
         }
         #endregion
 
-
         #region ObterEstabelecimento
         public static IEnumerator ObterEstabelecimento(
                 Dictionary<string, string> properties,
@@ -101,5 +101,6 @@ namespace Network
             return null;
         }
         #endregion
+
     }
 }

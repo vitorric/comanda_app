@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using APIModel;
 using BarcodeScanner;
 using BarcodeScanner.Scanner;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -61,13 +62,15 @@ public class LeitoQRCode : MonoBehaviour {
 			PnlLoading.SetActive(true);
 			
 			EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
-            
-			WWWForm form = new WWWForm();
-			form.AddField("_idCliente", Cliente.ClienteLogado._id);
-			form.AddField("_idEstabelecimento", barCodeValue);
 
-            StartCoroutine(APIManager.Instance.Post(APIManager.URLs.EntrarNoEstabelecimento,form, 
-            (response) =>
+            Dictionary<string, string> data = new Dictionary<string, string>
+            {
+                { "_idCliente", Cliente.ClienteLogado._id },
+                { "_idEstabelecimento", barCodeValue }
+            };
+
+            StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data, 
+            (response, error) =>
 			{
                 APIManager.Retorno<string> retornoAPI = 
                     JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
@@ -94,11 +97,7 @@ public class LeitoQRCode : MonoBehaviour {
 				}
 				
 				//StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));                
-			},
-            (error) =>
-            {
-                //TODO: Tratar Error
-            }));
+			}));
             
             //TextHeader.text += "Found: " + barCodeType + " / " + barCodeValue + "\n";
 

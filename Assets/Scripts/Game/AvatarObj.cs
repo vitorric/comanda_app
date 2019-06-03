@@ -29,9 +29,33 @@ public class AvatarObj : MonoBehaviour
     public string Sexo;
     public Cliente.Avatar Avatar = null;
 
-    public void PreencherInfo(string Sexo, Cliente.Avatar Avatar)
+    public void PreencherInfo(string Sexo, Cliente.Avatar avatar)
     {
-        this.Avatar = Avatar;
+        if (avatar != null)
+        {
+            this.Avatar = new Cliente.Avatar
+            {
+                corpo = avatar.corpo,
+                cabeca = avatar.cabeca,
+                nariz = avatar.nariz,
+                olhos = avatar.olhos,
+                boca = avatar.boca,
+                roupa = avatar.roupa,
+                cabeloTraseiro = avatar.cabeloTraseiro,
+                cabeloFrontal = avatar.cabeloFrontal,
+                barba = avatar.barba,
+                sombrancelhas = avatar.sombrancelhas,
+                orelha = avatar.orelha,
+                corPele = avatar.corPele,
+                corCabelo = avatar.corCabelo,
+                corBarba = avatar.corBarba
+            };
+        }
+        else
+        {
+            Avatar = null;
+        }
+
         this.Sexo = Sexo;
 
         if (this.Avatar == null)
@@ -131,7 +155,7 @@ public class AvatarObj : MonoBehaviour
 
         CabeloFrontal.enabled = (Avatar.cabeloFrontal == string.Empty) ? false : true;
         CabeloTraseiro.enabled = (Avatar.cabeloTraseiro == string.Empty) ? false : true;
-        
+
         Barba.enabled = (Avatar.barba == string.Empty || Sexo == "Feminino") ? false : true;
 
         CabeloFrontal.texture = Resources.Load<Texture2D>("Character/" + Sexo + "/cabeloFrontal/Habilitado/" + Avatar.cabeloFrontal);

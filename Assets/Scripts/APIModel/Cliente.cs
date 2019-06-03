@@ -27,7 +27,8 @@ namespace APIModel
             public string nome;
             public string apelido;
             public string password;
-            public DateTime dataNascimento;
+            public string chaveAmigavel;
+            public DateTime? dataNascimento;
             public string cpf;
             public string sexo;
             public int goldGeral;
@@ -166,14 +167,14 @@ namespace APIModel
 
         public static void GravarSession(string session, string _id, string credenciais)
         {
-            PlayerPrefs.SetString("session_token_cliente", session);
+            PlayerPrefs.SetString("session_token_cliente", "Bearer " + session);
             PlayerPrefs.SetString("session_cliente", _id);
             PlayerPrefs.SetString("credenciais_cliente", credenciais);
         }
 
         public static void RefazerToken(string session)
         {
-            PlayerPrefs.SetString("session_token_cliente", session);
+            PlayerPrefs.SetString("session_token_cliente", "Bearer " + session);
         }
 
         public static string ObterToken()

@@ -72,30 +72,4 @@ public class APIManager : MonoBehaviour
         public string msg;
         public T retorno;
     }
-
-    public IEnumerator Post(URLs url, 
-                            WWWForm form, 
-                            Action<string> onFinished,
-                            Action<string> onError)
-    {
-        using (UnityWebRequest webRequest = UnityWebRequest.Post(uRls[url], form))
-        {
-
-            webRequest.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            webRequest.SetRequestHeader("Accept", "application/x-www-form-urlencoded");
-            webRequest.SetRequestHeader("Authorization", Cliente.ObterToken());
-
-            yield return webRequest.SendWebRequest();
-
-            if (webRequest.isHttpError || webRequest.isNetworkError)
-            {
-                Debug.LogError("ERROR: " + webRequest.responseCode + " - " + webRequest.error);
-                onError("Ops, alguma coisa aconteceu de errada!");
-                yield break;
-            }
-
-            onFinished(webRequest.downloadHandler.text);
-        }
-    }
-
 }

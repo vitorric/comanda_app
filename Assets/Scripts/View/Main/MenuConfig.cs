@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using APIModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -52,7 +53,10 @@ public class MenuConfig : MonoBehaviour
     private void configurarListener()
     {
         BtnMenuConfig.onClick.AddListener(() => BtnAbrirConfiguracoes());
-        BtnAppConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigApp, null));
+        BtnAppConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigApp, () =>
+        {
+            BtnAbrirConfiguracoes(true);
+        }));
         BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
         BtnSairApp.onClick.AddListener(() => btnDeslogar());
 
@@ -101,31 +105,28 @@ public class MenuConfig : MonoBehaviour
             Cliente.ClienteLogado.configApp.somFundo = SliderSomFundo.value;
             Cliente.ClienteLogado.configApp.somGeral = SliderSomGeral.value;
 
-            WWWForm form = new WWWForm();
-            form.AddField("_id", Cliente.ClienteLogado._id);
-            form.AddField("configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp));
-
-            StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ClienteAlterarConfigApp, form, (response) =>
+            Dictionary<string, string> form = new Dictionary<string, string>
             {
-                APIManager.Retorno<string> retornoAPI =
-                        JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+                { "_id", Cliente.ClienteLogado._id },
+                { "configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp) }
+            };
 
-                if (retornoAPI.sucesso)
-                {
-                    //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-
-                    Main.Instance.PnlPopUp.SetActive(false);
-                    PnlConfigApp.SetActive(false);
-                }
-                else
-                {
-                    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                    //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-                }
-            },
-            (error) =>
+            StartCoroutine(ClienteAPI.ClienteAlterarConfigApp(form,
+            (response, error) =>
             {
-                //TODO: Tratar Error
+                if (error != null)
+                {
+                    Debug.Log(error);
+
+                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    return;
+                }
+
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaResponse(response));
+
+                Main.Instance.PnlPopUp.SetActive(false);
+
+                PnlConfigApp.SetActive(false);
             }));
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);

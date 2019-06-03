@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using APIModel;
 using FirebaseModel;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -70,7 +71,7 @@ public class Main : MonoBehaviour
     private void iniciarWatchsFirebase()
     {
         ClienteFirebase clienteFirebase = new ClienteFirebase();
-        clienteFirebase.IniciarWatch();
+        clienteFirebase.IniciarWatch(Cliente.ClienteLogado._id);
     }
     #endregion
 
@@ -107,48 +108,35 @@ public class Main : MonoBehaviour
 
     private void atualizarAvatarNoBanco()
     {
-        WWWForm form = new WWWForm();
-        form.AddField("_id", Cliente.ClienteLogado._id);
-        form.AddField("avatar", JsonConvert.SerializeObject(Cliente.ClienteLogado.avatar));
+        Dictionary<string, string> form = new Dictionary<string, string>();
+        form.Add("_id", Cliente.ClienteLogado._id);
+        form.Add("avatar", JsonConvert.SerializeObject(Cliente.ClienteLogado.avatar));
 
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.AvatarAlterar, form,
-        (response) =>
+        StartCoroutine(AvatarAPI.AvatarAlterar(form,
+        (response, error) =>
         {
-            APIManager.Retorno<string> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
 
-            if (retornoAPI.sucesso)
+            if (response)
             {
                 //sucesso
             }
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
         }));
     }
 
-    public void ResgatarConquistasUsuario(List<Estabelecimento.Conquista> conquistas, string _idEstabelecimento)
-    {
-        WWWForm form = new WWWForm();
-        form.AddField("_idCliente", Cliente.ClienteLogado._id);
-        form.AddField("_idEstabelecimento", _idEstabelecimento);
+    //public void ResgatarConquistasUsuario(List<Estabelecimento.Conquista> conquistas, string _idEstabelecimento)
+    //{
+    //    Dictionary<string, string> form = new Dictionary<string, string>
+    //    {
+    //        { "_idCliente", Cliente.ClienteLogado._id },
+    //        { "_idEstabelecimento", _idEstabelecimento }
+    //    };
 
-        StartCoroutine(APIManager.Instance.Post(APIManager.URLs.ListarClienteConquistas, form,
-        (response) =>
-        {
-            APIManager.Retorno<List<Cliente.Conquista>> retornoAPI =
-                JsonConvert.DeserializeObject<APIManager.Retorno<List<Cliente.Conquista>>>(response);
-
-            if (retornoAPI.sucesso)
-            {
-                Instance.MenuEstabelecimento.IniciarConquistas(conquistas, retornoAPI.retorno, _idEstabelecimento);
-            }
-        },
-        (error) =>
-        {
-            //TODO: Tratar Error
-        }));
-    }
+    //    //StartCoroutine(ClienteAPI.ListarClienteConquistas(form,
+    //    //(response, error) =>
+    //    //{
+    //    //    Instance.MenuEstabelecimento.IniciarConquistas(conquistas, response, _idEstabelecimento);
+    //    //}));
+    //}
     #endregion
 
     #region Manipular Componentes
@@ -252,11 +240,14 @@ public class Main : MonoBehaviour
         {
             PnlDecisao.AbrirPainelConviteEstab(() =>
             {
-                WWWForm form = new WWWForm();
-                form.AddField("_idCliente", Cliente.ClienteLogado._id);
-                form.AddField("_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento); //na web
+                Dictionary<string, string> form = new Dictionary<string, string>
+                {
+                    { "_idCliente", Cliente.ClienteLogado._id },
+                    { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento } //na web
+                };
 
-                StartCoroutine(APIManager.Instance.Post(APIManager.URLs.EntrarNoEstabelecimento, form, (response) =>
+                StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(form,
+                (response, error) =>
                 {
                     APIManager.Retorno<string> retornoAPI =
                         JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
@@ -269,15 +260,16 @@ public class Main : MonoBehaviour
                     {
                         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                     }
-                },
-                (error) => { }));
+                }));
             },
             () =>
             {
-                WWWForm form = new WWWForm();
-                form.AddField("_idCliente", Cliente.ClienteLogado._id);
+                Dictionary<string, string> form = new Dictionary<string, string>
+                {
+                    { "_idCliente", Cliente.ClienteLogado._id }
+                };
 
-                StartCoroutine(APIManager.Instance.Post(APIManager.URLs.RecusarConviteEstabelecimento, form, (response) =>
+                StartCoroutine(ClienteAPI.RecusarConviteEstabelecimento(form, (response, error) =>
                 {
                     APIManager.Retorno<string> retornoAPI =
                         JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
@@ -290,8 +282,7 @@ public class Main : MonoBehaviour
                     {
                         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                     }
-                },
-                (error) => { }));
+                }));
             },
             Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento);
 
