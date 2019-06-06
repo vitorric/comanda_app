@@ -61,27 +61,35 @@ public class EasyAudioUtility : MonoBehaviour
         string sound = som.ToString();
 
         EasyAudioUtility_Helper h = Array.Find(helper, item => item.name == sound);
-        //randomizing volume by variation
-        h.source.volume = h.volume;
-        //randomizing pitch by variation
-        h.source.pitch = h.pitch;
 
-        //playing it after setting all variations
-        if (h.source.enabled)
-            h.source.Play();
+        if (h != null)
+        {
+            //randomizing volume by variation
+            h.source.volume = h.volume;
+            //randomizing pitch by variation
+            h.source.pitch = h.pitch;
+
+            //playing it after setting all variations
+            if (h.source.enabled)
+                h.source.Play();
+        }
     }
 
-    public void AjustarSomBG(float volume){
-        
+    public void AjustarSomBG(float volume)
+    {
+
         EasyAudioUtility_Helper h = Array.Find(helper, item => item.name == Som.Background.ToString());
 
         h.source.volume = volume * (1f + UnityEngine.Random.Range(-h.volumeVariance / 2f, h.volumeVariance / 2f));
     }
 
-    public void AjustarSomSFX(float volume){
-        
-        Array.ForEach(helper, item => {
-            if (item.name != Som.Background.ToString())   {
+    public void AjustarSomSFX(float volume)
+    {
+
+        Array.ForEach(helper, item =>
+        {
+            if (item.name != Som.Background.ToString())
+            {
                 item.volume = volume * (1f + UnityEngine.Random.Range(-item.volumeVariance / 2f, item.volumeVariance / 2f));
             }
         });

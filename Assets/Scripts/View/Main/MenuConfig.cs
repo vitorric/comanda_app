@@ -122,7 +122,7 @@ public class MenuConfig : MonoBehaviour
                     return;
                 }
 
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaResponse(response));
+                AlertaManager.Instance.IniciarAlerta(response);
 
                 Main.Instance.PnlPopUp.SetActive(false);
 

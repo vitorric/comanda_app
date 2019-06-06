@@ -15,6 +15,7 @@ namespace APIModel
         public string descricao;
         public DateTime tempoDuracao;
         public string estabelecimento;
+        public bool emGrupo;
         public Objetivo objetivo;
 
         public partial class Objetivo

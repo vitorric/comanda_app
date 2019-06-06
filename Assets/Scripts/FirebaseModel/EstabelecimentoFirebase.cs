@@ -11,32 +11,49 @@ public class EstabelecimentoFirebase
     public enum TipoAcao
     {
         Adicionar,
-        Modificar
+        Modificar,
+        Remover
     }
 
-    public Action<List<ItemLoja>, TipoAcao> AcaoItemLoja;
+    public Action<ItemLoja, TipoAcao> AcaoItemLoja;
+    public Action<Desafio, TipoAcao> AcaoDesafio;
 
     public void Watch_TelaEstabelecimento(string estabelecimentoId, bool ehParaAdicionar)
     {
-        var estabelecimentos = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId);
+        var estabelecimentosLoja = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId + "/itensLoja");
+        var estabelecimentosDesafios = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId + "/desafios");
 
         if (ehParaAdicionar)
         {
-            estabelecimentos.ChildAdded += itensLojaAdicionar;
-            estabelecimentos.ChildChanged += itensLojaModificar;
+            estabelecimentosLoja.ChildAdded += itensLojaAdicionar;
+            estabelecimentosLoja.ChildChanged += itensLojaModificar;
+            estabelecimentosLoja.ChildRemoved += itensLojaRemover;
+
+            estabelecimentosDesafios.ChildAdded += desafioAdicionar;
+            estabelecimentosDesafios.ChildChanged += desafioModificar;
+            estabelecimentosDesafios.ChildRemoved += desafioRemover;
+
             return;
         }
 
         if (!ehParaAdicionar)
         {
-            estabelecimentos.ChildAdded -= itensLojaAdicionar;
-            estabelecimentos.ChildChanged -= itensLojaModificar;
+            estabelecimentosLoja.ChildAdded -= itensLojaAdicionar;
+            estabelecimentosLoja.ChildChanged -= itensLojaModificar;
+            estabelecimentosLoja.ChildChanged -= itensLojaRemover;
+
+            estabelecimentosDesafios.ChildAdded -= desafioAdicionar;
+            estabelecimentosDesafios.ChildChanged -= desafioModificar;
+            estabelecimentosDesafios.ChildRemoved -= desafioRemover;
             AcaoItemLoja = null;
+            AcaoDesafio = null;
             return;
         }
     }
-    #region Watch - configClienteAtual
 
+    #region AcoesItemLoja
+
+    #region itensLojaAdicionar
     private void itensLojaAdicionar(object sender, ChildChangedEventArgs e)
     {
         if (e.DatabaseError != null)
@@ -47,7 +64,7 @@ public class EstabelecimentoFirebase
 
         try
         {
-            AcaoItemLoja(tratarSnapshot(e.Snapshot.Children), TipoAcao.Adicionar);
+            AcaoItemLoja(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Adicionar);
         }
         catch (Exception x)
         {
@@ -55,6 +72,9 @@ public class EstabelecimentoFirebase
             throw x;
         }
     }
+    #endregion
+
+    #region itensLojaModificar
     private void itensLojaModificar(object sender, ChildChangedEventArgs e)
     {
         if (e.DatabaseError != null)
@@ -65,7 +85,7 @@ public class EstabelecimentoFirebase
 
         try
         {
-            AcaoItemLoja(tratarSnapshot(e.Snapshot.Children), TipoAcao.Modificar);
+            AcaoItemLoja(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Modificar);
         }
         catch (Exception x)
         {
@@ -73,32 +93,141 @@ public class EstabelecimentoFirebase
             throw x;
         }
     }
+    #endregion
 
-    private List<ItemLoja> tratarSnapshot(IEnumerable<DataSnapshot> dataSnapshots)
+    #region itensLojaRemover
+    private void itensLojaRemover(object sender, ChildChangedEventArgs e)
     {
-        List<ItemLoja> lstItensLoja = new List<ItemLoja>();
-
-        foreach (DataSnapshot ds in dataSnapshots)
+        if (e.DatabaseError != null)
         {
-            lstItensLoja.Add(
-                new ItemLoja
-                {
-                    _id = Convert.ToString(ds.Child("_id").Value),
-                    descricao = Convert.ToString(ds.Child("descricao").Value),
-                    icon = Convert.ToString(ds.Child("icon").Value),
-                    nome = Convert.ToString(ds.Child("nome").Value),
-                    hotSale = Convert.ToBoolean(ds.Child("hotSale").Value),
-                    preco = Convert.ToDouble(ds.Child("preco").Value),
-                    quantidadeDisponivel = Convert.ToInt32(ds.Child("quantidadeDisponivel").Value),
-                    quantidadeVendida = Convert.ToInt32(ds.Child("quantidadeVendida").Value),
-                    tempoDisponivel = Convert.ToDateTime(ds.Child("tempoDisponivel").Value)
-                }
-            );
+            Debug.LogError(e.DatabaseError.Message);
+            return;
         }
 
-        return lstItensLoja;
+        try
+        {
+            AcaoItemLoja(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Remover);
+        }
+        catch (Exception x)
+        {
+            Debug.LogError(x.Message);
+            throw x;
+        }
     }
+    #endregion
+
+    #region tratarSnapshotItemLoja
+    private ItemLoja tratarSnapshotItemLoja(DataSnapshot ds)
+    {
+        ItemLoja itemLoja = new ItemLoja
+        {
+            _id = Convert.ToString(ds.Child("_id").Value),
+            descricao = Convert.ToString(ds.Child("descricao").Value),
+            icon = Convert.ToString(ds.Child("icon").Value),
+            nome = Convert.ToString(ds.Child("nome").Value),
+            hotSale = Convert.ToBoolean(ds.Child("hotSale").Value),
+            preco = Convert.ToDouble(ds.Child("preco").Value),
+            quantidadeDisponivel = Convert.ToInt32(ds.Child("quantidadeDisponivel").Value),
+            quantidadeVendida = Convert.ToInt32(ds.Child("quantidadeVendida").Value),
+            tempoDisponivel = Convert.ToDateTime(ds.Child("tempoDisponivel").Value)
+        };
+
+        return itemLoja;
+    }
+    #endregion
 
     #endregion
 
+
+    #region AcoesDesafio
+
+    #region itensLojaAdicionar
+    private void desafioAdicionar(object sender, ChildChangedEventArgs e)
+    {
+        if (e.DatabaseError != null)
+        {
+            Debug.LogError(e.DatabaseError.Message);
+            return;
+        }
+
+        try
+        {
+            AcaoDesafio(tratarSnapshotDesafio(e.Snapshot), TipoAcao.Adicionar);
+        }
+        catch (Exception x)
+        {
+            Debug.LogError(x.Message);
+        }
+    }
+    #endregion
+
+    #region itensLojaModificar
+    private void desafioModificar(object sender, ChildChangedEventArgs e)
+    {
+        if (e.DatabaseError != null)
+        {
+            Debug.LogError(e.DatabaseError.Message);
+            return;
+        }
+
+        try
+        {
+            AcaoDesafio(tratarSnapshotDesafio(e.Snapshot), TipoAcao.Modificar);
+        }
+        catch (Exception x)
+        {
+            Debug.LogError(x.Message);
+            throw x;
+        }
+    }
+    #endregion
+
+    #region itensLojaRemover
+    private void desafioRemover(object sender, ChildChangedEventArgs e)
+    {
+        if (e.DatabaseError != null)
+        {
+            Debug.LogError(e.DatabaseError.Message);
+            return;
+        }
+
+        try
+        {
+            AcaoDesafio(tratarSnapshotDesafio(e.Snapshot), TipoAcao.Remover);
+        }
+        catch (Exception x)
+        {
+            Debug.LogError(x.Message);
+            throw x;
+        }
+    }
+    #endregion
+
+    #region tratarSnapshotItemLoja
+    private Desafio tratarSnapshotDesafio(DataSnapshot ds)
+    {
+        DataSnapshot dsObjetivo = ds.Child("objetivo");
+
+        Desafio desafio = new Desafio
+        {
+            _id = Convert.ToString(ds.Child("_id").Value),
+            descricao = Convert.ToString(ds.Child("descricao").Value),
+            icon = Convert.ToString(ds.Child("icon").Value),
+            nome = Convert.ToString(ds.Child("nome").Value),
+            premio = Convert.ToInt32(ds.Child("premio").Value),
+            emGrupo = Convert.ToBoolean(ds.Child("emGrupo").Value),
+            tempoDuracao = Convert.ToDateTime(ds.Child("tempoDuracao").Value),
+            objetivo = new Desafio.Objetivo
+            {
+                quantidade = Convert.ToInt32(dsObjetivo.Child("quantidade").Value),
+                tipo = Convert.ToString(dsObjetivo.Child("tipo").Value),
+                produto = Convert.ToString(dsObjetivo.Child("produto").Value)
+            }
+        };
+
+        return desafio;
+    }
+    #endregion
+
+    #endregion
 }

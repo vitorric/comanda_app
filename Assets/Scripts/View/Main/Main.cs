@@ -52,7 +52,7 @@ public class Main : MonoBehaviour
 
         instanciarListener();
 
-        iniciarWatchsFirebase();
+        //iniciarWatchsFirebase();
 
         preencherInfoUsuario();
     }

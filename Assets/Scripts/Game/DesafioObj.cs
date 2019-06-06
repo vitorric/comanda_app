@@ -16,6 +16,7 @@ public class DesafioObj : MonoBehaviour
     public Text TxtDescricaoConquista;
     public Text TxtTempoRestante;
     public Button BtnAbrirDesafioInfo;
+    public List<GameObject> lstImgGrupos;
 
     public RawImage IconPremio;
     public Text TxtPremio;
@@ -34,7 +35,9 @@ public class DesafioObj : MonoBehaviour
 
     //private Estabelecimento.Conquista conquista;
     private bool pararConferenciaTempo = false;
-    private Cliente.Conquista conquistaUsuario;
+
+    //private Cliente.Conquista conquistaUsuario;
+    public Desafio Desafio;
 
     private void Awake()
     {
@@ -51,30 +54,33 @@ public class DesafioObj : MonoBehaviour
     #region Update
     void Update()
     {
-        //if (!pararConferenciaTempo)
-        //{
-        //    pararConferenciaTempo = !rodarRelogio();
-        //    if (pararConferenciaTempo == false)
-        //    {
-        //        TimeSpan data = conquista.tempoDuracao.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
-        //        TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", data.Hours + (data.Days * 24), data.Minutes, data.Seconds);
-        //    }
-        //    else
-        //    {
-        //        pararConferenciaTempo = true;
-        //        configurarPainelAlerta();
-        //    }
-        //}
+        if (!pararConferenciaTempo)
+        {
+            pararConferenciaTempo = !rodarRelogio();
+            if (pararConferenciaTempo == false)
+            {
+                TimeSpan data = Desafio.tempoDuracao.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
+                TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", data.Hours + (data.Days * 24), data.Minutes, data.Seconds);
+            }
+            else
+            {
+                pararConferenciaTempo = true;
+                configurarPainelAlerta();
+            }
+        }
     }
     #endregion
 
     #region PreencherInfo
-    public void PreencherInfo(Desafio conquista, Cliente.Conquista conquistaUsuario, string _idEstabelecimento)
+    public void PreencherInfo(Desafio desafio, string estabelecimentoId)
     {
-        //this.conquista = conquista;
-        //TxtTituloConquista.text = conquista.nome;
-        //TxtDescricaoConquista.text = conquista.descricao;
-        //TxtPremio.text = conquista.premio.ToString();
+        this.Desafio = desafio;
+
+        TxtTituloConquista.text = desafio.nome;
+        TxtDescricaoConquista.text = desafio.descricao;
+        TxtPremio.text = desafio.premio.ToString();
+
+        lstImgGrupos.ForEach(x => x.SetActive(desafio.emGrupo));
 
         //int progressoUsuario = 0;
 
@@ -84,10 +90,10 @@ public class DesafioObj : MonoBehaviour
         //    progressoUsuario = conquistaUsuario.quantidadeParaObter;
         //}
 
-        //BarraProgresso.value = (float)progressoUsuario / (float)conquista.objetivo.quantidade / 100f;
+        //BarraProgresso.value = (float)progressoUsuario / (float)desafio.objetivo.quantidade / 100f;
 
-        //TxtProgresso.text = progressoUsuario + "/" + conquista.objetivo.quantidade;
-
+        //TxtProgresso.text = progressoUsuario + "/" + desafio.objetivo.quantidade;
+        TxtProgresso.text = "0/" + desafio.objetivo.quantidade;
         //configurarPainelAlerta();
     }
     #endregion
@@ -108,24 +114,25 @@ public class DesafioObj : MonoBehaviour
             PnlConquista.SetActive(false);
             PnlTempoEsgotado.SetActive(true);
         }
-        else if (conquistaUsuario != null && conquistaUsuario.concluido)
-        {
-            PnlConquista.SetActive(false);
-            PnlConquistaConcluida.SetActive(true);
-            TxtDataConclusao.text = conquistaUsuario.dataConclusao.ToShortDateString();
-        }
+        //else if (conquistaUsuario != null && conquistaUsuario.concluido)
+        //{
+        //    PnlConquista.SetActive(false);
+        //    PnlConquistaConcluida.SetActive(true);
+        //    TxtDataConclusao.text = conquistaUsuario.dataConclusao.ToShortDateString();
+        //}
     }
     #endregion
 
     #region abrirPnlInfoDesafio
     private void abrirPnlInfoDesafio()
     {
-        PnlPopUp.AbrirPopUp(Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject,
-         () =>
-         {
-             //Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(conquista.premio, conquista.icon);
-             Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(500, "");
-         });
+
+        AnimacoesTween.AnimarObjeto(Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, 
+        AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        {
+            Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
+        },
+        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
     #endregion
 

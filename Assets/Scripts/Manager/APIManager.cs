@@ -9,8 +9,8 @@ public class APIManager : MonoBehaviour
 {
     public static APIManager Instance { get; set; }
 
-    private readonly string urlBase = "http://localhost:3000/api/";
-    //private readonly string urlBase = "http://93.188.164.122:3000/api/";
+    //private readonly string urlBase = "http://localhost:3000/api/";
+    private readonly string urlBase = "http://93.188.164.122:3000/api/";
 
 
     public enum URLs

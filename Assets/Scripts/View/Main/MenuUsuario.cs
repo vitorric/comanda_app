@@ -316,7 +316,7 @@ public class MenuUsuario : MonoBehaviour
                 return;
             }
 
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaResponse(response));
+            AlertaManager.Instance.IniciarAlerta(response);
 
             Cliente.ClienteLogado.cpf = TxtCPFInfo.text;
             Cliente.ClienteLogado.dataNascimento = Convert.ToDateTime(Util.formatarDataParaAPI(TxtIdadeInfo.text));

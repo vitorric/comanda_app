@@ -46,11 +46,13 @@ public class MenuEstabelecimento : MonoBehaviour
     public Transform ScvConquista;
     public DesafioObj ConquistaRef;
     public GameObject TxtCarregandoConquista;
+    public GameObject PnlConquistaVazio;
 
     [Header("Estabelecimento Info Shop")]
     public Transform ScvShop;
     public ItemObj ItemShopRef;
     public Text TxtDescricaoItemShop;
+    public GameObject PnlShopVazio;
 
     [Header("Confirmarmacao Compra Shop")]
     public GameObject PnlConfirmarItemCompra;
@@ -64,10 +66,14 @@ public class MenuEstabelecimento : MonoBehaviour
     public DesafioInfo DesafioInfo;
 
     private EstabelecimentoFirebase estabelecimentoFirebase;
+    private List<ItemObj> lstItensLoja;
+    private List<DesafioObj> lstDesafios;
     private string estabelecimentoId_aberto;
 
     private void Awake()
     {
+        lstItensLoja = new List<ItemObj>();
+        lstDesafios = new List<DesafioObj>();
         configurarListener();
     }
 
@@ -201,19 +207,45 @@ public class MenuEstabelecimento : MonoBehaviour
             {
                 estabelecimentoFirebase = new EstabelecimentoFirebase
                 {
-                    AcaoItemLoja = (itens, tipoAcao) =>
+                    AcaoItemLoja = (item, tipoAcao) =>
                     {
                         if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Adicionar)
                         {
-                            iniciarShop(itens, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
+                            adicionarItemShop(item, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
                             return;
                         }
 
                         if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Modificar)
                         {
-                            ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
+                            modificarItemShop(item, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
+                            return;
+                        }
 
-                            iniciarShop(itens, estabelecimento.configEstabelecimentoAtual.estaAberta, estabelecimento._id);
+                        if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Remover)
+                        {
+                            //ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
+                            removerItemShop(item);
+                            return;
+                        }
+                    },
+                    AcaoDesafio = (desafio, tipoAcao) =>
+                    {
+                        if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Adicionar)
+                        {
+                            adicionarDesafio(desafio, estabelecimento._id);
+                            return;
+                        }
+
+                        if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Modificar)
+                        {
+                            modificarDesafio(desafio, estabelecimento._id);
+                            return;
+                        }
+
+                        if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Remover)
+                        {
+                            //ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
+                            removerDesafio(desafio);
                             return;
                         }
                     }
@@ -258,37 +290,91 @@ public class MenuEstabelecimento : MonoBehaviour
         estabelecimentoId_aberto = string.Empty;
         ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
         ScvConquista.GetComponentsInChildren<DesafioObj>().ToList().ForEach(x => Destroy(x.gameObject));
-        TxtCarregandoConquista.SetActive(true);
     }
     #endregion
 
-    #region iniciarShop
-    private void iniciarShop(List<ItemLoja> lojaItens, bool lojaAberta, string _idEstabelecimento)
+    #region adicionarItemShop
+    private void adicionarItemShop(ItemLoja item, bool lojaAberta, string estabelecimentoId)
     {
-        foreach (ItemLoja item in lojaItens)
+        if (item._id != null)
         {
-            if (item._id != null)
-            {
-                ItemObj objItemShop = Instantiate(ItemShopRef, ScvShop.transform);
-                objItemShop.PreencherInfo(item, lojaAberta, _idEstabelecimento);
-            }
+            ItemObj objItemShop = Instantiate(ItemShopRef, ScvShop.transform);
+
+            objItemShop.PreencherInfo(item, lojaAberta, estabelecimentoId);
+            lstItensLoja.Add(objItemShop);
+
+            PnlShopVazio.SetActive(false);
         }
     }
     #endregion
 
-    #region IniciarConquistas
-    public void IniciarConquistas(List<Desafio> desafios, List<Cliente.Conquista> conquistasUsuario, string _idEstabelecimento)
+    #region modificarItemShop
+    private void modificarItemShop(ItemLoja item, bool lojaAberta, string estabelecimentoId)
     {
-        TxtCarregandoConquista.SetActive(false);
+        ItemObj objItemShop = lstItensLoja.Find(x => x.ItemLoja._id == item._id);
 
-        foreach (Desafio desafio in desafios)
+        if (objItemShop != null)
+            objItemShop.PreencherInfo(item, lojaAberta, estabelecimentoId);
+    }
+    #endregion
+
+    #region removerItemShop
+    private void removerItemShop(ItemLoja item)
+    {
+        ItemObj objItemShop = lstItensLoja.Find(x => x.ItemLoja._id == item._id);
+
+        if (objItemShop != null)
         {
-            if (desafio._id != null)
-            {
-                DesafioObj objConquista = Instantiate(ConquistaRef, ScvConquista);
-                objConquista.PreencherInfo(desafio, conquistasUsuario.FirstOrDefault(x => x.conquista == desafio._id), _idEstabelecimento);
-            }
+            Destroy(objItemShop.gameObject);
+            lstItensLoja.Remove(objItemShop);
+
+            if (lstItensLoja.Count == 0)
+                PnlShopVazio.SetActive(true);
         }
+
+    }
+    #endregion
+
+    #region adicionarDesafio
+    public void adicionarDesafio(Desafio desafio, string estabelecimentoId)
+    {
+        if (desafio._id != null)
+        {
+            DesafioObj objDesafio = Instantiate(ConquistaRef, ScvConquista);
+            objDesafio.PreencherInfo(desafio, estabelecimentoId);
+
+            lstDesafios.Add(objDesafio);
+
+            PnlConquistaVazio.SetActive(false);
+        }
+    }
+    #endregion
+
+    #region modificarDesafio
+    private void modificarDesafio(Desafio desafio, string estabelecimentoId)
+    {
+        DesafioObj objItemDesafio = lstDesafios.Find(x => x.Desafio._id == desafio._id);
+
+        if (objItemDesafio != null)
+            objItemDesafio.PreencherInfo(desafio, estabelecimentoId);
+    }
+    #endregion
+
+    #region removerDesafio
+    private void removerDesafio(Desafio desafio)
+    {
+        DesafioObj objItemDesafio = lstDesafios.Find(x => x.Desafio._id == desafio._id);
+
+
+        if (objItemDesafio != null)
+        {
+            Destroy(objItemDesafio.gameObject);
+            lstDesafios.Remove(objItemDesafio);
+
+            if (lstDesafios.Count == 0)
+                PnlConquistaVazio.SetActive(true);
+        }
+
     }
     #endregion
 

@@ -340,7 +340,7 @@ public class EdicaoChar : MonoBehaviour
 
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Success);
 
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaResponse(response));
+            AlertaManager.Instance.IniciarAlerta(response);
 
             PnlCharacter.Avatar.level = Cliente.ClienteLogado.avatar.level;
             PnlCharacter.Avatar.exp = Cliente.ClienteLogado.avatar.exp;

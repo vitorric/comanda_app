@@ -30,7 +30,8 @@ public class ItemObj : MonoBehaviour
     public GameObject PnlTempo;
     public GameObject PnlHotSale;
     public Text TxtTempo;
-    private ItemLoja itemLoja;
+
+    public ItemLoja ItemLoja;
     private string estabelecimentoId;
     private bool pararConferenciaTempo = false;
     private bool lojaAberta = false;
@@ -43,7 +44,7 @@ public class ItemObj : MonoBehaviour
             pararConferenciaTempo = !rodarRelogio();
             if (pararConferenciaTempo == false)
             {
-                TimeSpan data = itemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
+                TimeSpan data = ItemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
                 TxtTempo.text = string.Format("{0:00}:{1:00}:{2:00}", data.Hours + (data.Days * 24), data.Minutes, data.Seconds);
             }
             else
@@ -61,7 +62,7 @@ public class ItemObj : MonoBehaviour
         this.lojaAberta = lojaAberta;
         PnlHotSale.SetActive(itemLoja.hotSale);
 
-        this.itemLoja = itemLoja;
+        this.ItemLoja = itemLoja;
         this.estabelecimentoId = _idEstabelecimento;
 
         TxtNome.text = itemLoja.nome;
@@ -91,7 +92,7 @@ public class ItemObj : MonoBehaviour
 
         AnimacoesTween.AnimarObjeto(BtnSelecionarItem.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
         {
-            Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(itemLoja.descricao);
+            Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(ItemLoja.descricao);
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -100,7 +101,7 @@ public class ItemObj : MonoBehaviour
     #region rodarRelogio
     public bool rodarRelogio()
     {
-        return (itemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime())).TotalSeconds > 0) ? true : false;
+        return (ItemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime())).TotalSeconds > 0) ? true : false;
     }
     #endregion
 
@@ -125,7 +126,7 @@ public class ItemObj : MonoBehaviour
             alerta = "É necessário estar no estabelecimento";
             corAlerta = 3;
         }
-        else if (itemLoja.quantidadeDisponivel == 0)
+        else if (ItemLoja.quantidadeDisponivel == 0)
         {
             alerta = "Esgotado";
             corAlerta = 2;
@@ -152,7 +153,7 @@ public class ItemObj : MonoBehaviour
         {
             int gold = Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimentoId);
 
-            if (itemLoja.preco > gold)
+            if (ItemLoja.preco > gold)
             {
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                 return;
@@ -163,7 +164,7 @@ public class ItemObj : MonoBehaviour
             btnConfirmarCompra.onClick.RemoveAllListeners();
             btnConfirmarCompra.onClick.AddListener(() => confirmarCompraItem(btnConfirmarCompra.gameObject));
 
-            Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(itemLoja, gold);
+            Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(ItemLoja, gold);
         },
         AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
@@ -182,7 +183,7 @@ public class ItemObj : MonoBehaviour
             Dictionary<string, string> data = new Dictionary<string, string>
             {
                 { "estabelecimento", estabelecimentoId },
-                { "itemLoja", itemLoja._id }
+                { "itemLoja", ItemLoja._id }
             };
 
             StartCoroutine(ClienteAPI.ClienteComprarItem(data,
@@ -193,13 +194,13 @@ public class ItemObj : MonoBehaviour
 
                 if (retornoAPI.sucesso)
                 {
-                    int novoGold = usuario.AlterarGoldEstabelecimento(estabelecimentoId, (int)itemLoja.preco, false);
+                    int novoGold = usuario.AlterarGoldEstabelecimento(estabelecimentoId, (int)ItemLoja.preco, false);
                     Cliente.ClienteLogado = usuario;
 
                     Main.Instance.MenuEstabelecimento.AtualizarInfoGold(estabelecimentoId, novoGold);
 
-                    itemLoja.quantidadeDisponivel -= 1;
-                    Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)itemLoja.preco);
+                    ItemLoja.quantidadeDisponivel -= 1;
+                    Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)ItemLoja.preco);
                     configurarPainelAlerta();
                 }
                 else

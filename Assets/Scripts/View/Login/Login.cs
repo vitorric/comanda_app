@@ -88,7 +88,8 @@ public class Login : MonoBehaviour
     public void BtnLogar()
     {       
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(BtnEntrar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => logar(), AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        logar();
+        //AnimacoesTween.AnimarObjeto(BtnEntrar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => logar(), AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
     }
     #endregion
 
@@ -97,13 +98,9 @@ public class Login : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(BtnRecupSenha.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            PnlRecuperarSenha.SetActive(true);
-            PnlLogin.SetActive(false);
-            TxtEmailRecSenha.text = string.Empty;
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        PnlRecuperarSenha.SetActive(true);
+        PnlLogin.SetActive(false);
+        TxtEmailRecSenha.text = string.Empty;
     }
     #endregion
 
@@ -112,9 +109,7 @@ public class Login : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
-        AnimacoesTween.AnimarObjeto(BtnRecupSenhaVoltar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click,
-        () => fecharPnlRecuperarSenha(),
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        fecharPnlRecuperarSenha();
     }
     #endregion
 
@@ -122,9 +117,7 @@ public class Login : MonoBehaviour
     public void BtnRecuperarSenha()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(BtnRecupSenhaEnviar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click,
-        () => recuperarSenha(),
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        recuperarSenha();
     }
     #endregion
 
@@ -132,9 +125,7 @@ public class Login : MonoBehaviour
     public void BtnCadastrarAvantarEtapa(int etapa, GameObject objClicado)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click,
-            () => avancarEtapa(etapa),
-            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        avancarEtapa(etapa);
     }
     #endregion
 
@@ -142,9 +133,7 @@ public class Login : MonoBehaviour
     public void BtnCadastrarVoltar(int etapa, GameObject objClicado)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click,
-        () => voltarEtapa(etapa),
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        voltarEtapa(etapa);
     }
     #endregion
 
@@ -152,9 +141,7 @@ public class Login : MonoBehaviour
     public void BtnConfirmarCadastro()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(BtnEtapa2Confirmar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click,
-            () => StartCoroutine(cadastrar()),
-            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        StartCoroutine(cadastrar());
     }
     #endregion
 
@@ -163,16 +150,12 @@ public class Login : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(BtnEdicaoAvatar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        if (SceneManager.GetSceneByName("EdicaoChar").isLoaded)
         {
-            if (SceneManager.GetSceneByName("EdicaoChar").isLoaded)
-            {
-                return;
-            }
+            return;
+        }
 
-            SceneManager.LoadSceneAsync("EdicaoChar", LoadSceneMode.Additive);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        SceneManager.LoadSceneAsync("EdicaoChar", LoadSceneMode.Additive);
     }
     #endregion
 
@@ -380,6 +363,7 @@ public class Login : MonoBehaviour
     {
         ClienteFirebase cliente = new ClienteFirebase();
         Cliente.ClienteLogado = await cliente.ObterUsuario(Cliente.Obter());
+        Debug.Log(JsonConvert.SerializeObject(Cliente.ClienteLogado));
 
         AppManager.Instance.DesativarLoaderAsync();
 

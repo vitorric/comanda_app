@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class DesafioInfo : MonoBehaviour
 {
     public Button BtnFechar;
+    public GameObject PnlInfo;
     public Text TxtValorPremio;
     public RawImage IconPremio;
 
@@ -17,7 +18,7 @@ public class DesafioInfo : MonoBehaviour
     #region configurarListener
     private void configurarListener()
     {
-        BtnFechar.onClick.AddListener(() => PnlPopUp.FecharPopUpSemDesligarPopUP(this.gameObject, null));
+        BtnFechar.onClick.AddListener(() => PnlPopUp.FecharPopUpSemDesligarPopUP(PnlInfo, () => this.gameObject.SetActive(false)));
     }
     #endregion
 
@@ -25,7 +26,14 @@ public class DesafioInfo : MonoBehaviour
     public void PreencherInfo(float valor, string icon)
     {
         this.gameObject.SetActive(true);
+        PnlInfo.SetActive(true);
         TxtValorPremio.text = Util.FormatarValorDisponivel(valor);
+
+        AnimacoesTween.AnimarObjeto(PnlInfo,
+                    AnimacoesTween.TiposAnimacoes.Scala,
+                    null,
+                    AppManager.TEMPO_ANIMACAO_ABRIR_MODEL,
+                    Vector2.one);
     }
     #endregion
 }

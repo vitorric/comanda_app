@@ -46,6 +46,11 @@ public class AlertaManager : MonoBehaviour
         };
     }
 
+    public void IniciarAlerta(bool sucesso)
+    {
+        StartCoroutine(ChamarAlertaResponse(sucesso));
+    }
+
     public IEnumerator ChamarAlertaResponse(bool sucesso)
     {
         ObjAlertaResponse.SetActive(true);
@@ -66,16 +71,17 @@ public class AlertaManager : MonoBehaviour
         {
             animando = true;
 
+
             PnlPai.SetActive(true);
             StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, -10, 545));
             yield return new WaitForSeconds(1.5f);
             StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, 10, 765));
             yield return new WaitForSeconds(0.6f);
             PnlPai.SetActive(false);
-            animando = false;
             ObjAlertaResponse.SetActive(false);
             ImgSucesso.gameObject.SetActive(false);
             ImgErro.gameObject.SetActive(false);
+            animando = false;
         }
     }
 

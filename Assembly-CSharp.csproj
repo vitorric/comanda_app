@@ -89,6 +89,7 @@
     <Compile Include="Assets\Scripts\Manager\APIManager.cs" />
     <Compile Include="Assets\Scripts\Manager\AppManager.cs" />
     <Compile Include="Assets\Scripts\Manager\FirebaseManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\TestManager.cs" />
     <Compile Include="Assets\Scripts\QRCode\LeitoQRCode.cs" />
     <Compile Include="Assets\Scripts\Util\Animacoes.cs" />
     <Compile Include="Assets\Scripts\Util\AnimacoesTween.cs" />
