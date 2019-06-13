@@ -127,12 +127,16 @@ public class DesafioObj : MonoBehaviour
     private void abrirPnlInfoDesafio()
     {
 
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
         AnimacoesTween.AnimarObjeto(Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, 
-        AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        AnimacoesTween.TiposAnimacoes.Scala, 
+        () =>
         {
             Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
         },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        AppManager.TEMPO_ANIMACAO_ABRIR_MODEL,
+        Vector2.one);
     }
     #endregion
 

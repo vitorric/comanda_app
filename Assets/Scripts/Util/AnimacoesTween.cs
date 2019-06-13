@@ -9,11 +9,11 @@ public class AnimacoesTween : MonoBehaviour
 
     public enum TiposAnimacoes
     {
-        Menu,
-        Button_Click,
-        SubMenu_Click,
-        Scala,
-        RotacaoSubMenu
+        //Menu,
+        //Button_Click,
+        //SubMenu_Click,
+        //RotacaoSubMenu,
+        Scala
     }
 
     public GameObject ObjAnimar;
@@ -28,7 +28,7 @@ public class AnimacoesTween : MonoBehaviour
 
     void Start()
     {
-        AnimarObjeto(ObjAnimar, TipoAnimacao, null, TempoAnimacao, VectorScala);
+        //AnimarObjeto(ObjAnimar, TipoAnimacao, null, TempoAnimacao, VectorScala);
     }
 
     public static void AnimarObjeto(GameObject ObjAnimar,
@@ -41,20 +41,6 @@ public class AnimacoesTween : MonoBehaviour
         {
             switch (TipoAnimacao)
             {
-                case TiposAnimacoes.Menu:
-                    ObjAnimar.transform.DOScale(VectorScala, TempoAnimacao).SetLoops(-1, LoopType.Yoyo);
-                    break;
-                case TiposAnimacoes.Button_Click:
-                    ObjAnimar.transform.DOScale(new Vector2(0.8f, 0.8f), 0.3f).SetEase(Ease.OutBounce).OnComplete(() => ObjAnimar.transform.DOScale(new Vector2(1, 1), 0.1f).SetEase(Ease.InBounce).OnComplete(onFinished));
-                    break;
-                case TiposAnimacoes.SubMenu_Click:
-                    ObjAnimar.transform.DOLocalRotate(new Vector3(0, 0, 30), TempoAnimacao).OnComplete(() =>
-                          ObjAnimar.transform.DOLocalRotate(new Vector3(0, 0, -30), TempoAnimacao).OnComplete(() =>
-                            ObjAnimar.transform.DOLocalRotate(new Vector3(0, 0, 0), TempoAnimacao).OnComplete(onFinished)
-                      )
-                    );
-                    ObjAnimar.transform.DOScale(new Vector2(0.8f, 0.8f), 0.3f).SetEase(Ease.OutBounce).OnComplete(() => ObjAnimar.transform.DOScale(new Vector2(1, 1), 0.1f).SetEase(Ease.InBounce).OnComplete(onFinished));
-                    break;
                 case TiposAnimacoes.Scala:
                     ObjAnimar.transform.DOScale(VectorScala, TempoAnimacao).OnComplete(onFinished);
                     break;

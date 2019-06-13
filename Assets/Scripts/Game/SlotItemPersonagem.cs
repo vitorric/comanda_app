@@ -28,13 +28,10 @@ public class SlotItemPersonagem : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            FindObjectsOfType<SlotItemPersonagem>().ToList().ForEach(x => x.gameObject.GetComponent<Outline>().enabled = false);
+        FindObjectsOfType<SlotItemPersonagem>().ToList().ForEach(x => x.gameObject.GetComponent<Outline>().enabled = false);
 
-            pnlCharacter.TrocarItem(ImgItem, modulo);
+        pnlCharacter.TrocarItem(ImgItem, modulo);
 
-            gameObject.GetComponent<Outline>().enabled = true;
-        });
+        gameObject.GetComponent<Outline>().enabled = true;
     }
 }

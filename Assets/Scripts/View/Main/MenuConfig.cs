@@ -8,6 +8,9 @@ using UnityEngine.UI;
 
 public class MenuConfig : MonoBehaviour
 {
+    [Header("Canvas")]
+    public Canvas CanvasConfigApp;
+
     [Header("Botoes")]
     public Button BtnMenuConfig;
     public Button BtnAppConfig;
@@ -53,14 +56,14 @@ public class MenuConfig : MonoBehaviour
     private void configurarListener()
     {
         BtnMenuConfig.onClick.AddListener(() => BtnAbrirConfiguracoes());
-        BtnAppConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigApp, () =>
+        BtnAppConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUpCanvas(CanvasConfigApp, PnlConfigApp, () =>
         {
             BtnAbrirConfiguracoes(true);
         }));
-        BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
+        //BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
         BtnSairApp.onClick.AddListener(() => btnDeslogar());
 
-        BtnFecharPnlConfigApp.onClick.AddListener(() => PnlPopUp.FecharPopUp(PnlConfigApp, () =>
+        BtnFecharPnlConfigApp.onClick.AddListener(() => PnlPopUp.FecharPopUp(CanvasConfigApp, PnlConfigApp, () =>
         {
             configurarSom();
         }));
@@ -82,15 +85,11 @@ public class MenuConfig : MonoBehaviour
     private void btnDeslogar()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(BtnSairApp.gameObject,
-        AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
-        {
-            EasyAudioUtility.Instance.AjustarSomSFX(1);
-            EasyAudioUtility.Instance.AjustarSomBG(1);
-            PlayerPrefs.DeleteAll();
-            SceneManager.LoadScene("Login");
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+
+        EasyAudioUtility.Instance.AjustarSomSFX(1);
+        EasyAudioUtility.Instance.AjustarSomBG(1);
+        PlayerPrefs.DeleteAll();
+        SceneManager.LoadScene("Login");
     }
     #endregion
 
@@ -99,37 +98,32 @@ public class MenuConfig : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(BtnSalvarConfigApp.gameObject,
-        AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        Cliente.ClienteLogado.configApp.somFundo = SliderSomFundo.value;
+        Cliente.ClienteLogado.configApp.somGeral = SliderSomGeral.value;
+
+        Dictionary<string, string> form = new Dictionary<string, string>
         {
-            Cliente.ClienteLogado.configApp.somFundo = SliderSomFundo.value;
-            Cliente.ClienteLogado.configApp.somGeral = SliderSomGeral.value;
+            { "_id", Cliente.ClienteLogado._id },
+            { "configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp) }
+        };
 
-            Dictionary<string, string> form = new Dictionary<string, string>
+        StartCoroutine(ClienteAPI.ClienteAlterarConfigApp(form,
+        (response, error) =>
+        {
+            if (error != null)
             {
-                { "_id", Cliente.ClienteLogado._id },
-                { "configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp) }
-            };
+                Debug.Log(error);
 
-            StartCoroutine(ClienteAPI.ClienteAlterarConfigApp(form,
-            (response, error) =>
-            {
-                if (error != null)
-                {
-                    Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
+            }
 
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
-                    return;
-                }
+            AlertaManager.Instance.IniciarAlerta(response);
 
-                AlertaManager.Instance.IniciarAlerta(response);
+            Main.Instance.PnlPopUp.SetActive(false);
 
-                Main.Instance.PnlPopUp.SetActive(false);
-
-                PnlConfigApp.SetActive(false);
-            }));
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            PnlConfigApp.SetActive(false);
+        }));
     }
     #endregion
 

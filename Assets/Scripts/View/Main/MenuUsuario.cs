@@ -12,6 +12,9 @@ using UnityEngine.UI;
 
 public class MenuUsuario : MonoBehaviour
 {
+    [Header("Canvas")]
+    public Canvas CanvasPerfil;
+
     [Header("Botoes")]
     public Button BtnMenuPerfil;
     public Button BtnPerfil;
@@ -94,7 +97,7 @@ public class MenuUsuario : MonoBehaviour
         BtnMenuPerfil.onClick.AddListener(() => BtnAbrirMenu());
         BtnPerfil.onClick.AddListener(() => btnAbrirPerfil());
         BtnInfoPerfil.onClick.AddListener(() => btnAbrirInfoPerfil());
-        BtnFechar.onClick.AddListener(() => PnlPopUp.FecharPopUp(PnlPerfil, null));
+        BtnFechar.onClick.AddListener(() => PnlPopUp.FecharPopUp(CanvasPerfil, PnlPerfil, null));
         BtnSalvarInfo.onClick.AddListener(() => salvarPerfil());
 
         BtnVoltarInfo.onClick.AddListener(() => PnlPopUp.FecharPnl(PnlPerfilEdicao, () =>
@@ -116,12 +119,7 @@ public class MenuUsuario : MonoBehaviour
         {
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            AnimacoesTween.AnimarObjeto(BtnAbrirEdicaoAvatar.gameObject,
-                AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-                {
-                    SceneManager.LoadSceneAsync("EdicaoChar", LoadSceneMode.Additive);
-                },
-                AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            SceneManager.LoadSceneAsync("EdicaoChar", LoadSceneMode.Additive);
         });
 
         BtnPerfilDados.onValueChanged.AddListener((result) => MudarAba(0, true, BtnPerfilDados.gameObject));
@@ -148,7 +146,7 @@ public class MenuUsuario : MonoBehaviour
 
         preencherPerfil();
 
-        PnlPopUp.AbrirPopUp(PnlPerfil, () =>
+        PnlPopUp.AbrirPopUpCanvas(CanvasPerfil, PnlPerfil, () =>
         {
             BtnAbrirMenu(true);
         });
@@ -249,7 +247,9 @@ public class MenuUsuario : MonoBehaviour
         TxtSenhaInfoConfirmar.text = string.Empty;
         TxtNomeInfo.text = Cliente.ClienteLogado.nome;
         TxtCPFInfo.text = Cliente.ClienteLogado.cpf;
-        TxtIdadeInfo.text = (Cliente.ClienteLogado.dataNascimento != null) ? Convert.ToDateTime(Cliente.ClienteLogado.dataNascimento).ToString("dd/MM/yyyy") : "";
+        TxtIdadeInfo.text = (Cliente.ClienteLogado.dataNascimento != null && 
+                            Cliente.ClienteLogado.dataNascimento != DateTime.MinValue) ? 
+                            Convert.ToDateTime(Cliente.ClienteLogado.dataNascimento).ToString("dd/MM/yyyy") : "";
         TxtApelidoInfo.text = Cliente.ClienteLogado.apelido;
         TxtSexoInfo.text = Cliente.ClienteLogado.sexo;
     }
@@ -266,11 +266,6 @@ public class MenuUsuario : MonoBehaviour
             BtnSalvarInfo.gameObject.SetActive((numeroAba == 0) ? true : false);
             PnlAbasEdicao.ForEach(x => x.SetActive(false));
             PnlAbasEdicao[numeroAba].SetActive(true);
-
-            AnimacoesTween.AnimarObjeto(
-                objClicado,
-                AnimacoesTween.TiposAnimacoes.Button_Click, null,
-                AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
         }
         else
         {
@@ -334,13 +329,10 @@ public class MenuUsuario : MonoBehaviour
     {
 
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
-        {
-            Main.Instance.PnlPopUp.SetActive(true);
-            PnlAmigos.SetActive(true);
-            AnimacoesTween.AnimarObjeto(PnlAmigos, AnimacoesTween.TiposAnimacoes.Scala, null, 0.5f, new Vector2(1, 1));
-        },
-        0.1f);
+
+        Main.Instance.PnlPopUp.SetActive(true);
+        PnlAmigos.SetActive(true);
+        AnimacoesTween.AnimarObjeto(PnlAmigos, AnimacoesTween.TiposAnimacoes.Scala, null, 0.5f, new Vector2(1, 1));
     }
     #endregion
 }

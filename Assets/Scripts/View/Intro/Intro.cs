@@ -16,47 +16,36 @@ public class Intro : MonoBehaviour
 
     private bool estaLogado = false;
 
-    private void Start()
+    private IEnumerator Start()
     {
-        //PlayerPrefs.DeleteAll();
-        AlterarProgressoSlider(0.5f);
-        StartCoroutine(aguardarFireBase());
-    }
-
-
-    #region Inicia o Firebase
-    private IEnumerator aguardarFireBase()
-    {
-        yield return new WaitUntil(() => FirebaseManager.Instance.isReady || !FirebaseManager.Instance.ConexaoOK);
-
-        if (!FirebaseManager.Instance.ConexaoOK)
-        {
-            Debug.Log("Sem Net");
-            yield break;
-        }
+        yield return new WaitUntil(() => FirebaseManager.Instance.isReady);
 
         AlterarProgressoSlider(0.3f);
-        validarLoginUsuario();
+
+        yield return StartCoroutine(relogar());
+
+        AlterarProgressoSlider(0.2f);
+
+        if (estaLogado)
+            buscarClienteNoFireBase();
     }
-    #endregion
 
     #region Manipula o progresso
     public void AlterarProgressoSlider(float value)
     {
         sliderProgresso.value += value;
         txtProgresso.text = (sliderProgresso.value * 100) + "%";
-        StartCoroutine(conferirProgresso());
+        conferirProgresso();
     }
 
-    private IEnumerator conferirProgresso()
+    private void conferirProgresso()
     {
         if (sliderProgresso.value == 1)
         {
             if (estaLogado)
             {
-                yield return StartCoroutine(relogar());
-                SceneManager.LoadScene("Main");
-                yield break;
+                SceneManager.LoadSceneAsync("Main");
+                return;
             }
 
             SceneManager.LoadScene("Login");
@@ -64,47 +53,46 @@ public class Intro : MonoBehaviour
     }
     #endregion
 
-    #region Verifica se esta logado
-    private async void validarLoginUsuario()
+    private async void buscarClienteNoFireBase()
     {
-        if (Cliente.EstaLogado())
-        {
-            ClienteFirebase cliente = new ClienteFirebase();
-            Cliente.ClienteLogado = await cliente.ObterUsuario(Cliente.Obter());
+        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(Cliente.Obter());
 
-            if (Cliente.ClienteLogado == null)
-                estaLogado = false;
-
-            estaLogado = true;
-            AlterarProgressoSlider(0.2f);
-
-            return;
-        }
-
-        estaLogado = false;
         AlterarProgressoSlider(0.2f);
     }
-    #endregion
 
     #region Post Login Cliente
     private IEnumerator relogar()
     {
         Cliente.Credenciais credenciais = Cliente.ObterCredenciais();
 
-        Dictionary<string, string> data = new Dictionary<string, string>
+        if (credenciais != null)
         {
-            { "email", credenciais.email },
-            { "password", credenciais.password }
-        };
+            Dictionary<string, string> data = new Dictionary<string, string>
+            {
+                { "email", credenciais.email },
+                { "password", credenciais.password }
+            };
 
-        yield return StartCoroutine(ClienteAPI.ClienteLogin(data,
-        (response, error) =>
-        {
-            Cliente.RefazerToken(response.token);
+            yield return StartCoroutine(ClienteAPI.ClienteLogin(data,
+            (response, error) =>
+            {
+                if (error != null)
+                {
+                    Debug.Log(error);
+                    AlterarProgressoSlider(0.5f);
+                    return;
+                }
 
-            StartCoroutine(AppManager.Instance.DesativarLoader());
-            //StartCoroutine(comunicadorAPI.Alerta.ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-        }));
+                estaLogado = true;
+                Cliente.RefazerToken(response.token);
+                AlterarProgressoSlider(0.3f);
+            }));
+
+            yield break;
+        }
+
+        AlterarProgressoSlider(0.5f);
     }
     #endregion
+
 }

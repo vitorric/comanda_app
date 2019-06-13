@@ -67,13 +67,13 @@ public class MenuEstabComanda : MonoBehaviour
             { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
         };
 
-        StartCoroutine(EstabelecimentoAPI.ObterEstabelecimento(form, 
+        StartCoroutine(EstabelecimentoAPI.ObterEstabelecimento(form,
         (response, error) =>
         {
-                Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(response, false, aba);
-            
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
+            Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(response, false, aba);
+
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+            //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
         }));
     }
     #endregion
@@ -83,36 +83,32 @@ public class MenuEstabComanda : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
-        AnimacoesTween.AnimarObjeto(BtnSairEstabelecimento.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        Dictionary<string, string> form = new Dictionary<string, string>
         {
-            Dictionary<string, string> form = new Dictionary<string, string>
-            {
-                { "_idCliente", Cliente.ClienteLogado._id },
-                { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
-            };
+            { "_idCliente", Cliente.ClienteLogado._id },
+            { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
+        };
 
-            StartCoroutine(ClienteAPI.SairDoEstabelecimento(
-            form,
-            (response, error) =>
-            {
-                APIManager.Retorno<string> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+        StartCoroutine(ClienteAPI.SairDoEstabelecimento(
+        form,
+        (response, error) =>
+        {
+            APIManager.Retorno<string> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
 
-                if (retornoAPI.sucesso)
-                {
-                    Main.Instance.ManipularMenus("FecharTodos");
-                    Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento = false;
-                    Cliente.ClienteLogado.configClienteAtual.estabelecimento = null;
-                    Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento = null;
-                    Main.Instance.ClienteEstaNoEstabelecimento();
-                }
-                else
-                {
-                    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                    //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-                }
-            }));
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            if (retornoAPI.sucesso)
+            {
+                Main.Instance.ManipularMenus("FecharTodos");
+                Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento = false;
+                Cliente.ClienteLogado.configClienteAtual.estabelecimento = null;
+                Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento = null;
+                Main.Instance.ClienteEstaNoEstabelecimento();
+            }
+            else
+            {
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+                //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
+            }
+        }));
 
     }
     #endregion

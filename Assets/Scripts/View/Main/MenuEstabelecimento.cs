@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using APIModel;
 using Network;
-using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class MenuEstabelecimento : MonoBehaviour
 {
+    [Header("Canvas")]
+    public Canvas CanvasEstabs;
+    public Canvas CanvasEstabInfo;
+
     [Header("Botoes")]
     public Button BtnAbrirListaEstab;
     public Button BtnFecharListaEstab;
@@ -81,7 +82,7 @@ public class MenuEstabelecimento : MonoBehaviour
     private void configurarListener()
     {
         BtnAbrirListaEstab.onClick.AddListener(() => btnAbrirPnlEstabelecimento());
-        BtnFecharListaEstab.onClick.AddListener(() => PnlPopUp.FecharPopUp(PnlEstabelecimentos, () =>
+        BtnFecharListaEstab.onClick.AddListener(() => PnlPopUp.FecharPopUp(CanvasEstabs, PnlEstabelecimentos, () =>
         {
             ScvEstabelecimentos.GetComponentsInChildren<EstabelecimentoObj>().ToList().ForEach(x => Destroy(x.gameObject));
 
@@ -106,7 +107,8 @@ public class MenuEstabelecimento : MonoBehaviour
 
         listarEstabelecimento((lstEstabelecimentos) =>
         {
-            PnlPopUp.AbrirPopUp(PnlEstabelecimentos,
+            PnlPopUp.AbrirPopUpCanvas(CanvasEstabs, 
+             PnlEstabelecimentos,
              () =>
              {
                  foreach (Estabelecimento estabelecimento in lstEstabelecimentos)
@@ -136,13 +138,8 @@ public class MenuEstabelecimento : MonoBehaviour
         if (tocarSom)
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject,
-        AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            PnlAbasEdicao.ForEach(x => x.SetActive(false));
-            PnlAbasEdicao[numeroAba].SetActive(true);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        PnlAbasEdicao.ForEach(x => x.SetActive(false));
+        PnlAbasEdicao[numeroAba].SetActive(true);
     }
     #endregion
 
@@ -202,7 +199,8 @@ public class MenuEstabelecimento : MonoBehaviour
                 BtnFecharPnlInfo.onClick.AddListener(() => fecharPnlEstabInfo(true));
             }
 
-            PnlPopUp.AbrirPopUp(PnlEstabInfo,
+            PnlPopUp.AbrirPopUpCanvas(CanvasEstabInfo,
+            PnlEstabInfo,
             () =>
             {
                 estabelecimentoFirebase = new EstabelecimentoFirebase
@@ -269,7 +267,7 @@ public class MenuEstabelecimento : MonoBehaviour
     {
         if (fecharPopup)
         {
-            PnlPopUp.FecharPopUp(PnlEstabInfo, () =>
+            PnlPopUp.FecharPopUp(CanvasEstabInfo,PnlEstabInfo, () =>
             {
                 limparPnlEstabInfo();
             });

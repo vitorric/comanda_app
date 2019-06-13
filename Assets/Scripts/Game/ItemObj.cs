@@ -90,11 +90,7 @@ public class ItemObj : MonoBehaviour
 
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(BtnSelecionarItem.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(ItemLoja.descricao);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(ItemLoja.descricao);
     }
     #endregion
 
@@ -149,24 +145,20 @@ public class ItemObj : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(BtnComprarItem.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
+        int gold = Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimentoId);
+
+        if (ItemLoja.preco > gold)
         {
-            int gold = Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimentoId);
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+            return;
+        }
 
-            if (ItemLoja.preco > gold)
-            {
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                return;
-            }
+        Button btnConfirmarCompra = Main.Instance.MenuEstabelecimento.BtnConfirmarCompraItem;
 
-            Button btnConfirmarCompra = Main.Instance.MenuEstabelecimento.BtnConfirmarCompraItem;
+        btnConfirmarCompra.onClick.RemoveAllListeners();
+        btnConfirmarCompra.onClick.AddListener(() => confirmarCompraItem(btnConfirmarCompra.gameObject));
 
-            btnConfirmarCompra.onClick.RemoveAllListeners();
-            btnConfirmarCompra.onClick.AddListener(() => confirmarCompraItem(btnConfirmarCompra.gameObject));
-
-            Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(ItemLoja, gold);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(ItemLoja, gold);
     }
     #endregion
 
@@ -175,43 +167,40 @@ public class ItemObj : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Compra_Item);
 
-        AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            Main.Instance.MenuEstabelecimento.PnlConfirmarItemCompra.SetActive(false);
-            Cliente.Dados usuario = Cliente.ClienteLogado;
+        Main.Instance.MenuEstabelecimento.PnlConfirmarItemCompra.SetActive(false);
+        Cliente.Dados usuario = Cliente.ClienteLogado;
 
-            Dictionary<string, string> data = new Dictionary<string, string>
+        Dictionary<string, string> data = new Dictionary<string, string>
             {
                 { "estabelecimento", estabelecimentoId },
                 { "itemLoja", ItemLoja._id }
             };
 
-            StartCoroutine(ClienteAPI.ClienteComprarItem(data,
-            (response, error) =>
+        StartCoroutine(ClienteAPI.ClienteComprarItem(data,
+        (response, error) =>
+        {
+            APIManager.Retorno<string> retornoAPI =
+                JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+
+            if (retornoAPI.sucesso)
             {
-                APIManager.Retorno<string> retornoAPI =
-                    JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
+                int novoGold = usuario.AlterarGoldEstabelecimento(estabelecimentoId, (int)ItemLoja.preco, false);
+                Cliente.ClienteLogado = usuario;
 
-                if (retornoAPI.sucesso)
-                {
-                    int novoGold = usuario.AlterarGoldEstabelecimento(estabelecimentoId, (int)ItemLoja.preco, false);
-                    Cliente.ClienteLogado = usuario;
+                Main.Instance.MenuEstabelecimento.AtualizarInfoGold(estabelecimentoId, novoGold);
 
-                    Main.Instance.MenuEstabelecimento.AtualizarInfoGold(estabelecimentoId, novoGold);
+                ItemLoja.quantidadeDisponivel -= 1;
+                Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)ItemLoja.preco);
+                configurarPainelAlerta();
+            }
+            else
+            {
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+            }
 
-                    ItemLoja.quantidadeDisponivel -= 1;
-                    Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)ItemLoja.preco);
-                    configurarPainelAlerta();
-                }
-                else
-                {
-                    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                }
+            //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
 
-                //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-
-            }));
-        }, AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        }));
     }
     #endregion
 

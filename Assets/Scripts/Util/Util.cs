@@ -10,9 +10,15 @@ using UnityEngine.Networking;
 public class Util  {
 
 	public static string formatarDataParaAPI(string data){
-		string[] campos = data.Split('/');
 
-		return campos[2] + "-" + campos[1] + "-" + campos[0];
+        if (!string.IsNullOrEmpty(data))
+        {
+            string[] campos = data.Split('/');
+
+            return campos[2] + "-" + campos[1] + "-" + campos[0];
+        }
+
+        return null;
 	}
 
 	public static string FormatarValorDisponivel(double valor)

@@ -10,6 +10,12 @@ using UnityEngine.UI;
 
 public class Login : MonoBehaviour
 {
+    [Header("Canvas")]
+    public Canvas PnlLogin;
+    public Canvas PnlRecuperarSenha;
+    public Canvas PnlCadasEtapa1;
+    public Canvas PnlCadasEtapa2;
+
     [Header("Button")]
     public Button BtnEntrar;
     public Button BtnCadastrar;
@@ -27,17 +33,15 @@ public class Login : MonoBehaviour
     public Toggle BtnSexoFem;
 
     [Header("Tela de Login")]
-    public GameObject PnlLogin;
     public InputField TxtEmail;
     public InputField TxtSenha;
 
     [Header("Recuperar Senha")]
-    public GameObject PnlRecuperarSenha;
     public InputField TxtEmailRecSenha;
 
 
     [Header("Cadastrar")]
-    public List<GameObject> PnlCadastrarEtapas;
+    //public List<GameObject> PnlCadastrarEtapas;
 
     [Header("Cadastro Etapa - 1")]
     public InputField TxtEmailCadastro;
@@ -86,7 +90,7 @@ public class Login : MonoBehaviour
 
     #region BtnLogar
     public void BtnLogar()
-    {       
+    {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
         logar();
         //AnimacoesTween.AnimarObjeto(BtnEntrar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => logar(), AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
@@ -98,8 +102,8 @@ public class Login : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        PnlRecuperarSenha.SetActive(true);
-        PnlLogin.SetActive(false);
+        PnlRecuperarSenha.enabled = true;
+        PnlLogin.enabled = false;
         TxtEmailRecSenha.text = string.Empty;
     }
     #endregion
@@ -210,11 +214,11 @@ public class Login : MonoBehaviour
             }
 
             Cliente.GravarSession(response.token, response._id,
-                JsonConvert.SerializeObject(new Cliente.Credenciais
-                {
-                    email = TxtEmail.text,
-                    password = Util.GerarHashMd5(TxtSenha.text)
-                }));
+            JsonConvert.SerializeObject(new Cliente.Credenciais
+            {
+                email = TxtEmail.text,
+                password = Util.GerarHashMd5(TxtSenha.text)
+            }));
 
             buscarClienteNoFireBase();
         }));
@@ -261,8 +265,8 @@ public class Login : MonoBehaviour
     #region fecharPnlRecuperarSenha
     private void fecharPnlRecuperarSenha()
     {
-        PnlRecuperarSenha.SetActive(false);
-        PnlLogin.SetActive(true);
+        PnlRecuperarSenha.enabled = false;
+        PnlLogin.enabled = true;
         TxtEmailRecSenha.text = string.Empty;
     }
     #endregion
@@ -291,28 +295,41 @@ public class Login : MonoBehaviour
 
         if (etapa == 0)
         {
-            PnlLogin.SetActive(false);
+            PnlLogin.enabled = false;
             LimparFormCadastro();
-        }
-        else
-        {
-            PnlCadastrarEtapas[etapa - 1].SetActive(false);
+            PnlCadasEtapa1.enabled = true;
         }
 
-        PnlCadastrarEtapas[etapa].SetActive(true);
+        if (etapa == 1)
+        {
+            PnlCadasEtapa2.enabled = true;
+            return;
+        }
+
     }
     #endregion
 
     #region voltarEtapa
     private void voltarEtapa(int etapa)
     {
+        PnlLogin.enabled = false;
+        PnlCadasEtapa1.enabled = false;
+        PnlCadasEtapa2.enabled = false;
 
         if (etapa == 0)
-            PnlLogin.SetActive(true);
-        else
-            PnlCadastrarEtapas[etapa - 1].SetActive(true);
-
-        PnlCadastrarEtapas[etapa].SetActive(false);
+        {
+            PnlLogin.enabled = true;
+            return;
+        }
+        if (etapa == 1)
+        {
+            PnlCadasEtapa1.enabled = true;
+            return;
+        }
+        if (etapa == 2)
+        {
+            PnlCadasEtapa2.enabled = true;
+        }
 
     }
     #endregion
@@ -346,11 +363,11 @@ public class Login : MonoBehaviour
             }
 
             Cliente.GravarSession(response.token, response._id,
-                JsonConvert.SerializeObject(new Cliente.Credenciais
-                {
-                    email = TxtEmailCadastro.text,
-                    password = senha
-                }));
+            JsonConvert.SerializeObject(new Cliente.Credenciais
+            {
+                email = TxtEmailCadastro.text,
+                password = senha
+            }));
 
             buscarClienteNoFireBase();
             return;
@@ -361,11 +378,7 @@ public class Login : MonoBehaviour
     #region buscarNoFireBase
     private async void buscarClienteNoFireBase()
     {
-        ClienteFirebase cliente = new ClienteFirebase();
-        Cliente.ClienteLogado = await cliente.ObterUsuario(Cliente.Obter());
-        Debug.Log(JsonConvert.SerializeObject(Cliente.ClienteLogado));
-
-        AppManager.Instance.DesativarLoaderAsync();
+        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(Cliente.Obter());
 
         SceneManager.LoadSceneAsync("Main");
     }

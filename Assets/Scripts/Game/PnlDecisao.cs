@@ -52,13 +52,9 @@ public class PnlDecisao : MonoBehaviour
 
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, 
-            AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-            {
-                actionSim();
+            actionSim();
 
-                ObjPnlDecisao.SetActive(false);
-            });
+            ObjPnlDecisao.SetActive(false);
 
         });
 
@@ -66,13 +62,9 @@ public class PnlDecisao : MonoBehaviour
         {
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
-            AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject,
-            AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-            {
-                actionNao();
+            actionNao();
 
-                ObjPnlDecisao.SetActive(false);
-            });
+            ObjPnlDecisao.SetActive(false);
         });
     }
 }

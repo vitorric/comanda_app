@@ -73,9 +73,9 @@ public class AlertaManager : MonoBehaviour
 
 
             PnlPai.SetActive(true);
-            StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, -10, 545));
+            StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, -10, 805));
             yield return new WaitForSeconds(1.5f);
-            StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, 10, 765));
+            StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, 10, 1165));
             yield return new WaitForSeconds(0.6f);
             PnlPai.SetActive(false);
             ObjAlertaResponse.SetActive(false);
@@ -104,9 +104,9 @@ public class AlertaManager : MonoBehaviour
 
             PnlPai.SetActive(true);
             TxtMensagem.text = mensagem;
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, -10, 545));
+            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, -10, 805));
             yield return new WaitForSeconds(2);
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, 10, 765));
+            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, 10, 1165));
             yield return new WaitForSeconds(0.6f);
             PnlPai.SetActive(false);
             animando = false;
@@ -133,9 +133,9 @@ public class AlertaManager : MonoBehaviour
 
             PnlPai.SetActive(true);
             TxtMensagem.text = msgsApp[msgAlerta];
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, -10, 545));
+            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, -10, 805));
             yield return new WaitForSeconds(2);
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, 10, 765));
+            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, 10, 1165));
             yield return new WaitForSeconds(0.6f);
             PnlPai.SetActive(false);
             animando = false;

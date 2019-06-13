@@ -223,16 +223,11 @@ public class EdicaoChar : MonoBehaviour
             if (tocarSom)
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            AnimacoesTween.AnimarObjeto(objClicado,
-                AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-                {
-                    this.sexo = sexo;
-                    BtnCorPele.isOn = true;
-                    PnlCharacter.PreencherInfo(sexo, PnlCharacter.Avatar);
+            this.sexo = sexo;
+            BtnCorPele.isOn = true;
+            PnlCharacter.PreencherInfo(sexo, PnlCharacter.Avatar);
 
-                    carregarItensDoPersonagem(_modulo, true);
-                },
-                AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            carregarItensDoPersonagem(_modulo, true);
         }
     }
     #endregion
@@ -245,13 +240,9 @@ public class EdicaoChar : MonoBehaviour
             if (tocarSom)
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-            {
-                PnlOpcaoPeleCor.SetActive((opcao == "pele") ? true : false);
-                PnlOpcaoCabeloCor.SetActive((opcao == "cabelo") ? true : false);
-                PnlOpcaoBarbaCor.SetActive((opcao == "barba" && sexo == "Masculino") ? true : false);
-            },
-            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            PnlOpcaoPeleCor.SetActive((opcao == "pele") ? true : false);
+            PnlOpcaoCabeloCor.SetActive((opcao == "cabelo") ? true : false);
+            PnlOpcaoBarbaCor.SetActive((opcao == "barba" && sexo == "Masculino") ? true : false);
         }
     }
     #endregion
@@ -263,11 +254,7 @@ public class EdicaoChar : MonoBehaviour
         {
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            AnimacoesTween.AnimarObjeto(objClicado, AnimacoesTween.TiposAnimacoes.SubMenu_Click, () =>
-            {
-                PnlCharacter.TrocarCor(objClicado.GetComponent<Image>().color, nomeCor, modulo);
-            },
-            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            PnlCharacter.TrocarCor(objClicado.GetComponent<Image>().color, nomeCor, modulo);
         }
     }
     #endregion
@@ -280,11 +267,7 @@ public class EdicaoChar : MonoBehaviour
             if (tocarSom)
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            AnimacoesTween.AnimarObjeto(objClicado.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-            {
-                carregarItensDoPersonagem(modulo);
-            },
-            AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+            carregarItensDoPersonagem(modulo);
         }
     }
     #endregion
@@ -294,13 +277,9 @@ public class EdicaoChar : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        AnimacoesTween.AnimarObjeto(BtnAleatorio.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            PnlCharacter.PreencherInfo(sexo, null);
+        PnlCharacter.PreencherInfo(sexo, null);
 
-            carregarItensDoPersonagem((_modulo == string.Empty) ? "cabeca" : _modulo);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        carregarItensDoPersonagem((_modulo == string.Empty) ? "cabeca" : _modulo);
     }
     #endregion
 
@@ -360,11 +339,7 @@ public class EdicaoChar : MonoBehaviour
         //Debug.Log(avatar.barba);
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
-        AnimacoesTween.AnimarObjeto(BtnFechar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            fecharCena(estaAlterando);
-        },
-        AppManager.TEMPO_ANIMACAO_FECHAR_MODAL);
+        fecharCena(estaAlterando);
     }
     #endregion
 
@@ -382,6 +357,7 @@ public class EdicaoChar : MonoBehaviour
     private void carregarItensDoPersonagem(string modulo, bool mudouSexo = false)
     {
         string nomeTexturaModuloSelecionado = PnlCharacter.NomeTexturaModuloSelecionado(modulo);
+        Debug.Log(nomeTexturaModuloSelecionado);
 
         FindObjectsOfType<SlotItemPersonagem>().ToList().ForEach(x => x.gameObject.GetComponent<Outline>().enabled = false);
 
@@ -409,7 +385,8 @@ public class EdicaoChar : MonoBehaviour
             }
         }
 
-        GameObject.Find(sexo + "_" + nomeTexturaModuloSelecionado).GetComponent<Outline>().enabled = true;
+
+        GameObject.Find(nomeTexturaModuloSelecionado.Contains("vazio") ? nomeTexturaModuloSelecionado : sexo + "_" + nomeTexturaModuloSelecionado).GetComponent<Outline>().enabled = true;
     }
     #endregion
 

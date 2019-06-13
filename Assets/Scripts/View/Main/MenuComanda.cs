@@ -17,6 +17,7 @@ public class MenuComanda : MonoBehaviour
     public Button BtnFecharHistoricoCompra;
 
     [Header("Grupo")]
+    public Canvas CanvasGrupo;
     public GameObject PnlAvatar;
     public GameObject PnlGrupo;
 
@@ -69,7 +70,7 @@ public class MenuComanda : MonoBehaviour
     #region btnAbrirGrupoComanda
     private void btnAbrirGrupoComanda()
     {
-        PnlPopUp.AbrirPopUp(PnlGrupo, () =>
+        PnlPopUp.AbrirPopUpCanvas(CanvasGrupo, PnlGrupo, () =>
         {
             PnlAvatar.GetComponent<AvatarObj>().PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
         });
@@ -79,7 +80,7 @@ public class MenuComanda : MonoBehaviour
     #region btnFecharGrupoComanda
     private void btnFecharGrupoComanda()
     {
-        PnlPopUp.FecharPopUp(PnlGrupo, () =>
+        PnlPopUp.FecharPopUp(CanvasGrupo, PnlGrupo, () =>
         {
             PnlAvatar.GetComponent<AvatarObj>().PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
         });
@@ -90,10 +91,10 @@ public class MenuComanda : MonoBehaviour
     private void btnAbrirItensComanda()
     {
 
-        PnlPopUp.AbrirPopUp(PnlItensComanda, () =>
-        {
+        //PnlPopUp.AbrirPopUp(PnlItensComanda, () =>
+        //{
 
-        });
+        //});
     }
     #endregion
 
@@ -101,20 +102,20 @@ public class MenuComanda : MonoBehaviour
     private void btnFecharItensComanda()
     {
 
-        PnlPopUp.FecharPopUp(PnlItensComanda, () =>
-        {
+        //PnlPopUp.FecharPopUp(PnlItensComanda, () =>
+        //{
 
-        });
+        //});
     }
     #endregion
 
     #region btnAbrirHistoriaCompra
     private void btnAbrirHistoriaCompra()
     {
-        PnlPopUp.AbrirPopUp(PnlHistoricoComanda, () =>
-        {
+        //PnlPopUp.AbrirPopUp(PnlHistoricoComanda, () =>
+        //{
 
-        });
+        //});
     }
     #endregion
 

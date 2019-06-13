@@ -85,7 +85,7 @@ namespace APIModel
                 if (this.goldPorEstabelecimento != null)
                 {
                     GoldPorEstabelecimento goldEstabelecimento = this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento);
-                    Debug.Log(goldEstabelecimento);
+
                     return (goldEstabelecimento != null) ? goldEstabelecimento.gold : 0;
                 }
 

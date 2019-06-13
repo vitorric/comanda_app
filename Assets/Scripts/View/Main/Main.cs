@@ -6,13 +6,13 @@ using FirebaseModel;
 using Network;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour
 {
-
     public static Main Instance { get; set; }
 
     [Header("Botoes")]
@@ -41,8 +41,12 @@ public class Main : MonoBehaviour
     public GameObject PnlNaoEstaNoEstabelecimento;
     public GameObject PnlEstaNoEstabelecimento;
 
+    public UnityEvent PreencherAvatares;
+
     void Awake()
     {
+        AppManager.Instance.DesativarLoaderAsync();
+
         ConfigApp = new Configuracoes();
 
         if (Instance != null)
@@ -52,7 +56,7 @@ public class Main : MonoBehaviour
 
         instanciarListener();
 
-        //iniciarWatchsFirebase();
+        iniciarWatchsFirebase();
 
         preencherInfoUsuario();
     }
@@ -70,8 +74,7 @@ public class Main : MonoBehaviour
     #region iniciarWatchsFirebase
     private void iniciarWatchsFirebase()
     {
-        ClienteFirebase clienteFirebase = new ClienteFirebase();
-        clienteFirebase.IniciarWatch(Cliente.ClienteLogado._id);
+        FirebaseManager.Instance.IniciarWatch(Cliente.ClienteLogado._id);
     }
     #endregion
 
@@ -80,7 +83,8 @@ public class Main : MonoBehaviour
     private void preencherInfoUsuario()
     {
         TxtApelido.text = Cliente.ClienteLogado.apelido;
-        FindObjectOfType<MenuUsuario>().PreencherAvatares();
+        PreencherAvatares.Invoke();
+        //FindObjectOfType<MenuUsuario>().PreencherAvatares();
         Cliente.ClienteLogado.ConfigurarExpProLevel();
         atualizarExp();
         ClienteEstaNoEstabelecimento();
@@ -195,15 +199,13 @@ public class Main : MonoBehaviour
         if (!fecharAutomatico)
             ManipularMenus(nomeMenu);
 
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            for (int i = 0; i < objAnimar.Count; i++)
-            {
-                AnimacoesTween.AnimarObjeto(objAnimar[i], AnimacoesTween.TiposAnimacoes.Scala, null, tempoAnimacao, new Vector2(valorScala, valorScala));
 
-                tempoAnimacao = (abrirMenu) ? tempoAnimacao + 0.1f : tempoAnimacao - 0.1f;
-            }
-        });
+        for (int i = 0; i < objAnimar.Count; i++)
+        {
+            AnimacoesTween.AnimarObjeto(objAnimar[i], AnimacoesTween.TiposAnimacoes.Scala, null, tempoAnimacao, new Vector2(valorScala, valorScala));
+
+            tempoAnimacao = (abrirMenu) ? tempoAnimacao + 0.1f : tempoAnimacao - 0.1f;
+        }
     }
 
     #endregion
@@ -212,13 +214,8 @@ public class Main : MonoBehaviour
     private void btnAbrirQRCode()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
-        AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-        {
-            StartCoroutine(permissaoCamera());
-            SceneManager.LoadSceneAsync("LeitorQRCode", LoadSceneMode.Additive);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+        StartCoroutine(permissaoCamera());
+        SceneManager.LoadSceneAsync("LeitorQRCode", LoadSceneMode.Additive);
     }
 
     private IEnumerator permissaoCamera()

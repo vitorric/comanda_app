@@ -155,13 +155,11 @@ public class LeitoQRCode : MonoBehaviour {
 	public void BtnFecharLeitor(){
 		
 		EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
-		AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => 
-		{
-			StartCoroutine(StopCamera(() => {
-				SceneManager.UnloadSceneAsync("LeitorQRCode");
-			}));
-		});
-	}
+
+        StartCoroutine(StopCamera(() => {
+            SceneManager.UnloadSceneAsync("LeitorQRCode");
+        }));
+    }
 
 	#endregion
 }
