@@ -30,7 +30,7 @@ public class EstabelecimentoObj : MonoBehaviour
             TxtNome.text = estabelecimento.nome;
             TxtAtendimento.text = estabelecimento.horarioAtendimentoInicio + " às " + estabelecimento.horarioAtendimentoFim;
             TxtPessoas.text = estabelecimento.configEstabelecimentoAtual.clientesNoLocal.Count.ToString();
-            TxtGold.text = Util.FormatarValorDisponivel(gold);
+            TxtGold.text = Util.FormatarValores(gold);
             if (!estabelecimento.configEstabelecimentoAtual.estaAberta) PnlBloqueio.SetActive(true);
             else configurarListener();
         }
@@ -44,8 +44,8 @@ public class EstabelecimentoObj : MonoBehaviour
     #region configurarListener
     private void configurarListener()
     {
-        BtnAbrirInfo.onClick.AddListener(() => Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(estabelecimento, true));
-        BtnAbrirInfoLoja.onClick.AddListener(() => print(estabelecimento._id));
+        BtnAbrirInfo.onClick.AddListener(() => Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(estabelecimento));
+        BtnAbrirInfoLoja.onClick.AddListener(() => Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(estabelecimento, 2));
     }
     #endregion
 

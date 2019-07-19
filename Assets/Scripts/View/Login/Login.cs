@@ -194,7 +194,7 @@ public class Login : MonoBehaviour
             return;
         }
 
-        Dictionary<string, string> form = new Dictionary<string, string>
+        Dictionary<string, object> form = new Dictionary<string, object>
         {
             { "email", TxtEmail.text },
             { "password", Util.GerarHashMd5(TxtSenha.text) }
@@ -213,7 +213,7 @@ public class Login : MonoBehaviour
                 return;
             }
 
-            Cliente.GravarSession(response.token, response._id,
+            AppManager.Instance.GravarSession(response.token, response._id,
             JsonConvert.SerializeObject(new Cliente.Credenciais
             {
                 email = TxtEmail.text,
@@ -236,7 +236,7 @@ public class Login : MonoBehaviour
             return;
         }
 
-        Dictionary<string, string> form = new Dictionary<string, string>
+        Dictionary<string, object> form = new Dictionary<string, object>
         {
             { "email", TxtEmailRecSenha.text }
         };
@@ -302,6 +302,7 @@ public class Login : MonoBehaviour
 
         if (etapa == 1)
         {
+            PnlCadasEtapa1.enabled = false;
             PnlCadasEtapa2.enabled = true;
             return;
         }
@@ -338,7 +339,7 @@ public class Login : MonoBehaviour
     private IEnumerator cadastrar()
     {
         string senha = Util.GerarHashMd5(TxtSenhaCadastro.text);
-        Dictionary<string, string> data = new Dictionary<string, string>
+        Dictionary<string, object> data = new Dictionary<string, object>
         {
             { "email", TxtEmailCadastro.text },
             { "password", senha },
@@ -362,7 +363,7 @@ public class Login : MonoBehaviour
                 return;
             }
 
-            Cliente.GravarSession(response.token, response._id,
+            AppManager.Instance.GravarSession(response.token, response._id,
             JsonConvert.SerializeObject(new Cliente.Credenciais
             {
                 email = TxtEmailCadastro.text,
@@ -378,7 +379,7 @@ public class Login : MonoBehaviour
     #region buscarNoFireBase
     private async void buscarClienteNoFireBase()
     {
-        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(Cliente.Obter());
+        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(AppManager.Instance.Obter());
 
         SceneManager.LoadSceneAsync("Main");
     }

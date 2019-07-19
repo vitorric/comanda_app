@@ -55,7 +55,7 @@ public class Intro : MonoBehaviour
 
     private async void buscarClienteNoFireBase()
     {
-        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(Cliente.Obter());
+        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(AppManager.Instance.Obter());
 
         AlterarProgressoSlider(0.2f);
     }
@@ -63,11 +63,11 @@ public class Intro : MonoBehaviour
     #region Post Login Cliente
     private IEnumerator relogar()
     {
-        Cliente.Credenciais credenciais = Cliente.ObterCredenciais();
+        Cliente.Credenciais credenciais = AppManager.Instance.ObterCredenciais();
 
         if (credenciais != null)
         {
-            Dictionary<string, string> data = new Dictionary<string, string>
+            Dictionary<string, object> data = new Dictionary<string, object>
             {
                 { "email", credenciais.email },
                 { "password", credenciais.password }
@@ -84,7 +84,7 @@ public class Intro : MonoBehaviour
                 }
 
                 estaLogado = true;
-                Cliente.RefazerToken(response.token);
+                AppManager.Instance.RefazerToken(response.token);
                 AlterarProgressoSlider(0.3f);
             }));
 

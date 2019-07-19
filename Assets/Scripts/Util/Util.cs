@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,7 +22,7 @@ public class Util  {
         return null;
 	}
 
-	public static string FormatarValorDisponivel(double valor)
+	public static string FormatarValores(double valor)
     {
         string valorFormatado = string.Empty;
 
@@ -59,6 +60,14 @@ public class Util  {
         }
 
         return sBuilder.ToString();
+    }
+    public static DateTime ConverterDataFB(string data)
+    {
+        if (string.IsNullOrEmpty(data))
+            return new DateTime();
+
+        data = data.Replace("T", " ").Substring(0, data.IndexOf("."));
+        return DateTime.ParseExact(data, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
     public static string GetExceptionDetails(Exception exception)

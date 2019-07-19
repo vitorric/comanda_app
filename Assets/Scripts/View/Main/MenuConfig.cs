@@ -8,16 +8,8 @@ using UnityEngine.UI;
 
 public class MenuConfig : MonoBehaviour
 {
-    [Header("Canvas")]
-    public Canvas CanvasConfigApp;
-
     [Header("Botoes")]
-    public Button BtnMenuConfig;
-    public Button BtnAppConfig;
-    public Button BtnPerfilConfig;
     public Button BtnSairApp;
-    public Button BtnFecharPnlConfigApp;
-    public Button BtnSalvarConfigApp;
 
     public GameObject PnlConfigApp;
     public GameObject PnlConfigPerfil;
@@ -28,20 +20,9 @@ public class MenuConfig : MonoBehaviour
     public Text TxtPctSomFundo;
     public Text TxtPctSomGeral;
 
-    [HideInInspector]
-    public bool MenuAtivo = false;
-
-    private List<GameObject> lstMenu;
-
     private void Awake()
     {
         configurarListener();
-        lstMenu = new List<GameObject>
-        {
-            BtnPerfilConfig.gameObject,
-            BtnAppConfig.gameObject,
-            BtnSairApp.gameObject
-        };
     }
 
     void Start()
@@ -55,29 +36,8 @@ public class MenuConfig : MonoBehaviour
     #region configurarListener
     private void configurarListener()
     {
-        BtnMenuConfig.onClick.AddListener(() => BtnAbrirConfiguracoes());
-        BtnAppConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUpCanvas(CanvasConfigApp, PnlConfigApp, () =>
-        {
-            BtnAbrirConfiguracoes(true);
-        }));
         //BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
         BtnSairApp.onClick.AddListener(() => btnDeslogar());
-
-        BtnFecharPnlConfigApp.onClick.AddListener(() => PnlPopUp.FecharPopUp(CanvasConfigApp, PnlConfigApp, () =>
-        {
-            configurarSom();
-        }));
-
-        BtnSalvarConfigApp.onClick.AddListener(() => btnAplicarConfigApp());
-    }
-    #endregion
-
-    #region BtnAbrirConfiguracoes
-    public void BtnAbrirConfiguracoes(bool fecharAutomatico = false)
-    {
-        MenuAtivo = (fecharAutomatico) ? false : !MenuAtivo;
-
-        Main.Instance.AbrirMenu("BtnConfiguracoes", (fecharAutomatico) ? false : MenuAtivo, lstMenu, fecharAutomatico);
     }
     #endregion
 
@@ -86,6 +46,7 @@ public class MenuConfig : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
+        FindObjectOfType<Main>().PararWatch();
         EasyAudioUtility.Instance.AjustarSomSFX(1);
         EasyAudioUtility.Instance.AjustarSomBG(1);
         PlayerPrefs.DeleteAll();
@@ -94,16 +55,13 @@ public class MenuConfig : MonoBehaviour
     #endregion
 
     #region btnAplicarConfigApp
-    private void btnAplicarConfigApp()
+    private void alterarConfigSom()
     {
-        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-
         Cliente.ClienteLogado.configApp.somFundo = SliderSomFundo.value;
         Cliente.ClienteLogado.configApp.somGeral = SliderSomGeral.value;
 
-        Dictionary<string, string> form = new Dictionary<string, string>
+        Dictionary<string, object> form = new Dictionary<string, object>
         {
-            { "_id", Cliente.ClienteLogado._id },
             { "configApp", JsonConvert.SerializeObject(Cliente.ClienteLogado.configApp) }
         };
 
@@ -113,16 +71,8 @@ public class MenuConfig : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
                 return;
             }
-
-            AlertaManager.Instance.IniciarAlerta(response);
-
-            Main.Instance.PnlPopUp.SetActive(false);
-
-            PnlConfigApp.SetActive(false);
         }));
     }
     #endregion
@@ -153,4 +103,8 @@ public class MenuConfig : MonoBehaviour
     }
     #endregion
 
+    private void OnApplicationQuit()
+    {
+        alterarConfigSom();
+    }
 }

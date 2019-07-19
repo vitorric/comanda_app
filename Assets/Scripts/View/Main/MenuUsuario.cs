@@ -12,26 +12,21 @@ using UnityEngine.UI;
 
 public class MenuUsuario : MonoBehaviour
 {
-    [Header("Canvas")]
-    public Canvas CanvasPerfil;
+    [Header("Button Aba Config")]
+    public ButtonControl buttonControl;
 
     [Header("Botoes")]
-    public Button BtnMenuPerfil;
     public Button BtnPerfil;
     public Button BtnInfoPerfil;
     public Button BtnAmigos;
     public Button BtnConquistas;
     public Button BtnLoja;
-    public Button BtnFechar;
     public Button BtnAbrirHistorico;
     public Button BtnFecharHistorico;
     public Button BtnVoltarInfo;
     public Button BtnSalvarInfo;
     public Button BtnAbrirEdicaoAvatar;
 
-    [Header("Toggle")]
-    public Toggle BtnPerfilDados;
-    public Toggle BtnInfoAvatar;
 
     [Header("PnlPrincipal")]
     public GameObject PnlPerfil;
@@ -76,28 +71,18 @@ public class MenuUsuario : MonoBehaviour
     [HideInInspector]
     public bool MenuAtivo = false;
 
-    private List<GameObject> lstMenus;
-
     void Awake()
     {
         configurarListener();
 
-        lstMenus = new List<GameObject>
-        {
-            BtnPerfil.gameObject,
-            BtnAmigos.gameObject,
-            BtnConquistas.gameObject,
-            BtnLoja.gameObject
-        };
+        btnAbrirPerfil();
     }
 
     #region configurarListener
     private void configurarListener()
     {
-        BtnMenuPerfil.onClick.AddListener(() => BtnAbrirMenu());
         BtnPerfil.onClick.AddListener(() => btnAbrirPerfil());
         BtnInfoPerfil.onClick.AddListener(() => btnAbrirInfoPerfil());
-        BtnFechar.onClick.AddListener(() => PnlPopUp.FecharPopUp(CanvasPerfil, PnlPerfil, null));
         BtnSalvarInfo.onClick.AddListener(() => salvarPerfil());
 
         BtnVoltarInfo.onClick.AddListener(() => PnlPopUp.FecharPnl(PnlPerfilEdicao, () =>
@@ -109,7 +94,6 @@ public class MenuUsuario : MonoBehaviour
         {
             ScvHistoricoCompra.GetComponentsInChildren<HistoricoCompraObj>().ToList().ForEach(x => Destroy(x.gameObject));
             TxtTitulo.text = "Perfil";
-            BtnFechar.gameObject.SetActive(true);
             PnlPerfilGeral.SetActive(true);
         }));
 
@@ -122,17 +106,8 @@ public class MenuUsuario : MonoBehaviour
             SceneManager.LoadSceneAsync("EdicaoChar", LoadSceneMode.Additive);
         });
 
-        BtnPerfilDados.onValueChanged.AddListener((result) => MudarAba(0, true, BtnPerfilDados.gameObject));
-        BtnInfoAvatar.onValueChanged.AddListener((result) => MudarAba(1, true, BtnInfoAvatar.gameObject));
-    }
-    #endregion
-
-    #region BtnAbrirMenu
-    public void BtnAbrirMenu(bool fecharAutomatico = false)
-    {
-        MenuAtivo = (fecharAutomatico) ? false : !MenuAtivo;
-
-        Main.Instance.AbrirMenu("BtnPerfil", (fecharAutomatico) ? false : MenuAtivo, lstMenus, fecharAutomatico);
+        buttonControl.BtnAbas[0].onClick.AddListener(() => MudarAba(0, true));
+        buttonControl.BtnAbas[1].onClick.AddListener(() => MudarAba(1, true));
     }
     #endregion
 
@@ -146,10 +121,10 @@ public class MenuUsuario : MonoBehaviour
 
         preencherPerfil();
 
-        PnlPopUp.AbrirPopUpCanvas(CanvasPerfil, PnlPerfil, () =>
-        {
-            BtnAbrirMenu(true);
-        });
+        //PnlPopUp.AbrirPopUpCanvas(CanvasPerfil, PnlPerfil, () =>
+        //{
+        //    BtnAbrirMenu(true);
+        //});
     }
     #endregion
 
@@ -158,7 +133,7 @@ public class MenuUsuario : MonoBehaviour
     {
         PnlPopUp.AbrirPopUp(PnlPerfilEdicao, () =>
         {
-            BtnPerfilDados.isOn = true;
+            MudarAba(0, false);
             configurarEdicaoPerfil();
         },
         PnlPerfilGeral);
@@ -225,8 +200,8 @@ public class MenuUsuario : MonoBehaviour
             PnlAvatarInfo.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
 
             LblPerfilApelido.text = Cliente.ClienteLogado.apelido;
-            LblPerfilExp.text = Cliente.ClienteLogado.avatar.exp + "/" + Cliente.ClienteLogado.avatar.expProximoLevel;
-            LblPerfilLevel.text = Cliente.ClienteLogado.avatar.level.ToString();
+            LblPerfilExp.text = Cliente.ClienteLogado.avatar.info.exp + "/" + Cliente.ClienteLogado.avatar.info.expProximoLevel;
+            LblPerfilLevel.text = Cliente.ClienteLogado.avatar.info.level.ToString();
             LblPerfilPontos.text = Cliente.ClienteLogado.pontos.ToString();
             LblPerfilGold.text = Cliente.ClienteLogado.RetornarGoldTotal().ToString();
             LblChaveAmigavel.text = Cliente.ClienteLogado.chaveAmigavel;
@@ -247,8 +222,8 @@ public class MenuUsuario : MonoBehaviour
         TxtSenhaInfoConfirmar.text = string.Empty;
         TxtNomeInfo.text = Cliente.ClienteLogado.nome;
         TxtCPFInfo.text = Cliente.ClienteLogado.cpf;
-        TxtIdadeInfo.text = (Cliente.ClienteLogado.dataNascimento != null && 
-                            Cliente.ClienteLogado.dataNascimento != DateTime.MinValue) ? 
+        TxtIdadeInfo.text = (Cliente.ClienteLogado.dataNascimento != null &&
+                            Cliente.ClienteLogado.dataNascimento != DateTime.MinValue) ?
                             Convert.ToDateTime(Cliente.ClienteLogado.dataNascimento).ToString("dd/MM/yyyy") : "";
         TxtApelidoInfo.text = Cliente.ClienteLogado.apelido;
         TxtSexoInfo.text = Cliente.ClienteLogado.sexo;
@@ -256,22 +231,15 @@ public class MenuUsuario : MonoBehaviour
     #endregion
 
     #region MudarAba
-    public void MudarAba(int numeroAba, bool tocarSom = false, GameObject objClicado = null)
+    public void MudarAba(int numeroAba, bool tocarSom = false)
     {
-        if (EventSystem.current.currentSelectedGameObject == objClicado)
-        {
-            if (tocarSom)
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        if (tocarSom)
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            BtnSalvarInfo.gameObject.SetActive((numeroAba == 0) ? true : false);
-            PnlAbasEdicao.ForEach(x => x.SetActive(false));
-            PnlAbasEdicao[numeroAba].SetActive(true);
-        }
-        else
-        {
-            PnlAbasEdicao.ForEach(x => x.SetActive(false));
-            PnlAbasEdicao[0].SetActive(true);
-        }
+        BtnSalvarInfo.gameObject.SetActive((numeroAba == 0) ? true : false);
+        PnlAbasEdicao.ForEach(x => x.SetActive(false));
+        PnlAbasEdicao[numeroAba].SetActive(true);
+        buttonControl.TrocarAba(numeroAba);
     }
     #endregion
 
@@ -293,7 +261,7 @@ public class MenuUsuario : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        Dictionary<string, string> data = new Dictionary<string, string>
+        Dictionary<string, object> data = new Dictionary<string, object>
         {
             { "nome", TxtNomeInfo.text },
             { "cpf", TxtCPFInfo.text },

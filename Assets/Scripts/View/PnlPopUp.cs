@@ -78,6 +78,25 @@ public class PnlPopUp : MonoBehaviour
     }
     #endregion
 
+
+    #region FecharPnl
+    public static void FecharPnlCanvas(Canvas canvas,
+                                 GameObject pnl,
+                                 Action acaoFechar)
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
+
+        AnimacoesTween.AnimarObjeto(pnl, AnimacoesTween.TiposAnimacoes.Scala, () =>
+        {
+            canvas.enabled = false;
+
+            acaoFechar?.Invoke();
+        },
+        AppManager.TEMPO_ANIMACAO_FECHAR_MODAL,
+        Vector2.zero);
+    }
+    #endregion
+
     #region AbrirPopUp
     public static void AbrirPopUp(GameObject pnl,
                                   Action acaoAbrir,

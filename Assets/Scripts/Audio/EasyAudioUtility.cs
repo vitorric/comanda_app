@@ -14,7 +14,9 @@ public class EasyAudioUtility : MonoBehaviour
         LevelUp,
         LevelUp2,
         Compra_Item,
-        Som_Camera
+        Som_Camera,
+        AchievWin,
+        AchievResgate
     }
 
     //Static reference
@@ -85,7 +87,6 @@ public class EasyAudioUtility : MonoBehaviour
 
     public void AjustarSomSFX(float volume)
     {
-
         Array.ForEach(helper, item =>
         {
             if (item.name != Som.Background.ToString())
@@ -93,7 +94,6 @@ public class EasyAudioUtility : MonoBehaviour
                 item.volume = volume * (1f + UnityEngine.Random.Range(-item.volumeVariance / 2f, item.volumeVariance / 2f));
             }
         });
-
     }
 
     /// <summary>

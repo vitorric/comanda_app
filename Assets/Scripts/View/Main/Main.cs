@@ -6,6 +6,7 @@ using FirebaseModel;
 using Network;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -30,22 +31,30 @@ public class Main : MonoBehaviour
     public Text TxtApelido;
     public Text TxtLevel;
     public Text TxtPctExp;
-    public Image ImgBarExp;
+    public Slider SliderExp;
 
     public GameObject PnlUpLevel;
 
     [Header("Geral")]
     public GameObject PnlPopUp;
-    public List<GameObject> LstBotoesMenu;
     public Configuracoes ConfigApp;
     public GameObject PnlNaoEstaNoEstabelecimento;
     public GameObject PnlEstaNoEstabelecimento;
 
+    public MenuComanda MenuComanda;
+    public MenuCorreio MenuCorreio;
+    public MenuDesafios MenuDesafio;
+
     public UnityEvent PreencherAvatares;
+
+    private bool estabelecimentosCarregados = false;
+
+    private GenericFirebase<string> comandaClienteFirebase;
+    private GenericFirebase<Cliente.ConfigClienteAtual> clienteConfigAtualFirebase;
+    private GenericFirebase<Cliente.AvatarInfo> clienteAvatarInfoFirebase;
 
     void Awake()
     {
-        AppManager.Instance.DesativarLoaderAsync();
 
         ConfigApp = new Configuracoes();
 
@@ -59,6 +68,8 @@ public class Main : MonoBehaviour
         iniciarWatchsFirebase();
 
         preencherInfoUsuario();
+
+        AppManager.Instance.DesativarLoaderAsync();
     }
 
     private void instanciarListener()
@@ -66,15 +77,65 @@ public class Main : MonoBehaviour
         BtnQrCode.onClick.AddListener(() => btnAbrirQRCode());
     }
 
-    public void BtnAdicionarExp()
+    #region PararWatch
+    public void PararWatch()
     {
-        AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, 100);
+        comandaClienteFirebase.Watch(false);
+        clienteConfigAtualFirebase.Watch(false);
+        clienteAvatarInfoFirebase.Watch(false);
+        MenuComanda.IniciarWatchComanda(false);
+        MenuCorreio.PararWatch();
+        MenuEstabelecimento.PararWatch();
+        MenuDesafio.PararWatch();
     }
+    #endregion
 
     #region iniciarWatchsFirebase
     private void iniciarWatchsFirebase()
     {
-        FirebaseManager.Instance.IniciarWatch(Cliente.ClienteLogado._id);
+        //inicia o watch na comanda do fire
+        comandaClienteFirebase = new GenericFirebase<string>($"clientes/{Cliente.ClienteLogado._id}/configClienteAtual/comanda")
+        {
+            Callback = (data) =>
+            {
+                Cliente.ClienteLogado.configClienteAtual.comanda = data;
+
+                bool temComanda = (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda)) ? false : true;
+                MenuComanda.IniciarWatchComanda(temComanda);
+            }
+        };
+
+        clienteConfigAtualFirebase = new GenericFirebase<Cliente.ConfigClienteAtual>($"clientes/{Cliente.ClienteLogado._id}/configClienteAtual")
+        {
+            Callback = (data) =>
+            {
+                if (data != null)
+                {
+                    Cliente.ClienteLogado.configClienteAtual = data;
+
+                    ClienteEstaNoEstabelecimento();
+                }
+            }
+        };
+
+        clienteAvatarInfoFirebase = new GenericFirebase<Cliente.AvatarInfo>($"clientes/{Cliente.ClienteLogado._id}/avatar/info")
+        {
+            Callback = (data) =>
+            {
+                bool upouLevel = data.level > Cliente.ClienteLogado.avatar.info.level;
+
+                Cliente.ClienteLogado.avatar.info = data;
+                if (upouLevel)
+                {
+                    AppManager.Instance.AtivarLevelUp();
+                }
+
+                atualizarExp();
+            }
+        };
+
+        clienteConfigAtualFirebase.Watch(true);
+        clienteAvatarInfoFirebase.Watch(true);
     }
     #endregion
 
@@ -84,128 +145,16 @@ public class Main : MonoBehaviour
     {
         TxtApelido.text = Cliente.ClienteLogado.apelido;
         PreencherAvatares.Invoke();
-        //FindObjectOfType<MenuUsuario>().PreencherAvatares();
-        Cliente.ClienteLogado.ConfigurarExpProLevel();
         atualizarExp();
-        ClienteEstaNoEstabelecimento();
     }
 
     private void atualizarExp()
     {
         int pctExp = Cliente.ClienteLogado.AtualizarPctExp();
 
-        TxtLevel.text = Cliente.ClienteLogado.avatar.level.ToString();
+        TxtLevel.text = Cliente.ClienteLogado.avatar.info.level.ToString();
         TxtPctExp.text = pctExp + "%";
-        ImgBarExp.transform.localScale = new Vector3((pctExp / 100f), 1, 1);
-    }
-
-    public void AdicionarExp(Configuracoes.LevelSystem.Acao acao, int parametro)
-    {
-        if (Cliente.ClienteLogado.AdicionarExp(ConfigApp.levelSystem.CalculoExpProAvatar(acao, parametro)))
-        {
-            GameObject objLevelUp = Instantiate(PnlUpLevel, PnlPrincipal.transform);
-            objLevelUp.GetComponent<LevelUpObj>().TxtLevel.GetComponent<Text>().text = Cliente.ClienteLogado.avatar.level.ToString();
-        }
-        atualizarAvatarNoBanco();
-        atualizarExp();
-    }
-
-    private void atualizarAvatarNoBanco()
-    {
-        Dictionary<string, string> form = new Dictionary<string, string>();
-        form.Add("_id", Cliente.ClienteLogado._id);
-        form.Add("avatar", JsonConvert.SerializeObject(Cliente.ClienteLogado.avatar));
-
-        StartCoroutine(AvatarAPI.AvatarAlterar(form,
-        (response, error) =>
-        {
-
-            if (response)
-            {
-                //sucesso
-            }
-        }));
-    }
-
-    //public void ResgatarConquistasUsuario(List<Estabelecimento.Conquista> conquistas, string _idEstabelecimento)
-    //{
-    //    Dictionary<string, string> form = new Dictionary<string, string>
-    //    {
-    //        { "_idCliente", Cliente.ClienteLogado._id },
-    //        { "_idEstabelecimento", _idEstabelecimento }
-    //    };
-
-    //    //StartCoroutine(ClienteAPI.ListarClienteConquistas(form,
-    //    //(response, error) =>
-    //    //{
-    //    //    Instance.MenuEstabelecimento.IniciarConquistas(conquistas, response, _idEstabelecimento);
-    //    //}));
-    //}
-    #endregion
-
-    #region Manipular Componentes
-    public void ManipularMenus(string menuQueVaiAbrir)
-    {
-        LstBotoesMenu.ForEach(x =>
-        {
-            if (x.name != menuQueVaiAbrir)
-            {
-                switch (x.name)
-                {
-                    //Menus que vao ser fechados automaticamente
-                    case "BtnPerfil":
-                        ObjScript.GetComponentInChildren<MenuUsuario>().BtnAbrirMenu(true);
-                        break;
-                    case "BtnConfiguracoes":
-                        ObjScript.GetComponentInChildren<MenuConfig>().BtnAbrirConfiguracoes(true);
-                        break;
-                    case "BtnComanda":
-                        if (Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento)
-                            ObjScript.GetComponentInChildren<MenuComanda>().BtnAbrirMenuComanda(true);
-                        break;
-                    case "BtnEstabelecimentoComanda":
-                        if (Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento)
-                            ObjScript.GetComponentInChildren<MenuEstabComanda>().BtnAbrirMenuEstabelecimentoComanda(true);
-                        break;
-                    default:
-                        Debug.Log(x.name);
-                        ObjScript.GetComponentInChildren<MenuConfig>().BtnAbrirConfiguracoes(true);
-                        ObjScript.GetComponentInChildren<MenuUsuario>().BtnAbrirMenu(true);
-                        ObjScript.GetComponentInChildren<MenuComanda>().BtnAbrirMenuComanda(true);
-                        break;
-                }
-            }
-        });
-    }
-
-    public void AbrirMenu(string nomeMenu, bool abrirMenu, List<GameObject> objAnimar, bool fecharAutomatico)
-    {
-        float tempoAnimacao = 0.1f;
-        float valorScala = 1;
-
-        if (abrirMenu)
-        {
-            if (!fecharAutomatico)
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        }
-        else
-        {
-            valorScala = 0;
-            tempoAnimacao = objAnimar.Count / 10f;
-            if (!fecharAutomatico)
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
-        }
-
-        if (!fecharAutomatico)
-            ManipularMenus(nomeMenu);
-
-
-        for (int i = 0; i < objAnimar.Count; i++)
-        {
-            AnimacoesTween.AnimarObjeto(objAnimar[i], AnimacoesTween.TiposAnimacoes.Scala, null, tempoAnimacao, new Vector2(valorScala, valorScala));
-
-            tempoAnimacao = (abrirMenu) ? tempoAnimacao + 0.1f : tempoAnimacao - 0.1f;
-        }
+        SliderExp.value = pctExp / 100f;
     }
 
     #endregion
@@ -215,45 +164,72 @@ public class Main : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
         StartCoroutine(permissaoCamera());
-        SceneManager.LoadSceneAsync("LeitorQRCode", LoadSceneMode.Additive);
     }
 
     private IEnumerator permissaoCamera()
     {
+
+#if UNITY_ANDROID
+        if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+        {
+            Permission.RequestUserPermission(Permission.Camera);
+        }
+
+        yield return new WaitUntil(() => Permission.HasUserAuthorizedPermission(Permission.Camera));
+
+#elif UNITY_IOS
         yield return Application.RequestUserAuthorization(UserAuthorization.WebCam);
+
+        if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
+        {
+            txtMsg.text = "Precisamos da permissão da câmera";
+            yield break;
+        }
+#endif
 
         if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
         {
             throw new Exception("This Webcam library can't work without the webcam authorization");
         }
+
+        SceneManager.LoadSceneAsync("LeitorQRCode", LoadSceneMode.Additive);
     }
     #endregion
 
     #region Esta No Estabelecimento
     public void ClienteEstaNoEstabelecimento()
     {
+        if (existeConviteEstab()) return;
 
+        if (clienteEstaNoEstab()) return;
+
+        clienteNaoEstaNoEstab();
+    }
+    #endregion
+
+    #region configurarConviteEstab
+    private bool existeConviteEstab()
+    {
         if (Cliente.ClienteLogado.configClienteAtual.conviteEstabPendente)
         {
             PnlDecisao.AbrirPainelConviteEstab(() =>
             {
-                Dictionary<string, string> form = new Dictionary<string, string>
+                Dictionary<string, object> form = new Dictionary<string, object>
                 {
-                    { "_idCliente", Cliente.ClienteLogado._id },
-                    { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento } //na web
+                    { "estabelecimentoId", Cliente.ClienteLogado.configClienteAtual.estabelecimento } //na web
                 };
 
                 StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(form,
                 (response, error) =>
                 {
-                    APIManager.Retorno<string> retornoAPI =
-                        JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-
-                    if (retornoAPI.sucesso)
+                    if (error != null)
                     {
-                        ManipularMenus("FecharTodos");
+                        Debug.Log(error);
+                        StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                        return;
                     }
-                    else
+
+                    if (!response)
                     {
                         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
                     }
@@ -261,43 +237,64 @@ public class Main : MonoBehaviour
             },
             () =>
             {
-                Dictionary<string, string> form = new Dictionary<string, string>
+                StartCoroutine(ClienteAPI.RecusarConviteEstabelecimento((response, error) =>
                 {
-                    { "_idCliente", Cliente.ClienteLogado._id }
-                };
-
-                StartCoroutine(ClienteAPI.RecusarConviteEstabelecimento(form, (response, error) =>
-                {
-                    APIManager.Retorno<string> retornoAPI =
-                        JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-
-                    if (retornoAPI.sucesso)
+                    if (error != null)
                     {
-
+                        Debug.Log(error);
+                        StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                        return;
                     }
-                    else
-                    {
+
+                    if (!response)
                         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                    }
                 }));
             },
             Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento);
 
-            return;
+            return true;
         }
 
+        return false;
+    }
+    #endregion
+
+    #region clienteEstaNoEstab
+    private bool clienteEstaNoEstab()
+    {
+        //esta no estabelecimento
         if (Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento)
         {
             PnlEstaNoEstabelecimento.SetActive(true);
             PnlNaoEstaNoEstabelecimento.SetActive(false);
-            return;
-        }
 
+            comandaClienteFirebase.Watch(true);
+
+            return true;
+        }
+        return false;
+    }
+    #endregion
+
+    #region clienteNaoEstaNoEstab
+    private void clienteNaoEstaNoEstab()
+    {
         //nao esta
         PnlEstaNoEstabelecimento.SetActive(false);
         PnlNaoEstaNoEstabelecimento.SetActive(true);
 
+        if (!estabelecimentosCarregados)
+        {
+            MenuEstabelecimento.ListarEstabelecimento();
+            estabelecimentosCarregados = true;
+        }
+
+        comandaClienteFirebase.Watch(false);
+
+        if (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda))
+        {
+            MenuComanda.IniciarWatchComanda(false);
+        }
     }
     #endregion
-
 }

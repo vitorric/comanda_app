@@ -17,7 +17,6 @@ public class LeitoQRCode : MonoBehaviour {
 	private IScanner BarcodeScanner;
 	public Text TextHeader;
 	public RawImage Image;
-	public GameObject PnlLoading;
 	private float RestartTime;
 
 	// Disable Screen Rotation on that screen
@@ -59,52 +58,39 @@ public class LeitoQRCode : MonoBehaviour {
 		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
 			BarcodeScanner.Stop();
 
-			PnlLoading.SetActive(true);
-			
 			EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
 
-            Dictionary<string, string> data = new Dictionary<string, string>
+            Dictionary<string, object> data = new Dictionary<string, object>
             {
-                { "_idCliente", Cliente.ClienteLogado._id },
-                { "_idEstabelecimento", barCodeValue }
+                { "estabelecimentoId", barCodeValue }
             };
 
-            StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data, 
+            StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data,
             (response, error) =>
-			{
-                APIManager.Retorno<string> retornoAPI = 
-                    JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-	
-				if (retornoAPI.sucesso){
+            {
+                if (error != null)
+                {
+                    Debug.Log(error);
+                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    return;
+                }
 
-                    Main.Instance.ManipularMenus("FecharTodos");		
+                if (response)
+                {
+                    StartCoroutine(StopCamera(() => {
+                        SceneManager.UnloadSceneAsync("LeitorQRCode");
+                    }));
 
-					string[] palavras = retornoAPI.msg.Split(' ');					
+                    return;
+                }
 
-					Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento = true;
-					Cliente.ClienteLogado.configClienteAtual.estabelecimento = barCodeValue;
-					Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento = palavras[palavras.Length -1].Replace("!","");
-
-                    //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-                    Main.Instance.ClienteEstaNoEstabelecimento();
-
-					StartCoroutine(StopCamera(() => {
-						SceneManager.UnloadSceneAsync("LeitorQRCode");
-					}));
-				}else{
-					EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-					PnlLoading.SetActive(false);
-				}
-				
-				//StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));                
-			}));
-            
-            //TextHeader.text += "Found: " + barCodeType + " / " + barCodeValue + "\n";
+                if (!response)
+                {
+                    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+                }
+            }));
 
             RestartTime += Time.realtimeSinceStartup + 1f;
-
-			// Feedback
-			//Audio.Play();
 
 			#if UNITY_ANDROID || UNITY_IOS
 			Handheld.Vibrate();

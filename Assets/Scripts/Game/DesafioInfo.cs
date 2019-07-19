@@ -27,7 +27,7 @@ public class DesafioInfo : MonoBehaviour
     {
         this.gameObject.SetActive(true);
         PnlInfo.SetActive(true);
-        TxtValorPremio.text = Util.FormatarValorDisponivel(valor);
+        TxtValorPremio.text = Util.FormatarValores(valor);
 
         AnimacoesTween.AnimarObjeto(PnlInfo,
                     AnimacoesTween.TiposAnimacoes.Scala,

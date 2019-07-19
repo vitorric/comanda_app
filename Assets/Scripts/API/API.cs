@@ -12,8 +12,8 @@ namespace Network
     public abstract class API
     {
         public const string CONTENT_TYPE_JSON = "application/json";
-        //private const string urlBase = "http://localhost:3000/api/";
-        private const string urlBase = "http://93.188.164.122:3000/api/";
+        private const string urlBase = "http://localhost:3000/api/";
+        //private const string urlBase = "http://93.188.164.122:3000/api/";
         internal const string msgErro = "Solicitação inválida, tente novamente!";
 
         public partial class Retorno<T>
@@ -23,8 +23,7 @@ namespace Network
             public T retorno;
         }
 
-        internal static string requestError(UnityWebRequest request,
-            Dictionary<string, string> propriedades)
+        internal static string requestError(UnityWebRequest request)
         {
 
             string responseBody = string.Empty;
@@ -43,9 +42,6 @@ namespace Network
                     "[api#error] request status code: {0}, data: ======= response: {1}, error: {2} =======",
                     request.responseCode, responseBody, request.error));
             }
-
-            if (propriedades != null)
-                Debug.LogError(JsonConvert.SerializeObject(propriedades));
 
             if (request.isHttpError)
             {
@@ -86,7 +82,7 @@ namespace Network
 
         #region Post
         internal static IEnumerator Post(string url,
-                            Dictionary<string, string> data,
+                            Dictionary<string, object> data,
                             Action<UnityWebRequest> doneCallback = null)
         {
             string urlPost = urlBase + url;
@@ -101,7 +97,7 @@ namespace Network
 
                 request.SetRequestHeader("Content-Type", CONTENT_TYPE_JSON);
                 request.SetRequestHeader("Accept", CONTENT_TYPE_JSON);
-                request.SetRequestHeader("Authorization", Cliente.ObterToken());
+                request.SetRequestHeader("Authorization", AppManager.Instance.ObterToken());
 
                 yield return request.SendWebRequest();
 

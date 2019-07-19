@@ -25,6 +25,10 @@ public class DesafioObj : MonoBehaviour
     public Slider BarraProgresso;
     public Text TxtProgresso;
 
+    [Header("Painel Resgatar Premio")]
+    public GameObject PnlResgatarPremio;
+    public Text TxtResgatarPremio;
+
     [Header("Painel Tempo Esgotado")]
     public GameObject PnlTempoEsgotado;
 
@@ -34,10 +38,11 @@ public class DesafioObj : MonoBehaviour
 
 
     //private Estabelecimento.Conquista conquista;
-    private bool pararConferenciaTempo = false;
+    private bool pararConferenciaTempo = true;
 
     //private Cliente.Conquista conquistaUsuario;
     public Desafio Desafio;
+    public Cliente.Desafio DesafioCliente;
 
     private void Awake()
     {
@@ -51,30 +56,29 @@ public class DesafioObj : MonoBehaviour
     }
     #endregion
 
-    #region Update
-    void Update()
+    #region rodarRelogio
+    void rodarRelogio()
     {
-        if (!pararConferenciaTempo)
+        TimeSpan ts = Desafio.tempoDuracao.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
+
+        if (ts.TotalSeconds <= 0)
         {
-            pararConferenciaTempo = !rodarRelogio();
-            if (pararConferenciaTempo == false)
-            {
-                TimeSpan data = Desafio.tempoDuracao.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
-                TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", data.Hours + (data.Days * 24), data.Minutes, data.Seconds);
-            }
-            else
-            {
-                pararConferenciaTempo = true;
-                configurarPainelAlerta();
-            }
+            pararConferenciaTempo = true;
+            configurarPainelAlerta();
+        }
+        else
+        {
+            TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
+            Invoke("rodarRelogio", 1f);
         }
     }
     #endregion
 
     #region PreencherInfo
-    public void PreencherInfo(Desafio desafio, string estabelecimentoId)
+    public void PreencherInfo(Desafio desafio, Cliente.Desafio desafioCliente)
     {
-        this.Desafio = desafio;
+        Desafio = desafio;
+        DesafioCliente = desafioCliente;
 
         TxtTituloConquista.text = desafio.nome;
         TxtDescricaoConquista.text = desafio.descricao;
@@ -82,27 +86,39 @@ public class DesafioObj : MonoBehaviour
 
         lstImgGrupos.ForEach(x => x.SetActive(desafio.emGrupo));
 
-        //int progressoUsuario = 0;
+        int progressoUsuario = 0;
 
-        //if (conquistaUsuario != null)
-        //{
-        //    this.conquistaUsuario = conquistaUsuario;
-        //    progressoUsuario = conquistaUsuario.quantidadeParaObter;
-        //}
+        if (DesafioCliente != null)
+        {
+            progressoUsuario = DesafioCliente.progresso;
 
-        //BarraProgresso.value = (float)progressoUsuario / (float)desafio.objetivo.quantidade / 100f;
+            if (DesafioCliente.concluido)
+            {
+                esconderTodosPaineis();
 
-        //TxtProgresso.text = progressoUsuario + "/" + desafio.objetivo.quantidade;
-        TxtProgresso.text = "0/" + desafio.objetivo.quantidade;
-        //configurarPainelAlerta();
-    }
-    #endregion
+                if (DesafioCliente.resgatouPremio)
+                {
+                    PnlResgatarPremio.SetActive(true);
+                    TxtResgatarPremio.text = Util.FormatarValores(desafio.premio);
+                }
+                else
+                {
+                    PnlConquistaConcluida.SetActive(true);
+                }
+            }
+            else
+            {
+                esconderTodosPaineis();
+                PnlConquista.SetActive(true);
+            }
+        }
 
-    #region rodarRelogio
-    public bool rodarRelogio()
-    {
-        //return (conquista.tempoDuracao.ToLocalTime().Subtract((DateTime.Now.ToLocalTime())).TotalSeconds > 0) ? true : false;
-        return true;
+        BarraProgresso.value = (float)progressoUsuario / (float)desafio.objetivo.quantidade;
+
+        TxtProgresso.text = progressoUsuario + "/" + desafio.objetivo.quantidade;
+
+        rodarRelogio();
+
     }
     #endregion
 
@@ -126,17 +142,21 @@ public class DesafioObj : MonoBehaviour
     #region abrirPnlInfoDesafio
     private void abrirPnlInfoDesafio()
     {
+        PnlPopUp.AbrirPopUpCanvas(
+            Main.Instance.MenuEstabelecimento.CanvasDesafioInfo, 
+            Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, () => {
+                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
+            });
 
-        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+    }
+    #endregion
 
-        AnimacoesTween.AnimarObjeto(Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, 
-        AnimacoesTween.TiposAnimacoes.Scala, 
-        () =>
-        {
-            Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
-        },
-        AppManager.TEMPO_ANIMACAO_ABRIR_MODEL,
-        Vector2.one);
+    #region esconderTodosPaineis
+    private void esconderTodosPaineis()
+    {
+        PnlConquista.SetActive(false);
+        PnlResgatarPremio.SetActive(false);
+        PnlConquistaConcluida.SetActive(false);
     }
     #endregion
 

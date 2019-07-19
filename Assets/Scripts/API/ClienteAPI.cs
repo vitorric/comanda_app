@@ -12,7 +12,7 @@ namespace Network
         //OK
         #region ClienteLogin
         public static IEnumerator ClienteLogin(
-               Dictionary<string, string> properties,
+               Dictionary<string, object> properties,
                Action<Cliente.SessaoCliente, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
@@ -26,7 +26,7 @@ namespace Network
                         request.isNetworkError ||
                         request.responseCode != 200)
                     {
-                        done(null, requestError(request, properties));
+                        done(null, requestError(request));
                         return;
                     }
 
@@ -56,7 +56,7 @@ namespace Network
         //OK
         #region ClienteRecuperarSenha
         public static IEnumerator ClienteRecuperarSenha(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<string, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
@@ -69,7 +69,7 @@ namespace Network
                          request.isNetworkError ||
                          request.responseCode != 200)
                      {
-                         done(null, requestError(request, properties));
+                         done(null, requestError(request));
                          return;
                      }
 
@@ -92,10 +92,11 @@ namespace Network
                  });
         }
         #endregion
+
         //OK
         #region ClienteCadastrar
         public static IEnumerator ClienteCadastrar(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<Cliente.SessaoCliente, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
@@ -108,7 +109,7 @@ namespace Network
                         request.isNetworkError ||
                         request.responseCode != 200)
                     {
-                        done(null, requestError(request, properties));
+                        done(null, requestError(request));
                         return;
                     }
 
@@ -138,7 +139,7 @@ namespace Network
         //OK
         #region ClienteAlterarConfigApp
         public static IEnumerator ClienteAlterarConfigApp(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<bool, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
@@ -151,7 +152,7 @@ namespace Network
                         request.isNetworkError ||
                         request.responseCode != 200)
                     {
-                        done(false, requestError(request, properties));
+                        done(false, requestError(request));
                         return;
                     }
 
@@ -181,7 +182,7 @@ namespace Network
         //OK
         #region ClienteAlterar
         public static IEnumerator ClienteAlterar(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<bool, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
@@ -194,7 +195,7 @@ namespace Network
                         request.isNetworkError ||
                         request.responseCode != 200)
                     {
-                        done(false, requestError(request, properties));
+                        done(false, requestError(request));
                         return;
                     }
 
@@ -223,7 +224,7 @@ namespace Network
 
         #region ClienteComprarItem
         public static IEnumerator ClienteComprarItem(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<string, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
@@ -235,7 +236,7 @@ namespace Network
                     if (request == null ||
                         request.isNetworkError ||
                         request.responseCode != 200)
-                        done(null, requestError(request, properties));
+                        done(null, requestError(request));
 
                     try
                     {
@@ -259,21 +260,25 @@ namespace Network
         }
         #endregion
 
+        //OK
         #region EntrarNoEstabelecimento
         public static IEnumerator EntrarNoEstabelecimento(
-                Dictionary<string, string> properties,
-                Action<string, string> doneCallback = null)
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
 
-            yield return Post("entrarestabelecimento/cliente",
+            yield return Post("entrar_estabelecimento/cliente",
                 properties,
                 (request) =>
                 {
                     if (request == null ||
                         request.isNetworkError ||
                         request.responseCode != 200)
-                        done(null, requestError(request, properties));
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
 
                     try
                     {
@@ -281,15 +286,18 @@ namespace Network
                                    JsonConvert.DeserializeObject<Retorno<string>>
                                    (request.downloadHandler.text);
 
-                        if (retornoAPI != null)
+                        if (retornoAPI.sucesso)
                         {
-                            done(retornoAPI.retorno, null);
+                            done(retornoAPI.sucesso, null);
+                            return;
                         }
+                        
+                        done(false, retornoAPI.mensagem);
                     }
                     catch (Exception ex)
                     {
                         Debug.Log(ex.Message);
-                        done(null, msgErro);
+                        done(false, msgErro);
                     }
                 });
         }
@@ -297,19 +305,21 @@ namespace Network
 
         #region SairDoEstabelecimento
         public static IEnumerator SairDoEstabelecimento(
-                Dictionary<string, string> properties,
-                Action<string, string> doneCallback = null)
+                Action<bool, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
 
             yield return Post("sair_estabelecimento/cliente",
-                properties,
+                null,
                 (request) =>
                 {
                     if (request == null ||
                         request.isNetworkError ||
                         request.responseCode != 200)
-                        done(null, requestError(request, properties));
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
 
                     try
                     {
@@ -317,35 +327,41 @@ namespace Network
                                    JsonConvert.DeserializeObject<Retorno<string>>
                                    (request.downloadHandler.text);
 
-                        if (retornoAPI != null)
+                        if (retornoAPI.sucesso)
                         {
-                            done(retornoAPI.retorno, null);
+                            done(true, null);
+                            return;
                         }
+
+                        done(false, retornoAPI.mensagem);
                     }
                     catch (Exception ex)
                     {
                         Debug.Log(ex.Message);
-                        done(null, msgErro);
+                        done(false, msgErro);
                     }
                 });
         }
         #endregion
 
+        //OK
         #region RecusarConviteEstabelecimento
         public static IEnumerator RecusarConviteEstabelecimento(
-                Dictionary<string, string> properties,
-                Action<string, string> doneCallback = null)
+                Action<bool, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
 
             yield return Post("recusar_convite_estabelecimento/cliente",
-                properties,
+                null,
                 (request) =>
                 {
                     if (request == null ||
                         request.isNetworkError ||
                         request.responseCode != 200)
-                        done(null, requestError(request, properties));
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
 
                     try
                     {
@@ -353,51 +369,18 @@ namespace Network
                                    JsonConvert.DeserializeObject<Retorno<string>>
                                    (request.downloadHandler.text);
 
-                        if (retornoAPI != null)
+                        if (retornoAPI.sucesso)
                         {
-                            done(retornoAPI.retorno, null);
+                            done(true, null);
+                            return;
                         }
+
+                        done(false, retornoAPI.mensagem);
                     }
                     catch (Exception ex)
                     {
                         Debug.Log(ex.Message);
-                        done(null, msgErro);
-                    }
-                });
-        }
-        #endregion
-
-        #region ListarClienteConquistas
-        public static IEnumerator ListarClienteConquistas(
-                Dictionary<string, string> properties,
-                Action<List<Cliente.Conquista>, string> doneCallback = null)
-        {
-            var done = wrapCallback(doneCallback);
-
-            yield return Post("listar/cliente/conquistas",
-                properties,
-                (request) =>
-                {
-                    if (request == null ||
-                        request.isNetworkError ||
-                        request.responseCode != 200)
-                        done(null, requestError(request, properties));
-
-                    try
-                    {
-                        Retorno<List<Cliente.Conquista>> retornoAPI =
-                                   JsonConvert.DeserializeObject<Retorno<List<Cliente.Conquista>>>
-                                   (request.downloadHandler.text);
-
-                        if (retornoAPI != null)
-                        {
-                            done(retornoAPI.retorno, null);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.Log(ex.Message);
-                        done(null, msgErro);
+                        done(false, msgErro);
                     }
                 });
         }
@@ -418,7 +401,7 @@ namespace Network
                         request.isNetworkError ||
                         request.responseCode != 200)
                     {
-                        done(null, requestError(request, null));
+                        done(null, requestError(request));
                         return;
                     }
 

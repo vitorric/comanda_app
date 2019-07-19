@@ -16,39 +16,15 @@ public class MenuEstabComanda : MonoBehaviour
     public Button BtnConquistaComanda;
     public Button BtnSairEstabelecimento;
 
-    [HideInInspector]
-    public bool MenuAtivo = false;
-
-    private List<GameObject> lstMenu;
-
     private void Awake()
     {
-        lstMenu = new List<GameObject>
-        {
-            BtnEstabInfoComanda.gameObject,
-            BtnConquistaComanda.gameObject,
-            BtnSairEstabelecimento.gameObject
-        };
-
         configurarListener();
     }
 
     #region configurarListener
     private void configurarListener()
     {
-        BtnMenuEstabComanda.onClick.AddListener(() => BtnAbrirMenuEstabelecimentoComanda());
-        BtnEstabInfoComanda.onClick.AddListener(() => btnAbrirInfoEstabelecimento(0));
-        BtnConquistaComanda.onClick.AddListener(() => btnAbrirInfoEstabelecimento(1));
         BtnSairEstabelecimento.onClick.AddListener(() => btnSairDoEstabelecimento());
-    }
-    #endregion
-
-    #region BtnAbrirMenuEstabelecimentoComanda
-    public void BtnAbrirMenuEstabelecimentoComanda(bool fecharAutomatico = false)
-    {
-        MenuAtivo = (fecharAutomatico) ? false : !MenuAtivo;
-
-        Main.Instance.AbrirMenu("BtnEstabelecimentoComanda", (fecharAutomatico) ? false : MenuAtivo, lstMenu, fecharAutomatico);
     }
     #endregion
 
@@ -62,7 +38,7 @@ public class MenuEstabComanda : MonoBehaviour
     #region obterEstabelecimento
     private void obterEstabelecimento(int aba)
     {
-        Dictionary<string, string> form = new Dictionary<string, string>
+        Dictionary<string, object> form = new Dictionary<string, object>
         {
             { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
         };
@@ -70,7 +46,7 @@ public class MenuEstabComanda : MonoBehaviour
         StartCoroutine(EstabelecimentoAPI.ObterEstabelecimento(form,
         (response, error) =>
         {
-            Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(response, false, aba);
+            Main.Instance.MenuEstabelecimento.PreencherInfoEstabelecimento(response, aba);
 
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
             //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
@@ -83,53 +59,23 @@ public class MenuEstabComanda : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
 
-        Dictionary<string, string> form = new Dictionary<string, string>
-        {
-            { "_idCliente", Cliente.ClienteLogado._id },
-            { "_idEstabelecimento", Cliente.ClienteLogado.configClienteAtual.estabelecimento }
-        };
-
         StartCoroutine(ClienteAPI.SairDoEstabelecimento(
-        form,
         (response, error) =>
         {
-            APIManager.Retorno<string> retornoAPI = JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-
-            if (retornoAPI.sucesso)
+            if (error != null)
             {
-                Main.Instance.ManipularMenus("FecharTodos");
-                Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento = false;
-                Cliente.ClienteLogado.configClienteAtual.estabelecimento = null;
-                Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento = null;
-                Main.Instance.ClienteEstaNoEstabelecimento();
+                Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
             }
-            else
+
+            if (!response)
             {
                 EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
             }
         }));
-
     }
     #endregion
 
-
-
-
-    //public void FecharPnlEstabInfo()
-    //{
-    //    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
-    //    AnimacoesTween.AnimarObjeto(EventSystem.current.currentSelectedGameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () =>
-    //    {
-    //        Main.Instance.PnlPopUp.SetActive(false);
-    //        AnimacoesTween.AnimarObjeto(Main.Instance.MenuEstabelecimento.PnlEstabInfo, AnimacoesTween.TiposAnimacoes.Scala, () =>
-    //        {
-    //            Main.Instance.MenuEstabelecimento.PnlEstabInfo.SetActive(false);
-    //        }, 0.1f, new Vector2(0, 0));
-    //    },
-    //    0.1f);
-
-    //    Main.Instance.MenuEstabelecimento.ScvEstabelecimentoShopContent.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
-    //}
 
 }

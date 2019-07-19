@@ -1,55 +1,124 @@
 ﻿using APIModel;
 using Firebase.Database;
-using Newtonsoft.Json;
 using System;
-using System.Globalization;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace FirebaseModel
 {
     public class ClienteFirebase
     {
-        #region Watch - ConfigClienteAtual
-        public void ConfigClienteAtual(object sender, ValueChangedEventArgs e)
+        public enum TipoAcao
+        {
+            Adicionar,
+            Modificar,
+            Remover
+        }
+
+        public Action<Cliente.Desafio, TipoAcao> AcaoDesafio;
+
+        public void Watch(string clienteId, bool ehParaAdicionar)
+        {
+            var desafiosCliente = FirebaseDatabase.DefaultInstance.GetReference("desafios/" + clienteId);
+
+            if (ehParaAdicionar)
+            {
+                desafiosCliente.ChildAdded += desafioAdicionar;
+                desafiosCliente.ChildChanged += desafioModificar;
+                desafiosCliente.ChildRemoved += desafioRemover;
+                return;
+            }
+
+            if (!ehParaAdicionar)
+            {
+                desafiosCliente.ChildAdded -= desafioAdicionar;
+                desafiosCliente.ChildChanged -= desafioModificar;
+                desafiosCliente.ChildChanged -= desafioRemover;
+                return;
+            }
+        }
+
+
+        #region AcoesDesafio
+
+        #region desafioAdicionar
+        private void desafioAdicionar(object sender, ChildChangedEventArgs e)
         {
             if (e.DatabaseError != null)
             {
-                Debug.LogError("ERRO EM ----------------------------- ConfigClienteAtual");
                 Debug.LogError(e.DatabaseError.Message);
                 return;
             }
 
             try
             {
-                Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento = (e.Snapshot.HasChild("estaEmUmEstabelecimento")) ?
-                                                       Convert.ToBoolean(e.Snapshot.Child("estaEmUmEstabelecimento").Value) : false;
-
-                Cliente.ClienteLogado.configClienteAtual.estabelecimento = (e.Snapshot.HasChild("estabelecimento")) ?
-                                                       Convert.ToString(e.Snapshot.Child("estabelecimento").Value) : "";
-
-                Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento = (e.Snapshot.HasChild("nomeEstabelecimento")) ?
-                                                       Convert.ToString(e.Snapshot.Child("nomeEstabelecimento").Value) : "";
-
-                Cliente.ClienteLogado.configClienteAtual.conviteEstabPendente = (e.Snapshot.HasChild("conviteEstabPendente")) ?
-                                                       Convert.ToBoolean(e.Snapshot.Child("conviteEstabPendente").Value) : false;
-
-                Main.Instance.ClienteEstaNoEstabelecimento();
+                AcaoDesafio(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Adicionar);
             }
             catch (Exception x)
             {
-                Debug.Log(x.Message);
+                Debug.LogError(x.Message);
                 throw x;
             }
         }
-
         #endregion
 
-        #region Watch - Exp/Level
+        #region desafioModificar
+        private void desafioModificar(object sender, ChildChangedEventArgs e)
+        {
+            if (e.DatabaseError != null)
+            {
+                Debug.LogError(e.DatabaseError.Message);
+                return;
+            }
+
+            try
+            {
+                AcaoDesafio(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Modificar);
+            }
+            catch (Exception x)
+            {
+                Debug.LogError(x.Message);
+                throw x;
+            }
+        }
         #endregion
 
-        #region Watch - Status
+        #region desafioRemover
+        private void desafioRemover(object sender, ChildChangedEventArgs e)
+        {
+            if (e.DatabaseError != null)
+            {
+                Debug.LogError(e.DatabaseError.Message);
+                return;
+            }
+
+            try
+            {
+                AcaoDesafio(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Remover);
+            }
+            catch (Exception x)
+            {
+                Debug.LogError(x.Message);
+                throw x;
+            }
+        }
         #endregion
 
+        #region tratarSnapshotItemLoja
+        private Cliente.Desafio tratarSnapshotItemLoja(DataSnapshot ds)
+        {
+            Cliente.Desafio desafio = new Cliente.Desafio
+            {
+                _id = Convert.ToString(ds.Child("_id").Value),
+                concluido = Convert.ToBoolean(ds.Child("concluido").Value),
+                resgatouPremio = Convert.ToBoolean(ds.Child("resgatouPremio").Value),
+                progresso = Convert.ToInt32(ds.Child("progresso").Value),
+                estabelecimento = Convert.ToString(ds.Child("estabelecimento").Value)
+            };
+
+            return desafio;
+        }
+        #endregion
+
+        #endregion
     }
 }

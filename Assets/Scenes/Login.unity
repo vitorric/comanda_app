@@ -6361,7 +6361,7 @@ MonoBehaviour:
     m_SelectedTrigger: Highlighted
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 323903824}
+  m_TargetGraphic: {fileID: 1802210765}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []

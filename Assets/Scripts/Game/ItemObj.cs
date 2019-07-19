@@ -36,26 +36,6 @@ public class ItemObj : MonoBehaviour
     private bool pararConferenciaTempo = false;
     private bool lojaAberta = false;
 
-    #region Update
-    void Update()
-    {
-        if (!pararConferenciaTempo)
-        {
-            pararConferenciaTempo = !rodarRelogio();
-            if (pararConferenciaTempo == false)
-            {
-                TimeSpan data = ItemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
-                TxtTempo.text = string.Format("{0:00}:{1:00}:{2:00}", data.Hours + (data.Days * 24), data.Minutes, data.Seconds);
-            }
-            else
-            {
-                pararConferenciaTempo = true;
-                configurarPainelAlerta();
-            }
-        }
-    }
-    #endregion
-
     #region PreencherInfo
     public void PreencherInfo(ItemLoja itemLoja, bool lojaAberta, string _idEstabelecimento)
     {
@@ -66,11 +46,31 @@ public class ItemObj : MonoBehaviour
         this.estabelecimentoId = _idEstabelecimento;
 
         TxtNome.text = itemLoja.nome;
-        TxtPreco.text = Util.FormatarValorDisponivel(itemLoja.preco);
+        TxtPreco.text = Util.FormatarValores(itemLoja.preco);
 
         configurarPainelAlerta();
 
         configurarListener();
+        rodarRelogio();
+    }
+    #endregion
+
+    #region rodarRelogio
+    void rodarRelogio()
+    {
+        TimeSpan ts = ItemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
+
+        if (ts.TotalSeconds <= 0)
+        {
+            pararConferenciaTempo = true;
+            configurarPainelAlerta();
+        }
+        else
+        {
+            TxtTempo.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
+            //txtTime.text = ts.ToString(@"hh\h\ mm\m\ ss\s");
+            Invoke("rodarRelogio", 1f);
+        }
     }
     #endregion
 
@@ -91,13 +91,6 @@ public class ItemObj : MonoBehaviour
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
         Main.Instance.MenuEstabelecimento.PreencherDescricaoItem(ItemLoja.descricao);
-    }
-    #endregion
-
-    #region rodarRelogio
-    public bool rodarRelogio()
-    {
-        return (ItemLoja.tempoDisponivel.ToLocalTime().Subtract((DateTime.Now.ToLocalTime())).TotalSeconds > 0) ? true : false;
     }
     #endregion
 
@@ -170,7 +163,7 @@ public class ItemObj : MonoBehaviour
         Main.Instance.MenuEstabelecimento.PnlConfirmarItemCompra.SetActive(false);
         Cliente.Dados usuario = Cliente.ClienteLogado;
 
-        Dictionary<string, string> data = new Dictionary<string, string>
+        Dictionary<string, object> data = new Dictionary<string, object>
             {
                 { "estabelecimento", estabelecimentoId },
                 { "itemLoja", ItemLoja._id }
@@ -190,7 +183,6 @@ public class ItemObj : MonoBehaviour
                 Main.Instance.MenuEstabelecimento.AtualizarInfoGold(estabelecimentoId, novoGold);
 
                 ItemLoja.quantidadeDisponivel -= 1;
-                Main.Instance.AdicionarExp(Configuracoes.LevelSystem.Acao.CompraItem, (int)ItemLoja.preco);
                 configurarPainelAlerta();
             }
             else

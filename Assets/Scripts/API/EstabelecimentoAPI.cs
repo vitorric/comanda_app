@@ -9,96 +9,89 @@ namespace Network
 {
     public class EstabelecimentoAPI : API
     {
-
+        //OK
         #region ListarEstabelecimento
         public static IEnumerator ListarEstabelecimento(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<List<Estabelecimento>, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
 
-            try
-            {
-                return Post("listar/estabelecimento/cliente",
-                    properties,
-                    (request) =>
+            return Post("listar/estabelecimento/cliente",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
                     {
-                        if (request == null ||
-                            request.isNetworkError ||
-                            request.responseCode != 200)
-                            done(null, requestError(request, properties));
+                        done(null, requestError(request));
+                        return;
+                    }
 
-                        try
+                    try
+                    {
+                        Retorno<List<Estabelecimento>> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<List<Estabelecimento>>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
                         {
-                            Retorno<List<Estabelecimento>> retornoAPI =
-                                       JsonConvert.DeserializeObject<Retorno<List<Estabelecimento>>>
-                                       (request.downloadHandler.text);
-
-                            if (retornoAPI != null)
-                            {
-                                done(retornoAPI.retorno, null);
-                            }
+                            done(retornoAPI.retorno, null);
+                            return;
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.Log(ex.Message);
-                            done(null, ex.Message);
-                        }
-                    });
-            }
-            catch (Exception ex)
-            {
-                Debug.Log(ex.Message);
-                done(null, ex.Message);
-            }
 
-            return null;
+                        done(null, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(null, ex.Message);
+                    }
+                });
         }
         #endregion
 
+        //OK
         #region ObterEstabelecimento
         public static IEnumerator ObterEstabelecimento(
-                Dictionary<string, string> properties,
+                Dictionary<string, object> properties,
                 Action<Estabelecimento, string> doneCallback = null)
         {
             var done = wrapCallback(doneCallback);
 
-            try
-            {
-                return Post("obter/estabelecimento/cliente",
-                    properties,
-                    (request) =>
+            return Post("obter/estabelecimento/cliente",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
                     {
-                        if (request == null ||
-                            request.isNetworkError ||
-                            request.responseCode != 200)
-                            done(null, requestError(request, properties));
+                        done(null, requestError(request));
+                        return;
+                    }
 
-                        try
+                    try
+                    {
+                        Retorno<Estabelecimento> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<Estabelecimento>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
                         {
-                            Retorno<Estabelecimento> retornoAPI =
-                                       JsonConvert.DeserializeObject<Retorno<Estabelecimento>>
-                                       (request.downloadHandler.text);
-
-                            if (retornoAPI != null)
-                            {
-                                done(retornoAPI.retorno, null);
-                            }
+                            done(retornoAPI.retorno, null);
+                            return;
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.Log(ex.Message);
-                            done(null, ex.Message);
-                        }
-                    });
-            }
-            catch (Exception ex)
-            {
-                Debug.Log(ex.Message);
-                done(null, ex.Message);
-            }
 
-            return null;
+                        done(null, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(null, ex.Message);
+                    }
+                });
         }
         #endregion
 

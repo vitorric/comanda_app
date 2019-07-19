@@ -80,8 +80,12 @@ public class FirebaseManager : MonoBehaviour
                                                           avatar = new Cliente.Avatar
                                                           {
                                                               _id = Convert.ToString(task.Result.Child("avatar").Child("_id").Value),
-                                                              exp = Convert.ToInt32(task.Result.Child("avatar").Child("exp").Value),
-                                                              level = Convert.ToInt32(task.Result.Child("avatar").Child("level").Value),
+                                                              info = new Cliente.AvatarInfo
+                                                              {
+                                                                  exp = Convert.ToInt32(task.Result.Child("avatar").Child("info").Child("exp").Value),
+                                                                  expProximoLevel = Convert.ToInt32(task.Result.Child("avatar").Child("info").Child("expProximoLevel").Value),
+                                                                  level = Convert.ToInt32(task.Result.Child("avatar").Child("info").Child("level").Value),
+                                                              },
                                                               barba = Convert.ToString(task.Result.Child("avatar").Child("barba").Value),
                                                               boca = Convert.ToString(task.Result.Child("avatar").Child("boca").Value),
                                                               cabeca = Convert.ToString(task.Result.Child("avatar").Child("cabeca").Value),
@@ -98,7 +102,6 @@ public class FirebaseManager : MonoBehaviour
                                                               sombrancelhas = Convert.ToString(task.Result.Child("avatar").Child("sombrancelhas").Value)
                                                           },
                                                           configClienteAtual = new Cliente.ConfigClienteAtual(),
-                                                          conquistas = new System.Collections.Generic.List<Cliente.Conquista>(),
                                                           goldPorEstabelecimento = new System.Collections.Generic.List<Cliente.GoldPorEstabelecimento>()
                                                       };
                                                   });
@@ -112,23 +115,6 @@ public class FirebaseManager : MonoBehaviour
         
 
         return cliente;
-    }
-    #endregion
-
-    #region IniciarWatch
-    public void IniciarWatch(string clienteId)
-    {
-        try
-        {
-            var clienteRef = FirebaseDatabase.DefaultInstance.GetReference("clientes/" + clienteId + "/configClienteAtual");
-
-            clienteRef.ValueChanged += new ClienteFirebase().ConfigClienteAtual;
-        }
-        catch (Exception e)
-        {
-            Debug.Log("---------------------------------------------------------------------------------------");
-            Debug.Log("ObterUsuario: " + e.Message);
-        }
     }
     #endregion
 

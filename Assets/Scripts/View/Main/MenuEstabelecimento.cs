@@ -2,29 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using APIModel;
+using FirebaseModel;
 using Network;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MenuEstabelecimento : MonoBehaviour
 {
+    [Header("Button Aba Config")]
+    public ButtonControl buttonControl;
+
     [Header("Canvas")]
-    public Canvas CanvasEstabs;
     public Canvas CanvasEstabInfo;
+    public Canvas CanvasDesafioInfo;
 
     [Header("Botoes")]
-    public Button BtnAbrirListaEstab;
-    public Button BtnFecharListaEstab;
     public Button BtnFecharPnlInfo;
     public Button BtnFecharPnlConfirmacaoItem;
-
-    [Header("Toggle")]
-    public Toggle BtnAbaInfo;
-    public Toggle BtnAbaConquista;
-    public Toggle BtnAbaShop;
+    public Button BtnSairEstabelecimento;
 
     [Header("Estabelecimento Lista")]
-    public GameObject PnlEstabelecimentos;
     public Transform ScvEstabelecimentos;
     public EstabelecimentoObj EstabelecimentoRef;
 
@@ -81,53 +78,34 @@ public class MenuEstabelecimento : MonoBehaviour
     #region configurarListener
     private void configurarListener()
     {
-        BtnAbrirListaEstab.onClick.AddListener(() => btnAbrirPnlEstabelecimento());
-        BtnFecharListaEstab.onClick.AddListener(() => PnlPopUp.FecharPopUp(CanvasEstabs, PnlEstabelecimentos, () =>
-        {
-            ScvEstabelecimentos.GetComponentsInChildren<EstabelecimentoObj>().ToList().ForEach(x => Destroy(x.gameObject));
-
-            PnlAbasEdicao.ForEach(x => x.SetActive(false));
-            PnlAbasEdicao[0].SetActive(true);
-        }));
-
-        BtnAbaInfo.onValueChanged.AddListener((BtnAbaInfo) => mudarAba(0, true));
-        BtnAbaConquista.onValueChanged.AddListener((BtnAbaConquista) => mudarAba(1, true));
-        BtnAbaShop.onValueChanged.AddListener((BtnAbaShop) => mudarAba(2, true));
+        buttonControl.BtnAbas[0].onClick.AddListener(() => mudarAba(0, true));
+        buttonControl.BtnAbas[1].onClick.AddListener(() => mudarAba(1, true));
+        buttonControl.BtnAbas[2].onClick.AddListener(() => mudarAba(2, true));
 
         BtnFecharPnlConfirmacaoItem.onClick.AddListener(() => PnlPopUp.FecharPnl(PnlConfirmarItemCompra, null));
-    }
-    #endregion
-
-    #region btnAbrirPnlEstabelecimento
-    private void btnAbrirPnlEstabelecimento()
-    {
-        Main.Instance.ManipularMenus("FecharTodos");
-
-        ScvEstabelecimentos.GetComponentsInChildren<EstabelecimentoObj>().ToList().ForEach(x => Destroy(x.gameObject));
-
-        listarEstabelecimento((lstEstabelecimentos) =>
-        {
-            PnlPopUp.AbrirPopUpCanvas(CanvasEstabs, 
-             PnlEstabelecimentos,
-             () =>
-             {
-                 foreach (Estabelecimento estabelecimento in lstEstabelecimentos)
-                 {
-                     EstabelecimentoObj objEstab = Instantiate(EstabelecimentoRef, ScvEstabelecimentos);
-                     objEstab.PreencherInfo(estabelecimento, Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimento._id));
-                 }
-             });
-        });
+        BtnFecharPnlInfo.onClick.AddListener(() => fecharPnlEstabInfo());
+        BtnSairEstabelecimento.onClick.AddListener(() => btnSairEstabelecimento());
     }
     #endregion
 
     #region listarEstabelecimento
-    private void listarEstabelecimento(Action<List<Estabelecimento>> callback)
+    public void ListarEstabelecimento()
     {
         StartCoroutine(EstabelecimentoAPI.ListarEstabelecimento(null,
         (response, error) =>
         {
-            callback(response);
+            if (error != null)
+            {
+                Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
+            }
+
+            foreach (Estabelecimento estabelecimento in response)
+            {
+                EstabelecimentoObj objEstab = Instantiate(EstabelecimentoRef, ScvEstabelecimentos);
+                objEstab.PreencherInfo(estabelecimento, Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimento._id));
+            }
         }));
     }
     #endregion    
@@ -140,25 +118,52 @@ public class MenuEstabelecimento : MonoBehaviour
 
         PnlAbasEdicao.ForEach(x => x.SetActive(false));
         PnlAbasEdicao[numeroAba].SetActive(true);
+        buttonControl.TrocarAba(numeroAba);
+    }
+    #endregion
+
+    #region btnSairEstabelecimento
+    private void btnSairEstabelecimento()
+    {
+        StartCoroutine(ClienteAPI.SairDoEstabelecimento(
+        (response, error) =>
+        {
+            if (error != null)
+            {
+                Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
+            }
+
+            if (response)
+            {
+                PnlPopUp.FecharPnlCanvas(CanvasEstabInfo, PnlEstabInfo, () =>
+                {
+                    limparPnlEstabInfo();
+                });
+                return;
+            }
+
+            if (!response)
+            {
+                Debug.Log("error");
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+            }
+        }));
+
     }
     #endregion
 
     #region PreencherInfoEstabelecimento
-    public void PreencherInfoEstabelecimento(Estabelecimento estabelecimento, bool vemDaListaDeEstab, int aba = 0)
+    public void PreencherInfoEstabelecimento(Estabelecimento estabelecimento, int aba = 0)
     {
         try
         {
+            BtnSairEstabelecimento.gameObject.SetActive(Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento);
+
             estabelecimentoId_aberto = estabelecimento._id;
 
-            BtnAbaInfo.isOn = false;
-            BtnAbaConquista.isOn = false;
-            BtnAbaShop.isOn = false;
-
-            if (aba == 0)
-                BtnAbaInfo.isOn = true;
-
-            if (aba == 1)
-                BtnAbaConquista.isOn = true;
+            mudarAba(aba, false);
 
             TxtNomeEstabInfo.text = estabelecimento.nome;
             TxtDescricaoEstabInfo.text = estabelecimento.descricao;
@@ -174,7 +179,7 @@ public class MenuEstabelecimento : MonoBehaviour
             else
                 TxtEndEstabInfo.text = string.Empty;
 
-            TxtGoldEstabInfo.text = Util.FormatarValorDisponivel(Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimento._id));
+            TxtGoldEstabInfo.text = Util.FormatarValores(Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimento._id));
 
             if (estabelecimento.configEstabelecimentoAtual.estaAberta)
             {
@@ -188,16 +193,6 @@ public class MenuEstabelecimento : MonoBehaviour
             }
 
             TxtDescricaoItemShop.text = string.Empty;
-            BtnFecharPnlInfo.onClick.RemoveAllListeners();
-
-            if (vemDaListaDeEstab)
-            {
-                BtnFecharPnlInfo.onClick.AddListener(() => fecharPnlEstabInfo(false));
-            }
-            else
-            {
-                BtnFecharPnlInfo.onClick.AddListener(() => fecharPnlEstabInfo(true));
-            }
 
             PnlPopUp.AbrirPopUpCanvas(CanvasEstabInfo,
             PnlEstabInfo,
@@ -221,7 +216,6 @@ public class MenuEstabelecimento : MonoBehaviour
 
                         if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Remover)
                         {
-                            //ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
                             removerItemShop(item);
                             return;
                         }
@@ -230,13 +224,13 @@ public class MenuEstabelecimento : MonoBehaviour
                     {
                         if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Adicionar)
                         {
-                            adicionarDesafio(desafio, estabelecimento._id);
+                            adicionarDesafio(desafio);
                             return;
                         }
 
                         if (tipoAcao == EstabelecimentoFirebase.TipoAcao.Modificar)
                         {
-                            modificarDesafio(desafio, estabelecimento._id);
+                            modificarDesafio(desafio);
                             return;
                         }
 
@@ -263,21 +257,20 @@ public class MenuEstabelecimento : MonoBehaviour
     #endregion
 
     #region fecharPnlEstabInfo
-    private void fecharPnlEstabInfo(bool fecharPopup)
+    private void fecharPnlEstabInfo()
     {
-        if (fecharPopup)
-        {
-            PnlPopUp.FecharPopUp(CanvasEstabInfo,PnlEstabInfo, () =>
-            {
-                limparPnlEstabInfo();
-            });
-            return;
-        }
-
-        PnlPopUp.FecharPnl(PnlEstabInfo, () =>
+        PnlPopUp.FecharPnlCanvas(CanvasEstabInfo, PnlEstabInfo, () =>
         {
             limparPnlEstabInfo();
         });
+    }
+    #endregion
+
+    #region PararWatch
+    public void PararWatch()
+    {
+        if (estabelecimentoFirebase != null)
+            estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimentoId_aberto, false);
     }
     #endregion
 
@@ -286,6 +279,8 @@ public class MenuEstabelecimento : MonoBehaviour
     {
         estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimentoId_aberto, false);
         estabelecimentoId_aberto = string.Empty;
+        lstItensLoja.Clear();
+        lstDesafios.Clear();
         ScvShop.GetComponentsInChildren<ItemObj>().ToList().ForEach(x => Destroy(x.gameObject));
         ScvConquista.GetComponentsInChildren<DesafioObj>().ToList().ForEach(x => Destroy(x.gameObject));
     }
@@ -334,12 +329,14 @@ public class MenuEstabelecimento : MonoBehaviour
     #endregion
 
     #region adicionarDesafio
-    public void adicionarDesafio(Desafio desafio, string estabelecimentoId)
+    public void adicionarDesafio(Desafio desafio)
     {
         if (desafio._id != null)
         {
             DesafioObj objDesafio = Instantiate(ConquistaRef, ScvConquista);
-            objDesafio.PreencherInfo(desafio, estabelecimentoId);
+
+            Cliente.Desafio clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
+            objDesafio.PreencherInfo(desafio, clienteDesafio);
 
             lstDesafios.Add(objDesafio);
 
@@ -349,12 +346,15 @@ public class MenuEstabelecimento : MonoBehaviour
     #endregion
 
     #region modificarDesafio
-    private void modificarDesafio(Desafio desafio, string estabelecimentoId)
+    private void modificarDesafio(Desafio desafio)
     {
         DesafioObj objItemDesafio = lstDesafios.Find(x => x.Desafio._id == desafio._id);
 
         if (objItemDesafio != null)
-            objItemDesafio.PreencherInfo(desafio, estabelecimentoId);
+        {
+            Cliente.Desafio clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
+            objItemDesafio.PreencherInfo(desafio, clienteDesafio);
+        }
     }
     #endregion
 
@@ -399,7 +399,7 @@ public class MenuEstabelecimento : MonoBehaviour
     //quando se compra um item
     public void AtualizarInfoGold(string _idEstab, int novoGold)
     {
-        string gold = Util.FormatarValorDisponivel(novoGold);
+        string gold = Util.FormatarValores(novoGold);
         TxtGoldEstabInfo.text = gold;
     }
     #endregion

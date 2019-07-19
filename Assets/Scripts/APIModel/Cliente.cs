@@ -38,36 +38,10 @@ namespace APIModel
             public Avatar avatar;
             public ConfigApp configApp;
             public ConfigClienteAtual configClienteAtual;
-            public List<Conquista> conquistas;
-
-            public bool AdicionarExp(int exp)
-            {
-                this.avatar.exp += exp;
-                return subiuLevel();
-            }
-
-            private bool subiuLevel()
-            {
-                if (this.avatar.exp >= this.avatar.expProximoLevel)
-                {
-                    this.avatar.level += 1;
-                    this.avatar.exp = this.avatar.exp - this.avatar.expProximoLevel;
-                    ConfigurarExpProLevel();
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void ConfigurarExpProLevel()
-            {
-                Configuracoes configApp = new Configuracoes();
-                this.avatar.expProximoLevel = configApp.levelSystem.ExpProximoLevel(this.avatar.level);
-            }
 
             public int AtualizarPctExp()
             {
-                return Mathf.FloorToInt(((float)this.avatar.exp / (float)this.avatar.expProximoLevel) * 100f);
+                return Mathf.FloorToInt(((float)this.avatar.info.exp / (float)this.avatar.info.expProximoLevel) * 100f);
             }
 
             public int RetornarGoldTotal()
@@ -106,9 +80,7 @@ namespace APIModel
         public partial class Avatar
         {
             public string _id;
-            public int level;
-            public int exp;
-            public int expProximoLevel;
+            public AvatarInfo info;
             public string corpo;
             public string cabeca;
             public string nariz;
@@ -123,6 +95,13 @@ namespace APIModel
             public string corPele;
             public string corCabelo;
             public string corBarba;
+        }
+
+        public partial class AvatarInfo
+        {
+            public int level;
+            public double exp;
+            public double expProximoLevel;
         }
 
         public partial class Endereco
@@ -153,51 +132,16 @@ namespace APIModel
             public string estabelecimento;
             public string nomeEstabelecimento;
             public bool conviteEstabPendente;
+            public string comanda;
         }
 
-        public partial class Conquista
+        public partial class Desafio
         {
-            public string conquista;
-            public string estabelecimento;
-            public int quantidadeParaObter;
+            public string _id;
             public bool concluido;
-            public DateTime dataConclusao;
-
-        }
-
-        public static void GravarSession(string session, string _id, string credenciais)
-        {
-            PlayerPrefs.SetString("session_token_cliente", "Bearer " + session);
-            PlayerPrefs.SetString("session_cliente", _id);
-            PlayerPrefs.SetString("credenciais_cliente", credenciais);
-        }
-
-        public static void RefazerToken(string session)
-        {
-            PlayerPrefs.SetString("session_token_cliente", "Bearer " + session);
-        }
-
-        public static string ObterToken()
-        {
-            return PlayerPrefs.GetString("session_token_cliente");
-        }
-
-        public static string Obter()
-        {
-            return PlayerPrefs.GetString("session_cliente");
-        }
-
-        public static Credenciais ObterCredenciais()
-        {
-            return JsonConvert.DeserializeObject<Credenciais>(PlayerPrefs.GetString("credenciais_cliente"));
-        }
-
-        public static bool EstaLogado()
-        {
-            if (PlayerPrefs.HasKey("session_token_cliente"))
-                return true;
-
-            return false;
+            public string estabelecimento;
+            public int progresso;
+            public bool resgatouPremio;
         }
     }
 }

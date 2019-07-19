@@ -10,6 +10,7 @@ namespace APIModel
         public string _id;
         public string icon;
         public int premio;
+        public int pontos;
         public int status;
         public string nome;
         public string descricao;

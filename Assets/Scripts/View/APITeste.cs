@@ -15,39 +15,32 @@ public class APITeste : MonoBehaviour {
 	}
 
 	public void EntrarNoEstabelecimento(){
-        Main.Instance.ClienteEstaNoEstabelecimento();
 
-        Dictionary<string, string> data = new Dictionary<string, string>
+        Dictionary<string, object> data = new Dictionary<string, object>
+            {
+                { "estabelecimentoId", "5cdcc0885d47c43790919e7c" }
+            };
+
+        StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data,
+        (response, error) =>
         {
-            { "_idCliente", Cliente.ClienteLogado._id },
-            { "_idEstabelecimento", "5bfd45728ca64e29c8fd7a78" } //na web
-        };
+            if (error != null)
+            {
+                Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
+            }
 
-        StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data, 
-            (response, error) =>
-			{
-                APIManager.Retorno<string> retornoAPI = 
-                        JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-	
-				if (retornoAPI.sucesso){
-                    Main.Instance.ManipularMenus("FecharTodos");	
-       
-					string[] palavras = retornoAPI.msg.Split(' ');					
+            if (response)
+            {
+                return;
+            }
 
-					Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento = true;
-					Cliente.ClienteLogado.configClienteAtual.estabelecimento = "5bfd45728ca64e29c8fd7a78";
-					Cliente.ClienteLogado.configClienteAtual.nomeEstabelecimento = palavras[palavras.Length -1].Replace("!","");
-
-                    //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-                    Main.Instance.ClienteEstaNoEstabelecimento();     
-				
-				}else{
-					EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-				}
-				
-				//StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
-
-			}));
+            if (!response)
+            {
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+            }
+        }));
     }
 	
 }

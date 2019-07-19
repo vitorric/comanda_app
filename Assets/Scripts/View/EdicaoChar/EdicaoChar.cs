@@ -10,29 +10,17 @@ using UnityEngine.UI;
 
 public class EdicaoChar : MonoBehaviour
 {
+
+    [Header("Button Aba Config")]
+    public ButtonControl buttonControlItens;
+    public ButtonControl buttonControlCores;
+    public ButtonControl buttonControlSexo;
+
     [Header("Button")]
     public Button BtnAleatorio;
     public Button BtnFechar;
     public Button BtnFecharCriacao;
     public Button BtnSalvar;
-
-    [Header("Toggle")]
-    public Toggle BtnCabeca;
-    public Toggle BtnOlhos;
-    public Toggle BtnBoca;
-    public Toggle BtnNariz;
-    public Toggle BtnBarba;
-    public Toggle BtnCabeloFrontal;
-    public Toggle BtnCabeloTraseiro;
-    public Toggle BtnSombrancelhas;
-    public Toggle BtnRoupa;
-
-    public Toggle BtnCorPele;
-    public Toggle BtnCorBarba;
-    public Toggle BtnCorCabelo;
-
-    public Toggle BtnSexoMasc;
-    public Toggle BtnSexoFem;
 
     public Transform ScvEdicaoChar;
     public SlotItemPersonagem SlotItemPers;
@@ -50,7 +38,7 @@ public class EdicaoChar : MonoBehaviour
     public GameObject PnlOpcaoCabeloCor;
     public GameObject PnlOpcaoBarbaCor;
 
-    private string _modulo = string.Empty;
+    private string _modulo = "cabeca";
 
     private string cenaAtiva;
     private string sexo;
@@ -68,11 +56,12 @@ public class EdicaoChar : MonoBehaviour
         PnlCharacter.PreencherInfo(sexo, Cliente.ClienteLogado.avatar);
 
         if (sexo == "Masculino")
-            BtnSexoMasc.isOn = true;
+            btnAlterarSexo(0, "Masculino", false);
         else
-            BtnSexoFem.isOn = true;
+            btnAlterarSexo(1, "Feminino", false);
 
-        carregarItensDoPersonagem((_modulo == string.Empty) ? "cabeca" : _modulo);
+
+        carregarItensDoPersonagem(_modulo);
     }
 
     #region configurarListener
@@ -83,22 +72,24 @@ public class EdicaoChar : MonoBehaviour
         BtnFecharCriacao.onClick.AddListener(() => btnFechar(true));
         BtnSalvar.onClick.AddListener(() => btnSalvarAlteracao());
 
-        BtnOlhos.onValueChanged.AddListener((result) => btnTrocarItem("olhos", BtnOlhos.gameObject, true));
-        BtnBoca.onValueChanged.AddListener((result) => btnTrocarItem("boca", BtnBoca.gameObject, true));
-        BtnNariz.onValueChanged.AddListener((result) => btnTrocarItem("nariz", BtnNariz.gameObject, true));
-        BtnBarba.onValueChanged.AddListener((result) => btnTrocarItem("barba", BtnBarba.gameObject, true));
-        BtnCabeloFrontal.onValueChanged.AddListener((result) => btnTrocarItem("cabeloFrontal", BtnCabeloFrontal.gameObject, true));
-        BtnCabeloTraseiro.onValueChanged.AddListener((result) => btnTrocarItem("cabeloTraseiro", BtnCabeloTraseiro.gameObject, true));
-        BtnSombrancelhas.onValueChanged.AddListener((result) => btnTrocarItem("sombrancelhas", BtnSombrancelhas.gameObject, true));
-        BtnRoupa.onValueChanged.AddListener((result) => btnTrocarItem("roupa", BtnRoupa.gameObject, true));
-        BtnCabeca.onValueChanged.AddListener((result) => btnTrocarItem("cabeca", BtnCabeca.gameObject, true));
 
-        BtnCorPele.onValueChanged.AddListener((result) => btnAlterarCor("pele", true, BtnCorPele.gameObject));
-        BtnCorBarba.onValueChanged.AddListener((result) => btnAlterarCor("cabelo", true, BtnCorBarba.gameObject));
-        BtnCorCabelo.onValueChanged.AddListener((result) => btnAlterarCor("barba", true, BtnCorCabelo.gameObject));
+        buttonControlItens.BtnAbas[0].onClick.AddListener(() => btnTrocarItem(0, "cabeca", true));
+        buttonControlItens.BtnAbas[1].onClick.AddListener(() => btnTrocarItem(1, "olhos", true));
+        buttonControlItens.BtnAbas[2].onClick.AddListener(() => btnTrocarItem(2, "boca", true));
+        buttonControlItens.BtnAbas[3].onClick.AddListener(() => btnTrocarItem(3, "nariz", true));
+        buttonControlItens.BtnAbas[4].onClick.AddListener(() => btnTrocarItem(4, "barba", true));
+        buttonControlItens.BtnAbas[5].onClick.AddListener(() => btnTrocarItem(5, "cabeloFrontal", true));
+        buttonControlItens.BtnAbas[6].onClick.AddListener(() => btnTrocarItem(6, "cabeloTraseiro", true));
+        buttonControlItens.BtnAbas[7].onClick.AddListener(() => btnTrocarItem(7, "sombrancelhas", true));
+        buttonControlItens.BtnAbas[8].onClick.AddListener(() => btnTrocarItem(8, "roupa", true));
 
-        BtnSexoMasc.onValueChanged.AddListener((result) => btnAlterarSexo("Masculino", true, BtnSexoMasc.gameObject));
-        BtnSexoFem.onValueChanged.AddListener((result) => btnAlterarSexo("Feminino", true, BtnSexoFem.gameObject));
+
+        buttonControlCores.BtnAbas[0].onClick.AddListener(() => btnAlterarCor(0, "pele", true));
+        buttonControlCores.BtnAbas[1].onClick.AddListener(() => btnAlterarCor(1, "cabelo", true));
+        buttonControlCores.BtnAbas[2].onClick.AddListener(() => btnAlterarCor(2, "barba", true));
+
+        buttonControlSexo.BtnAbas[0].onClick.AddListener(() => btnAlterarSexo(0, "Masculino", true));
+        buttonControlSexo.BtnAbas[1].onClick.AddListener(() => btnAlterarSexo(1, "Feminino", true));
     }
     #endregion
 
@@ -213,37 +204,36 @@ public class EdicaoChar : MonoBehaviour
     #endregion
 
     #region btnAlterarSexo
-    private void btnAlterarSexo(string sexo, bool tocarSom = false, GameObject objClicado = null)
+    private void btnAlterarSexo(int numeroAba, string sexo, bool tocarSom = false)
     {
         BtnBarbaItem.SetActive((sexo == "Masculino") ? true : false);
         BtnBarbaCor.SetActive((sexo == "Masculino") ? true : false);
 
-        if (EventSystem.current.currentSelectedGameObject == objClicado)
-        {
-            if (tocarSom)
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        if (tocarSom)
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            this.sexo = sexo;
-            BtnCorPele.isOn = true;
-            PnlCharacter.PreencherInfo(sexo, PnlCharacter.Avatar);
+        this.sexo = sexo;
+        btnAlterarCor(0, "pele", false);
+        PnlCharacter.PreencherInfo(sexo, PnlCharacter.Avatar);
 
-            carregarItensDoPersonagem(_modulo, true);
-        }
+        carregarItensDoPersonagem(_modulo, true);
+
+        buttonControlSexo.TrocarAba(numeroAba);
     }
     #endregion
 
     #region btnAlterarCor
-    private void btnAlterarCor(string opcao, bool tocarSom = false, GameObject objClicado = null)
+    private void btnAlterarCor(int numeroAba, string opcao, bool tocarSom = false)
     {
-        if (EventSystem.current.currentSelectedGameObject == objClicado)
-        {
-            if (tocarSom)
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            PnlOpcaoPeleCor.SetActive((opcao == "pele") ? true : false);
-            PnlOpcaoCabeloCor.SetActive((opcao == "cabelo") ? true : false);
-            PnlOpcaoBarbaCor.SetActive((opcao == "barba" && sexo == "Masculino") ? true : false);
-        }
+        if (tocarSom)
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+        PnlOpcaoPeleCor.SetActive((opcao == "pele") ? true : false);
+        PnlOpcaoCabeloCor.SetActive((opcao == "cabelo") ? true : false);
+        PnlOpcaoBarbaCor.SetActive((opcao == "barba" && sexo == "Masculino") ? true : false);
+
+        buttonControlCores.TrocarAba(numeroAba);
     }
     #endregion
 
@@ -260,15 +250,13 @@ public class EdicaoChar : MonoBehaviour
     #endregion
 
     #region btnTrocarItem
-    private void btnTrocarItem(string modulo, GameObject objClicado, bool tocarSom = false)
+    private void btnTrocarItem(int numeroAba, string modulo, bool tocarSom = false)
     {
-        if (EventSystem.current.currentSelectedGameObject == objClicado)
-        {
-            if (tocarSom)
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        if (tocarSom)
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-            carregarItensDoPersonagem(modulo);
-        }
+        carregarItensDoPersonagem(modulo);
+        buttonControlItens.TrocarAba(numeroAba);
     }
     #endregion
 
@@ -287,7 +275,7 @@ public class EdicaoChar : MonoBehaviour
     private void btnSalvarAlteracao()
     {
 
-        Dictionary<string, string> data = new Dictionary<string, string>
+        Dictionary<string, object> data = new Dictionary<string, object>
         {
             {   "corpo", PnlCharacter.Avatar.corpo  },
             {   "cabeca", PnlCharacter.Avatar.cabeca },
@@ -305,14 +293,13 @@ public class EdicaoChar : MonoBehaviour
             {   "corBarba", PnlCharacter.Avatar.corBarba }
         };
 
-        StartCoroutine(AvatarAPI.AvatarAlterar(data,
+        StartCoroutine(AvatarAPI.AlterarAvatar(data,
         (response, error) =>
         {
 
             if (error != null)
             {
-                Debug.Log(error);
-
+                Debug.Log("btnSalvarAlteracao" + error);
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
                 return;
             }
@@ -321,9 +308,9 @@ public class EdicaoChar : MonoBehaviour
 
             AlertaManager.Instance.IniciarAlerta(response);
 
-            PnlCharacter.Avatar.level = Cliente.ClienteLogado.avatar.level;
-            PnlCharacter.Avatar.exp = Cliente.ClienteLogado.avatar.exp;
-            PnlCharacter.Avatar.expProximoLevel = Cliente.ClienteLogado.avatar.expProximoLevel;
+            PnlCharacter.Avatar.info.level = Cliente.ClienteLogado.avatar.info.level;
+            PnlCharacter.Avatar.info.exp = Cliente.ClienteLogado.avatar.info.exp;
+            PnlCharacter.Avatar.info.expProximoLevel = Cliente.ClienteLogado.avatar.info.expProximoLevel;
 
             Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
 
@@ -357,7 +344,6 @@ public class EdicaoChar : MonoBehaviour
     private void carregarItensDoPersonagem(string modulo, bool mudouSexo = false)
     {
         string nomeTexturaModuloSelecionado = PnlCharacter.NomeTexturaModuloSelecionado(modulo);
-        Debug.Log(nomeTexturaModuloSelecionado);
 
         FindObjectsOfType<SlotItemPersonagem>().ToList().ForEach(x => x.gameObject.GetComponent<Outline>().enabled = false);
 
