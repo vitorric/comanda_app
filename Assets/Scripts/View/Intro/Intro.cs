@@ -18,6 +18,12 @@ public class Intro : MonoBehaviour
 
     private IEnumerator Start()
     {
+
+#if UNITY_STANDALONE
+        Screen.SetResolution(480, 960, false);
+        Screen.fullScreen = false;
+#endif
+
         yield return new WaitUntil(() => FirebaseManager.Instance.isReady);
 
         AlterarProgressoSlider(0.3f);

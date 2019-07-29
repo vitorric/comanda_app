@@ -185,6 +185,8 @@ public class Main : MonoBehaviour
             txtMsg.text = "Precisamos da permissão da câmera";
             yield break;
         }
+#else
+        yield return null;
 #endif
 
         if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
