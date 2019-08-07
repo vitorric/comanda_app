@@ -299,4 +299,9 @@ public class Main : MonoBehaviour
         }
     }
     #endregion
+
+    private void OnApplicationQuit()
+    {
+        FileManager.RemoveAllFiles();
+    }
 }

@@ -25,7 +25,7 @@ public class DesafioConcluidoObj : MonoBehaviour
     {
         this.desafio = desafio;
         TxtTituloDesafio.text = desafio.nome;
-        TxtPremioDesafio.text = Util.FormatarValores(desafio.premio);
+        TxtPremioDesafio.text = Util.FormatarValores(desafio.premio.quantidade);
     }
     #endregion
 

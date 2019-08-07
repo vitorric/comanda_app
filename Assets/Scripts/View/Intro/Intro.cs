@@ -26,6 +26,8 @@ public class Intro : MonoBehaviour
 
         yield return new WaitUntil(() => FirebaseManager.Instance.isReady);
 
+        criarDiretoriosImagens();
+
         AlterarProgressoSlider(0.3f);
 
         yield return StartCoroutine(relogar());
@@ -59,12 +61,14 @@ public class Intro : MonoBehaviour
     }
     #endregion
 
+    #region buscarClienteNoFireBase
     private async void buscarClienteNoFireBase()
     {
         Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(AppManager.Instance.Obter());
 
         AlterarProgressoSlider(0.2f);
     }
+    #endregion
 
     #region Post Login Cliente
     private IEnumerator relogar()
@@ -101,4 +105,12 @@ public class Intro : MonoBehaviour
     }
     #endregion
 
+    #region criarDiretoriosImagens
+    private void criarDiretoriosImagens()
+    {
+        FileManager.CreateFileDirectory(FileManager.Directories.desafio);
+        FileManager.CreateFileDirectory(FileManager.Directories.item_Loja);
+        FileManager.CreateFileDirectory(FileManager.Directories.produto);
+    }
+    #endregion
 }

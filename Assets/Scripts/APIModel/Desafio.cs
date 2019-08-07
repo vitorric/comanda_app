@@ -9,7 +9,6 @@ namespace APIModel
     {
         public string _id;
         public string icon;
-        public int premio;
         public int pontos;
         public int status;
         public string nome;
@@ -18,6 +17,14 @@ namespace APIModel
         public string estabelecimento;
         public bool emGrupo;
         public Objetivo objetivo;
+        public Premio premio;
+
+        public partial class Premio
+        {
+            public string tipo;
+            public int quantidade;
+            public string produto;
+        }
 
         public partial class Objetivo
         {

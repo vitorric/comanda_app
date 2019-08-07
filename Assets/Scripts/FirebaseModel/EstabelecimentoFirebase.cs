@@ -206,6 +206,7 @@ namespace FirebaseModel
         private Desafio tratarSnapshotDesafio(DataSnapshot ds)
         {
             DataSnapshot dsObjetivo = ds.Child("objetivo");
+            DataSnapshot dsPremio = ds.Child("premio");
 
             Desafio desafio = new Desafio
             {
@@ -213,7 +214,6 @@ namespace FirebaseModel
                 descricao = Convert.ToString(ds.Child("descricao").Value),
                 icon = Convert.ToString(ds.Child("icon").Value),
                 nome = Convert.ToString(ds.Child("nome").Value),
-                premio = Convert.ToInt32(ds.Child("premio").Value),
                 pontos = (ds.Child("pontos").Exists) ? Convert.ToInt32(ds.Child("pontos").Value) : 0,
                 emGrupo = Convert.ToBoolean(ds.Child("emGrupo").Value),
                 tempoDuracao = Util.ConverterDataFB(ds.Child("tempoDuracao").Value.ToString()),
@@ -221,7 +221,13 @@ namespace FirebaseModel
                 {
                     quantidade = Convert.ToInt32(dsObjetivo.Child("quantidade").Value),
                     tipo = Convert.ToString(dsObjetivo.Child("tipo").Value),
-                    produto = Convert.ToString(dsObjetivo.Child("produto").Value)
+                    produto = Convert.ToString(dsObjetivo.Child("produto").Exists ? dsObjetivo.Child("produto").Value : null)
+                },
+                premio = new Desafio.Premio
+                {
+                    quantidade = Convert.ToInt32(dsObjetivo.Child("quantidade").Value),
+                    tipo = Convert.ToString(dsObjetivo.Child("tipo").Value),
+                    produto = Convert.ToString(dsObjetivo.Child("produto").Exists ? dsObjetivo.Child("produto").Value : null)
                 }
             };
 

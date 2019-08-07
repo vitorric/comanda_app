@@ -4931,7 +4931,7 @@ PrefabInstance:
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[0].volume
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
@@ -4956,7 +4956,7 @@ PrefabInstance:
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[1].volume
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
@@ -4981,7 +4981,7 @@ PrefabInstance:
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[2].volume
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}

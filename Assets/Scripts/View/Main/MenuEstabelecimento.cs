@@ -336,6 +336,11 @@ public class MenuEstabelecimento : MonoBehaviour
             DesafioObj objDesafio = Instantiate(ConquistaRef, ScvConquista);
 
             Cliente.Desafio clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
+
+            obterIcone(desafio.icon, FileManager.Directories.desafio, (textura) =>
+            {
+                objDesafio.PreencherIcone(textura);
+            });
             objDesafio.PreencherInfo(desafio, clienteDesafio);
 
             lstDesafios.Add(objDesafio);
@@ -404,5 +409,21 @@ public class MenuEstabelecimento : MonoBehaviour
     }
     #endregion
 
+    #region obterIcone
+    private void obterIcone(string nomeIcon, FileManager.Directories tipo, Action<Texture2D> callback)
+    {
+        if (FileManager.Exists(tipo, nomeIcon))
+        {
+            Texture2D texture2d = FileManager.ConvertToTexture2D(FileManager.LoadFile(tipo, nomeIcon));
+            callback(texture2d);
+            return;
+        }
 
+        StartCoroutine(DownloadAPI.DownloadImage(nomeIcon, tipo.ToString(), (texture, bytes) =>
+        {
+            FileManager.SaveFile(tipo, nomeIcon, bytes);
+            callback(texture);
+        }));
+    }
+    #endregion
 }

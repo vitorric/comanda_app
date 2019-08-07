@@ -99,7 +99,7 @@ public class DesafioObj : MonoBehaviour
                 if (DesafioCliente.resgatouPremio)
                 {
                     PnlResgatarPremio.SetActive(true);
-                    TxtResgatarPremio.text = Util.FormatarValores(desafio.premio);
+                    TxtResgatarPremio.text = Util.FormatarValores(desafio.premio.quantidade);
                 }
                 else
                 {
@@ -118,7 +118,14 @@ public class DesafioObj : MonoBehaviour
         TxtProgresso.text = progressoUsuario + "/" + desafio.objetivo.quantidade;
 
         rodarRelogio();
+        //obterIcone();
+    }
+    #endregion
 
+    #region PreencherIcone
+    public void PreencherIcone(Texture2D icone)
+    {
+        IconConquista.texture = icone;
     }
     #endregion
 
@@ -143,9 +150,10 @@ public class DesafioObj : MonoBehaviour
     private void abrirPnlInfoDesafio()
     {
         PnlPopUp.AbrirPopUpCanvas(
-            Main.Instance.MenuEstabelecimento.CanvasDesafioInfo, 
-            Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, () => {
-                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
+            Main.Instance.MenuEstabelecimento.CanvasDesafioInfo,
+            Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, () =>
+            {
+                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio.quantidade, Desafio.icon);
             });
 
     }

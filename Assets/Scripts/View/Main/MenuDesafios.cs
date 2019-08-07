@@ -198,7 +198,29 @@ public class MenuDesafios : MonoBehaviour
             if (desafio.concluido)
                 AppManager.Instance.AtivarDesafioCompletado(response);
 
+            obterIcone(response.icon, FileManager.Directories.desafio, (textura) => {
+                desafioObj.PreencherIcone(textura);
+            });
+
             desafioObj.PreencherInfo(response, desafio);
+        }));
+    }
+    #endregion
+
+    #region obterIcone
+    private void obterIcone(string nomeIcon, FileManager.Directories tipo, Action<Texture2D> callback)
+    {
+        if (FileManager.Exists(tipo, nomeIcon))
+        {
+            Texture2D texture2d = FileManager.ConvertToTexture2D(FileManager.LoadFile(tipo, nomeIcon));
+            callback(texture2d);
+            return;
+        }
+
+        StartCoroutine(DownloadAPI.DownloadImage(nomeIcon, tipo.ToString(), (texture, bytes) =>
+        {
+            FileManager.SaveFile(tipo, nomeIcon, bytes);
+            callback(texture);
         }));
     }
     #endregion
