@@ -546,7 +546,7 @@ MonoBehaviour:
     source: {fileID: 0}
     canPlay: 0
   - name: AchievWin
-    clip: {fileID: 8300000, guid: 445dcdafdbf9f6345ae4ec3d39a2e270, type: 3}
+    clip: {fileID: 8300000, guid: 95c35dd922dee014f8a8381adf003973, type: 3}
     volume: 1
     volumeVariance: 0
     pitch: 1
@@ -555,7 +555,7 @@ MonoBehaviour:
     source: {fileID: 0}
     canPlay: 0
   - name: AchievResgate
-    clip: {fileID: 8300000, guid: 95c35dd922dee014f8a8381adf003973, type: 3}
+    clip: {fileID: 8300000, guid: e9fa941ed77d48742ac765f9e1737f56, type: 3}
     volume: 1
     volumeVariance: 0
     pitch: 1
@@ -1285,11 +1285,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: pnlDesafioConcluido
       objectReference: {fileID: 0}
-    - target: {fileID: 37607660227698813, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 37607660227698812, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1394,56 +1389,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1880688582826331110, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2424616400802810728, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4288404782375188843, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4288404782375188843, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2149653569665544347, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1880711232595147076, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1880711232595147076, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1003870675333621508, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1003870675333621508, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 37607660615752080, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf7b4ebae04c4614c8bf14e0d02b0133, type: 3}
@@ -2148,7 +2093,7 @@ MonoBehaviour:
   lstImgGrupos:
   - {fileID: 8250498878806222264}
   - {fileID: 6075857306374982437}
-  IconPremio: {fileID: 1735880769768637749}
+  IconPremio: {fileID: 0}
   TxtPremio: {fileID: 1735309895860252193}
   PnlBarraProgresso: {fileID: 7070187183899095502}
   BarraProgresso: {fileID: 1081892717521572183}
@@ -2158,18 +2103,6 @@ MonoBehaviour:
   PnlTempoEsgotado: {fileID: 1839402962204862933}
   PnlConquistaConcluida: {fileID: 1838897763501498463}
   TxtDataConclusao: {fileID: 1735673670066124931}
---- !u!114 &1735880769768637749 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1770633369356275330, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-    type: 3}
-  m_PrefabInstance: {fileID: 37607660846238647}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -98529514, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1735902861572319505
 MonoBehaviour:
   m_ObjectHideFlags: 0

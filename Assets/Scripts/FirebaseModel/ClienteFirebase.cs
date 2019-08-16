@@ -51,7 +51,7 @@ namespace FirebaseModel
 
             try
             {
-                AcaoDesafio(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Adicionar);
+                AcaoDesafio(tratarSnapshotDesafio(e.Snapshot), TipoAcao.Adicionar);
             }
             catch (Exception x)
             {
@@ -72,7 +72,7 @@ namespace FirebaseModel
 
             try
             {
-                AcaoDesafio(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Modificar);
+                AcaoDesafio(tratarSnapshotDesafio(e.Snapshot), TipoAcao.Modificar);
             }
             catch (Exception x)
             {
@@ -93,7 +93,7 @@ namespace FirebaseModel
 
             try
             {
-                AcaoDesafio(tratarSnapshotItemLoja(e.Snapshot), TipoAcao.Remover);
+                AcaoDesafio(tratarSnapshotDesafio(e.Snapshot), TipoAcao.Remover);
             }
             catch (Exception x)
             {
@@ -103,8 +103,8 @@ namespace FirebaseModel
         }
         #endregion
 
-        #region tratarSnapshotItemLoja
-        private Cliente.Desafio tratarSnapshotItemLoja(DataSnapshot ds)
+        #region tratarSnapshotDesafio
+        private Cliente.Desafio tratarSnapshotDesafio(DataSnapshot ds)
         {
             Cliente.Desafio desafio = new Cliente.Desafio
             {
@@ -120,5 +120,6 @@ namespace FirebaseModel
         #endregion
 
         #endregion
+
     }
 }

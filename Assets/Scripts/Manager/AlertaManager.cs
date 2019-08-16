@@ -24,7 +24,8 @@ public class AlertaManager : MonoBehaviour
     public enum MsgAlerta
     {
         PreenchaOsCampos,
-        SenhasNaoConferem
+        SenhasNaoConferem,
+        SairEstabComandaAberta
     }
 
     private Dictionary<MsgAlerta, string> msgsApp;
@@ -42,7 +43,8 @@ public class AlertaManager : MonoBehaviour
         msgsApp = new Dictionary<MsgAlerta, string>
         {
             { MsgAlerta.PreenchaOsCampos, "Preencha todos os campos!"},
-            { MsgAlerta.SenhasNaoConferem, "Senhas não conferem!"}
+            { MsgAlerta.SenhasNaoConferem, "Senhas não conferem!"},
+            { MsgAlerta.SairEstabComandaAberta, "Não é possível sair de um estabelecimento tendo uma comanda aberta!"}
         };
     }
 

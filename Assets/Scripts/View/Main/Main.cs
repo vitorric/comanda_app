@@ -49,7 +49,7 @@ public class Main : MonoBehaviour
 
     private bool estabelecimentosCarregados = false;
 
-    private GenericFirebase<string> comandaClienteFirebase;
+    //private GenericFirebase<string> comandaClienteFirebase;
     private GenericFirebase<Cliente.ConfigClienteAtual> clienteConfigAtualFirebase;
     private GenericFirebase<Cliente.AvatarInfo> clienteAvatarInfoFirebase;
 
@@ -80,7 +80,7 @@ public class Main : MonoBehaviour
     #region PararWatch
     public void PararWatch()
     {
-        comandaClienteFirebase.Watch(false);
+        //comandaClienteFirebase.Watch(false);
         clienteConfigAtualFirebase.Watch(false);
         clienteAvatarInfoFirebase.Watch(false);
         MenuComanda.IniciarWatchComanda(false);
@@ -94,16 +94,16 @@ public class Main : MonoBehaviour
     private void iniciarWatchsFirebase()
     {
         //inicia o watch na comanda do fire
-        comandaClienteFirebase = new GenericFirebase<string>($"clientes/{Cliente.ClienteLogado._id}/configClienteAtual/comanda")
-        {
-            Callback = (data) =>
-            {
-                Cliente.ClienteLogado.configClienteAtual.comanda = data;
-
-                bool temComanda = (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda)) ? false : true;
-                MenuComanda.IniciarWatchComanda(temComanda);
-            }
-        };
+        //comandaClienteFirebase = new GenericFirebase<string>($"clientes/{Cliente.ClienteLogado._id}/configClienteAtual/comanda")
+        //{
+        //    Callback = (data) =>
+        //    {
+        //        Cliente.ClienteLogado.configClienteAtual.comanda = data;
+        //        Debug.Log("iniciarWatchsFirebase");
+        //        bool temComanda = (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda)) ? false : true;
+        //        MenuComanda.IniciarWatchComanda(temComanda);
+        //    }
+        //}; 
 
         clienteConfigAtualFirebase = new GenericFirebase<Cliente.ConfigClienteAtual>($"clientes/{Cliente.ClienteLogado._id}/configClienteAtual")
         {
@@ -270,7 +270,13 @@ public class Main : MonoBehaviour
             PnlEstaNoEstabelecimento.SetActive(true);
             PnlNaoEstaNoEstabelecimento.SetActive(false);
 
-            comandaClienteFirebase.Watch(true);
+            if (!string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda) && string.IsNullOrEmpty(MenuComanda.ComandaId))
+            {
+                bool temComanda = (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda)) ? false : true;
+                MenuComanda.IniciarWatchComanda(temComanda);
+            }
+
+            //comandaClienteFirebase.Watch(true);
 
             return true;
         }
@@ -291,11 +297,32 @@ public class Main : MonoBehaviour
             estabelecimentosCarregados = true;
         }
 
-        comandaClienteFirebase.Watch(false);
+        //comandaClienteFirebase.Watch(false);
 
-        if (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda))
+        if (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda) && !String.IsNullOrEmpty(MenuComanda.ComandaId))
         {
             MenuComanda.IniciarWatchComanda(false);
+        }
+    }
+    #endregion
+
+    #region ObterIcones
+    public void ObterIcones(string nomeIcon, FileManager.Directories tipo, Action<Texture2D> callback)
+    {
+        if (!string.IsNullOrEmpty(nomeIcon))
+        {
+            if (FileManager.Exists(tipo, nomeIcon))
+            {
+                Texture2D texture2d = FileManager.ConvertToTexture2D(FileManager.LoadFile(tipo, nomeIcon));
+                callback(texture2d);
+                return;
+            }
+
+            StartCoroutine(DownloadAPI.DownloadImage(nomeIcon, tipo.ToString(), (texture, bytes) =>
+            {
+                FileManager.SaveFile(tipo, nomeIcon, bytes);
+                callback(texture);
+            }));
         }
     }
     #endregion

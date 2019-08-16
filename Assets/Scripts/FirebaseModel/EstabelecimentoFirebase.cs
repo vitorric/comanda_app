@@ -140,7 +140,7 @@ namespace FirebaseModel
 
         #region AcoesDesafio
 
-        #region itensLojaAdicionar
+        #region desafioAdicionar
         private void desafioAdicionar(object sender, ChildChangedEventArgs e)
         {
             if (e.DatabaseError != null)
@@ -160,7 +160,7 @@ namespace FirebaseModel
         }
         #endregion
 
-        #region itensLojaModificar
+        #region desafioModificar
         private void desafioModificar(object sender, ChildChangedEventArgs e)
         {
             if (e.DatabaseError != null)
@@ -181,7 +181,7 @@ namespace FirebaseModel
         }
         #endregion
 
-        #region itensLojaRemover
+        #region desafioRemover
         private void desafioRemover(object sender, ChildChangedEventArgs e)
         {
             if (e.DatabaseError != null)
@@ -202,7 +202,7 @@ namespace FirebaseModel
         }
         #endregion
 
-        #region tratarSnapshotItemLoja
+        #region tratarSnapshotDesafio
         private Desafio tratarSnapshotDesafio(DataSnapshot ds)
         {
             DataSnapshot dsObjetivo = ds.Child("objetivo");
@@ -225,9 +225,9 @@ namespace FirebaseModel
                 },
                 premio = new Desafio.Premio
                 {
-                    quantidade = Convert.ToInt32(dsObjetivo.Child("quantidade").Value),
-                    tipo = Convert.ToString(dsObjetivo.Child("tipo").Value),
-                    produto = Convert.ToString(dsObjetivo.Child("produto").Exists ? dsObjetivo.Child("produto").Value : null)
+                    quantidade = Convert.ToInt32(dsPremio.Child("quantidade").Value),
+                    tipo = Convert.ToString(dsPremio.Child("tipo").Value),
+                    produto = Convert.ToString(dsPremio.Child("produto").Exists ? dsPremio.Child("produto").Value : null)
                 }
             };
 

@@ -1,9 +1,11 @@
 ﻿using APIModel;
 using FirebaseModel;
 using Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +25,7 @@ public class MenuDesafios : MonoBehaviour
     public GameObject txtDesafioConcluidoVazio;
 
     private List<DesafioObj> lstDesafiosProgresso;
-    private List<DesafioObj> lstDesafiosConcluido;
+    private List<string> lstDesafiosConcluido;
 
     [HideInInspector]
     public ClienteFirebase ClienteFirebase;
@@ -33,7 +35,7 @@ public class MenuDesafios : MonoBehaviour
         configurarListener();
 
         lstDesafiosProgresso = new List<DesafioObj>();
-        lstDesafiosConcluido = new List<DesafioObj>();
+        lstDesafiosConcluido = new List<string>();
 
         ClienteFirebase = new ClienteFirebase()
         {
@@ -60,6 +62,8 @@ public class MenuDesafios : MonoBehaviour
         };
 
         ClienteFirebase.Watch(Cliente.ClienteLogado._id, true);
+
+        listarDesafiosConcluidos();
     }
 
     #region configurarListener
@@ -88,20 +92,8 @@ public class MenuDesafios : MonoBehaviour
         {
             DesafioObj desafioObj = null;
 
-            if (desafio.concluido)
-            {
-                desafioObj = Instantiate(DesafioObjRef, SvcDesafioConcluido);
-                lstDesafiosConcluido.Add(desafioObj);
-                txtDesafioConcluidoVazio.SetActive(false);
-            }
-            else
-            {
-                desafioObj = Instantiate(DesafioObjRef, SvcDesafioProgresso);
-                lstDesafiosProgresso.Add(desafioObj);
-                txtDesafioProgressoVazio.SetActive(false);
-            }
-
-            obterDesafio(desafio, desafioObj);
+            //os objetos do desafio sao criado dentro do response, somente quando for adicionar que eh feito isso
+            obterDesafio(desafio, desafioObj, true);
         }
     }
     #endregion
@@ -116,29 +108,17 @@ public class MenuDesafios : MonoBehaviour
             if (desafio.concluido)
             {
                 lstDesafiosProgresso.Remove(desafioObj);
-                lstDesafiosConcluido.Add(desafioObj);
-                desafioObj.transform.SetParent(SvcDesafioConcluido);
+                lstDesafiosConcluido.Add(desafio._id);
 
                 if (lstDesafiosProgresso.Count == 0)
                 {
                     txtDesafioProgressoVazio.SetActive(true);
                 }
-                
-                if (lstDesafiosConcluido.Count > 0 && txtDesafioConcluidoVazio.activeInHierarchy)
-                {
-                    txtDesafioConcluidoVazio.SetActive(false);
-                }
+
+                listarDesafiosConcluidos();
             }
 
-            obterDesafio(desafio, desafioObj);
-            return;
-        }
-
-        desafioObj = lstDesafiosConcluido.Find(x => x.DesafioCliente._id == desafio._id);
-
-        if (desafioObj != null)
-        {
-            obterDesafio(desafio, desafioObj);
+            obterDesafio(desafio, desafioObj, false);
         }
     }
     #endregion
@@ -161,24 +141,24 @@ public class MenuDesafios : MonoBehaviour
             return;
         }
 
-        desafioObj = lstDesafiosConcluido.Find(x => x.DesafioCliente._id == desafio._id);
+        //desafioObj = lstDesafiosConcluido.Find(x => x.DesafioCliente._id == desafio._id);
 
-        if (desafioObj != null)
-        {
-            Destroy(desafioObj.gameObject);
-            lstDesafiosConcluido.Remove(desafioObj);
+        //if (desafioObj != null)
+        //{
+        //    Destroy(desafioObj.gameObject);
+        //    lstDesafiosConcluido.Remove(desafioObj);
 
 
-            if (lstDesafiosConcluido.Count == 0)
-            {
-                txtDesafioConcluidoVazio.SetActive(true);
-            }
-        }
+        //    if (lstDesafiosConcluido.Count == 0)
+        //    {
+        //        txtDesafioConcluidoVazio.SetActive(true);
+        //    }
+        //}
     }
     #endregion
 
     #region obterDesafio
-    private void obterDesafio(Cliente.Desafio desafio, DesafioObj desafioObj)
+    private void obterDesafio(Cliente.Desafio desafio, DesafioObj desafioObj, bool ehAdicao)
     {
         Dictionary<string, object> form = new Dictionary<string, object>
         {
@@ -195,32 +175,47 @@ public class MenuDesafios : MonoBehaviour
                 return;
             }
 
-            if (desafio.concluido)
+            if (ehAdicao)
+            {
+                TimeSpan ts = response.tempoDuracao.ToLocalTime().Subtract((DateTime.Now.ToLocalTime()));
+
+                if (ts.TotalSeconds <= 0 && !desafio.concluido)
+                    return;
+
+                if (desafio.concluido)
+                {
+                    lstDesafiosConcluido.Add(desafio._id);
+
+                    if (!desafio.resgatouPremio)
+                        AppManager.Instance.AtivarDesafioCompletado(response);
+
+                    return;
+                }
+
+                desafioObj = Instantiate(DesafioObjRef, SvcDesafioProgresso);
+                lstDesafiosProgresso.Add(desafioObj);
+                txtDesafioProgressoVazio.SetActive(false);
+            }
+
+
+            if (desafio.concluido && !desafio.resgatouPremio)
                 AppManager.Instance.AtivarDesafioCompletado(response);
 
-            obterIcone(response.icon, FileManager.Directories.desafio, (textura) => {
+            if (!ehAdicao)
+            {
+                if (desafio.concluido)
+                {
+                    Destroy(desafioObj.gameObject);
+                    return;
+                }
+            }
+
+            Main.Instance.ObterIcones(response.icon, FileManager.Directories.desafio, (textura) =>
+            {
                 desafioObj.PreencherIcone(textura);
             });
 
             desafioObj.PreencherInfo(response, desafio);
-        }));
-    }
-    #endregion
-
-    #region obterIcone
-    private void obterIcone(string nomeIcon, FileManager.Directories tipo, Action<Texture2D> callback)
-    {
-        if (FileManager.Exists(tipo, nomeIcon))
-        {
-            Texture2D texture2d = FileManager.ConvertToTexture2D(FileManager.LoadFile(tipo, nomeIcon));
-            callback(texture2d);
-            return;
-        }
-
-        StartCoroutine(DownloadAPI.DownloadImage(nomeIcon, tipo.ToString(), (texture, bytes) =>
-        {
-            FileManager.SaveFile(tipo, nomeIcon, bytes);
-            callback(texture);
         }));
     }
     #endregion
@@ -244,14 +239,38 @@ public class MenuDesafios : MonoBehaviour
             return clienteDesafio.DesafioCliente;
         }
 
-        clienteDesafio = lstDesafiosConcluido.Find(x => x.DesafioCliente._id == _id);
-
-        if (clienteDesafio != null)
-        {
-            return clienteDesafio.DesafioCliente;
-        }
-
         return null;
+    }
+    #endregion
+
+    #region ConferirDesfioConcluido
+    public bool ConferirDesafioConcluido(string desafioId)
+    {
+        if (lstDesafiosConcluido.Find(x => x == desafioId) != null)
+            return true;
+
+        return false;
+    }
+    #endregion
+
+    #region listarDesafiosConcluidos
+    private void listarDesafiosConcluidos()
+    {
+        SvcDesafioConcluido.GetComponentsInChildren<DesafioObj>().ToList().ForEach(x => Destroy(x.gameObject));
+
+        StartCoroutine(DesafioAPI.ListarDesafiosConcluidos((response, error) =>
+        {
+            if (response != null && response.desafios.Count > 0)
+            {
+                txtDesafioConcluidoVazio.SetActive(false);
+
+                for (int i = 0; i < response.desafios.Count; i++)
+                {
+                    DesafioObj desafioObj = Instantiate(DesafioObjRef, SvcDesafioConcluido);
+                    desafioObj.PreencherInfoConcluido(response.desafios[i]);
+                }
+            }
+        }));
     }
     #endregion
 }

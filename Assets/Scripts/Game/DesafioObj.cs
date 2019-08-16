@@ -18,9 +18,6 @@ public class DesafioObj : MonoBehaviour
     public Button BtnAbrirDesafioInfo;
     public List<GameObject> lstImgGrupos;
 
-    public RawImage IconPremio;
-    public Text TxtPremio;
-
     public GameObject PnlBarraProgresso;
     public Slider BarraProgresso;
     public Text TxtProgresso;
@@ -35,6 +32,8 @@ public class DesafioObj : MonoBehaviour
     [Header("Painel Conquista Concluida")]
     public GameObject PnlConquistaConcluida;
     public Text TxtDataConclusao;
+    public Text TxtPontos;
+    public Text txtNomePremio;
 
 
     //private Estabelecimento.Conquista conquista;
@@ -82,7 +81,6 @@ public class DesafioObj : MonoBehaviour
 
         TxtTituloConquista.text = desafio.nome;
         TxtDescricaoConquista.text = desafio.descricao;
-        TxtPremio.text = desafio.premio.ToString();
 
         lstImgGrupos.ForEach(x => x.SetActive(desafio.emGrupo));
 
@@ -93,20 +91,6 @@ public class DesafioObj : MonoBehaviour
             progressoUsuario = DesafioCliente.progresso;
 
             if (DesafioCliente.concluido)
-            {
-                esconderTodosPaineis();
-
-                if (DesafioCliente.resgatouPremio)
-                {
-                    PnlResgatarPremio.SetActive(true);
-                    TxtResgatarPremio.text = Util.FormatarValores(desafio.premio.quantidade);
-                }
-                else
-                {
-                    PnlConquistaConcluida.SetActive(true);
-                }
-            }
-            else
             {
                 esconderTodosPaineis();
                 PnlConquista.SetActive(true);
@@ -126,6 +110,29 @@ public class DesafioObj : MonoBehaviour
     public void PreencherIcone(Texture2D icone)
     {
         IconConquista.texture = icone;
+        IconConquista = Util.ImgResize(IconConquista, 180, 180);
+    }
+    #endregion
+
+    #region PreencherInfoConcluido
+    public void PreencherInfoConcluido(DesafioConcluido.InfoDesafio desafioConcluido)
+    {
+        esconderTodosPaineis();
+        PnlConquistaConcluida.SetActive(true);
+
+        TxtTituloConquista.text = desafioConcluido.desafio.nome;
+        TxtDescricaoConquista.text = desafioConcluido.desafio.descricao;
+        txtNomePremio.text =
+            (desafioConcluido.desafio.premio.produto == null) ?
+                $"{desafioConcluido.desafio.premio.quantidade} x CPGold" :
+                $"{desafioConcluido.desafio.premio.quantidade} x {desafioConcluido.desafio.premio.produto.nome}";
+        TxtDataConclusao.text = desafioConcluido.dataConclusao;
+
+
+        Main.Instance.ObterIcones(desafioConcluido.desafio.icon, FileManager.Directories.desafio, (textura) =>
+        {
+            PreencherIcone(textura);
+        });
     }
     #endregion
 
@@ -153,7 +160,7 @@ public class DesafioObj : MonoBehaviour
             Main.Instance.MenuEstabelecimento.CanvasDesafioInfo,
             Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, () =>
             {
-                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio.quantidade, Desafio.icon);
+                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
             });
 
     }

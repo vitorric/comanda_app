@@ -36,7 +36,7 @@ namespace Network
                                    (request.downloadHandler.text);
 
                         if (retornoAPI.sucesso)
-                        {                            
+                        {
                             done(retornoAPI.retorno, null);
                             return;
                         }
@@ -52,5 +52,91 @@ namespace Network
         }
         #endregion
 
+        //OK
+        #region ResgatarPremioDesafio
+        public static IEnumerator ResgatarPremioDesafio(
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            return Post("resgatar/recompensa/desafio",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+
+                        Retorno<bool> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<bool>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, ex.Message);
+                    }
+                });
+        }
+        #endregion
+
+        //OK
+        #region ListarDesafiosConcluidos
+        public static IEnumerator ListarDesafiosConcluidos(
+                Action<DesafioConcluido, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            return Post("listar/cliente/desafios/concluido",
+                null,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(null, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+
+                        Retorno<DesafioConcluido> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<DesafioConcluido>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(retornoAPI.retorno, null);
+                            return;
+                        }
+
+                        done(null, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(null, ex.Message);
+                    }
+                });
+        }
+        #endregion
     }
 }

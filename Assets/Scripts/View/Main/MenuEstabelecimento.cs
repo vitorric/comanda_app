@@ -125,6 +125,12 @@ public class MenuEstabelecimento : MonoBehaviour
     #region btnSairEstabelecimento
     private void btnSairEstabelecimento()
     {
+        if (!string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda))
+        {
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SairEstabComandaAberta, false));
+            return;
+        }
+
         StartCoroutine(ClienteAPI.SairDoEstabelecimento(
         (response, error) =>
         {
@@ -293,9 +299,13 @@ public class MenuEstabelecimento : MonoBehaviour
         {
             ItemObj objItemShop = Instantiate(ItemShopRef, ScvShop.transform);
 
+            Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) =>
+            {
+                objItemShop.PreencherIcone(textura);
+            });
+
             objItemShop.PreencherInfo(item, lojaAberta, estabelecimentoId);
             lstItensLoja.Add(objItemShop);
-
             PnlShopVazio.SetActive(false);
         }
     }
@@ -333,19 +343,32 @@ public class MenuEstabelecimento : MonoBehaviour
     {
         if (desafio._id != null)
         {
-            DesafioObj objDesafio = Instantiate(ConquistaRef, ScvConquista);
+            if (Main.Instance.MenuDesafio.ConferirDesafioConcluido(desafio._id))
+                return;
 
             Cliente.Desafio clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
 
-            obterIcone(desafio.icon, FileManager.Directories.desafio, (textura) =>
+            DesafioObj objDesafio = Instantiate(ConquistaRef, ScvConquista);
+
+            Main.Instance.ObterIcones(desafio.icon, FileManager.Directories.desafio, (textura) =>
             {
                 objDesafio.PreencherIcone(textura);
             });
-            objDesafio.PreencherInfo(desafio, clienteDesafio);
 
             lstDesafios.Add(objDesafio);
 
             PnlConquistaVazio.SetActive(false);
+
+            if (clienteDesafio == null)
+            {
+                objDesafio.PreencherInfo(desafio, null);
+                return;
+            }
+
+            if (!clienteDesafio.concluido)
+            {
+                objDesafio.PreencherInfo(desafio, clienteDesafio);
+            }
         }
     }
     #endregion
@@ -409,21 +432,4 @@ public class MenuEstabelecimento : MonoBehaviour
     }
     #endregion
 
-    #region obterIcone
-    private void obterIcone(string nomeIcon, FileManager.Directories tipo, Action<Texture2D> callback)
-    {
-        if (FileManager.Exists(tipo, nomeIcon))
-        {
-            Texture2D texture2d = FileManager.ConvertToTexture2D(FileManager.LoadFile(tipo, nomeIcon));
-            callback(texture2d);
-            return;
-        }
-
-        StartCoroutine(DownloadAPI.DownloadImage(nomeIcon, tipo.ToString(), (texture, bytes) =>
-        {
-            FileManager.SaveFile(tipo, nomeIcon, bytes);
-            callback(texture);
-        }));
-    }
-    #endregion
 }

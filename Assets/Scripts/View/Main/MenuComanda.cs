@@ -2,6 +2,7 @@
 using FirebaseModel;
 using Network;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,9 +51,10 @@ public class MenuComanda : MonoBehaviour
     public ComandaFirebase ComandaFirebase;
     [HideInInspector]
     public GenericFirebase<double> ComandaValorTotalFirebase;
+    [HideInInspector]
+    public string ComandaId;
 
     private bool clienteLogadoEhLider = false;
-    private string comandaId;
     private List<GrupoObj> lstGrupoComanda;
     private List<ItemComandaObj> lstProdutosComanda;
     private Comanda.Grupo ClienteComanda;
@@ -187,13 +189,15 @@ public class MenuComanda : MonoBehaviour
         PnlSemComanda.SetActive(!ehParaAdicionar);
         PnlComComanda.SetActive(ehParaAdicionar);
 
-        if (ehParaAdicionar) this.comandaId = Cliente.ClienteLogado.configClienteAtual.comanda;
+        if (ehParaAdicionar) this.ComandaId = Cliente.ClienteLogado.configClienteAtual.comanda;
 
-        ComandaFirebase.Watch((ehParaAdicionar) ? Cliente.ClienteLogado.configClienteAtual.comanda : this.comandaId, ehParaAdicionar);
+        string comandaIdAtual = (ehParaAdicionar) ? Cliente.ClienteLogado.configClienteAtual.comanda : this.ComandaId;
+
+        ComandaFirebase.Watch(comandaIdAtual, ehParaAdicionar);
 
         if (ComandaValorTotalFirebase == null)
         {
-            ComandaValorTotalFirebase = new GenericFirebase<double>($"comandas/{Cliente.ClienteLogado.configClienteAtual.comanda}/valorTotal")
+            ComandaValorTotalFirebase = new GenericFirebase<double>($"comandas/{comandaIdAtual}/valorTotal")
             {
                 Callback = (valorTotal) =>
                 {
@@ -204,6 +208,12 @@ public class MenuComanda : MonoBehaviour
         }
 
         ComandaValorTotalFirebase.Watch(ehParaAdicionar);
+
+        if (!ehParaAdicionar)
+        {
+            this.ComandaId = string.Empty;
+            ComandaValorTotalFirebase = null;
+        }
     }
     #endregion
 
@@ -271,6 +281,11 @@ public class MenuComanda : MonoBehaviour
         if (produto != null)
         {
             ItemComandaObj itemComandaObj = Instantiate(ItensComandaRef, ScvItensComanda);
+
+            Main.Instance.ObterIcones(produto.infoProduto.icon, FileManager.Directories.produto, (textura) =>
+            {
+                itemComandaObj.PreencherIcone(textura);
+            });
             itemComandaObj.PreencherInfo(produto);
             lstProdutosComanda.Add(itemComandaObj);
         }

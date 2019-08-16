@@ -143,8 +143,6 @@ public class MenuUsuario : MonoBehaviour
     #region btnAbrirHistoricoCompra
     private void btnAbrirHistoricoCompra()
     {
-        ScvHistoricoCompra.GetComponentsInChildren<HistoricoCompraObj>().ToList().ForEach(x => Destroy(x.gameObject));
-
         buscarHistorico((lstHistoricoCompra) =>
         {
             TxtHistoricoVazio.SetActive(false);

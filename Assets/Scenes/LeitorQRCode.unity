@@ -499,7 +499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &441558359
 RectTransform:
   m_ObjectHideFlags: 0
@@ -925,12 +925,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1003480497}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1003480499 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1351425475782440, guid: 1271f7521947dc64494706b0dd3ba361,
-    type: 3}
-  m_PrefabInstance: {fileID: 1003480497}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1073485978
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,7 +943,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1073485979
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1041,7 +1035,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TextHeader: {fileID: 323404034}
   Image: {fileID: 638923947}
-  PnlLoading: {fileID: 1003480499}
 --- !u!20 &1169623322
 Camera:
   m_ObjectHideFlags: 0
@@ -1197,7 +1190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1584865605
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1275,7 +1268,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2082385932
 RectTransform:
   m_ObjectHideFlags: 0

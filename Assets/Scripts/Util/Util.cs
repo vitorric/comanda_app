@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class Util  {
 
@@ -86,4 +87,12 @@ public class Util  {
         return String.Join("\n", fields.ToArray());
     }
 
+    public static RawImage ImgResize(RawImage rawImage, float width, float height)
+    {
+        float x = rawImage.rectTransform.sizeDelta.x;
+        float y = rawImage.rectTransform.sizeDelta.y;
+        y = x * (height / width);
+        rawImage.rectTransform.sizeDelta = new Vector2(x, y);
+        return rawImage;
+    }
 }

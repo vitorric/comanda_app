@@ -55,6 +55,14 @@ public class ItemObj : MonoBehaviour
     }
     #endregion
 
+    #region PreencherIcone
+    public void PreencherIcone(Texture2D icone)
+    {
+        Icon.texture = icone;
+        Icon = Util.ImgResize(Icon, 180, 180);
+    }
+    #endregion
+
     #region rodarRelogio
     void rodarRelogio()
     {

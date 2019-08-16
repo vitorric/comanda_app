@@ -1494,7 +1494,7 @@ GameObject:
   - component: {fileID: 572391289}
   - component: {fileID: 572391288}
   m_Layer: 5
-  m_Name: Image
+  m_Name: logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1512,7 +1512,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 800722408}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2055,8 +2055,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 829041468}
-  - {fileID: 1336844160}
   - {fileID: 572391287}
+  - {fileID: 1336844160}
   - {fileID: 1966891350}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -2491,11 +2491,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: pnlDesafioConcluido
       objectReference: {fileID: 0}
-    - target: {fileID: 37607660227698813, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 37607660227698812, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2600,26 +2595,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 37607660227698810, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 0.47058824
-      objectReference: {fileID: 0}
-    - target: {fileID: 37607660227698810, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 0.39607844
-      objectReference: {fileID: 0}
-    - target: {fileID: 37607660227698810, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 0.3372549
-      objectReference: {fileID: 0}
-    - target: {fileID: 37607660227698810, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
-        type: 3}
-      propertyPath: m_Color.a
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5574265695716263002, guid: bf7b4ebae04c4614c8bf14e0d02b0133,
         type: 3}
@@ -3672,7 +3647,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 800722408}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4956,7 +4931,7 @@ PrefabInstance:
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[1].volume
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
@@ -4981,7 +4956,7 @@ PrefabInstance:
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[2].volume
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
@@ -5122,7 +5097,7 @@ PrefabInstance:
         type: 3}
       propertyPath: helper.Array.data[9].clip
       value: 
-      objectReference: {fileID: 8300000, guid: 445dcdafdbf9f6345ae4ec3d39a2e270, type: 3}
+      objectReference: {fileID: 8300000, guid: 95c35dd922dee014f8a8381adf003973, type: 3}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[9].volume
@@ -5142,7 +5117,7 @@ PrefabInstance:
         type: 3}
       propertyPath: helper.Array.data[10].clip
       value: 
-      objectReference: {fileID: 8300000, guid: 95c35dd922dee014f8a8381adf003973, type: 3}
+      objectReference: {fileID: 8300000, guid: e9fa941ed77d48742ac765f9e1737f56, type: 3}
     - target: {fileID: 114055644364376342, guid: 96158aa3d91918b49b04ef00dd8b5515,
         type: 3}
       propertyPath: helper.Array.data[10].volume

@@ -23,4 +23,11 @@ public class ItemComandaObj : MonoBehaviour
         LblValor.text = produto.precoTotal.ToString("C2");
     }
 
+    #region PreencherIcone
+    public void PreencherIcone(Texture2D icone)
+    {
+        Icon.texture = icone;
+        Icon = Util.ImgResize(Icon, 180, 180);
+    }
+    #endregion
 }

@@ -12,140 +12,154 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LeitoQRCode : MonoBehaviour {
+public class LeitoQRCode : MonoBehaviour
+{
 
-	private IScanner BarcodeScanner;
-	public Text TextHeader;
-	public RawImage Image;
-	private float RestartTime;
+    private IScanner BarcodeScanner;
+    public Text TextHeader;
+    public RawImage Image;
+    private float RestartTime;
 
-	// Disable Screen Rotation on that screen
-	void Awake()
-	{
-		Screen.autorotateToPortrait = false;
-		Screen.autorotateToPortraitUpsideDown = false;
+    // Disable Screen Rotation on that screen
+    void Awake()
+    {
+        Screen.autorotateToPortrait = false;
+        Screen.autorotateToPortraitUpsideDown = false;
 
-		// Enable vsync for the samples (avoid running mobile device at 300fps)
-		QualitySettings.vSyncCount = 1;
-	}
+        // Enable vsync for the samples (avoid running mobile device at 300fps)
+        QualitySettings.vSyncCount = 1;
+    }
 
-	void Start () {
-		// Create a basic scanner
-		BarcodeScanner = new Scanner();
-		BarcodeScanner.Camera.Play();
-		
-		// Display the camera texture through a RawImage
-		BarcodeScanner.OnReady += (sender, arg) => {
-			// Set Orientation & Texture
-			Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
-			Image.transform.localScale = BarcodeScanner.Camera.GetScale();
-			Image.texture = BarcodeScanner.Camera.Texture;
+    void Start()
+    {
+        // Create a basic scanner
+        BarcodeScanner = new Scanner();
+        BarcodeScanner.Camera.Play();
 
-			// Keep Image Aspect Ratio
-			var rect = Image.GetComponent<RectTransform>();
-			var newHeight = rect.sizeDelta.x * BarcodeScanner.Camera.Height / BarcodeScanner.Camera.Width;
-			rect.sizeDelta = new Vector2(rect.sizeDelta.x, newHeight);
+        // Display the camera texture through a RawImage
+        BarcodeScanner.OnReady += (sender, arg) =>
+        {
+            // Set Orientation & Texture
+            Image.transform.localEulerAngles = BarcodeScanner.Camera.GetEulerAngles();
+            Image.transform.localScale = BarcodeScanner.Camera.GetScale();
+            Image.texture = BarcodeScanner.Camera.Texture;
 
-			RestartTime = Time.realtimeSinceStartup;
-		};
-	}
+            // Keep Image Aspect Ratio
+            var rect = Image.GetComponent<RectTransform>();
+            var newHeight = rect.sizeDelta.x * BarcodeScanner.Camera.Height / BarcodeScanner.Camera.Width;
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x, newHeight);
 
-	/// <summary>
-	/// Start a scan and wait for the callback (wait 1s after a scan success to avoid scanning multiple time the same element)
-	/// </summary>
-	private void StartScanner()
-	{
-		BarcodeScanner.Scan((barCodeType, barCodeValue) => {
-			BarcodeScanner.Stop();
+            RestartTime = Time.realtimeSinceStartup;
+        };
+    }
 
-			EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
+    /// <summary>
+    /// Start a scan and wait for the callback (wait 1s after a scan success to avoid scanning multiple time the same element)
+    /// </summary>
+    private void StartScanner()
+    {
+        try
+        {
+            BarcodeScanner.Scan((barCodeType, barCodeValue) =>
+            {
+                BarcodeScanner.Stop();
 
-            Dictionary<string, object> data = new Dictionary<string, object>
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
+
+                Dictionary<string, object> data = new Dictionary<string, object>
             {
                 { "estabelecimentoId", barCodeValue }
             };
 
-            StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data,
-            (response, error) =>
-            {
-                if (error != null)
+                StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data,
+                (response, error) =>
                 {
-                    Debug.Log(error);
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
-                    return;
-                }
+                    if (error != null)
+                    {
+                        Debug.Log(error);
+                        StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                        return;
+                    }
 
-                if (response)
-                {
-                    StartCoroutine(StopCamera(() => {
-                        SceneManager.UnloadSceneAsync("LeitorQRCode");
-                    }));
+                    if (response)
+                    {
+                        StartCoroutine(StopCamera(() =>
+                        {
+                            SceneManager.UnloadSceneAsync("LeitorQRCode");
+                        }));
 
-                    return;
-                }
+                        return;
+                    }
 
-                if (!response)
-                {
-                    EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                }
-            }));
+                    if (!response)
+                    {
+                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+                    }
+                }));
 
-            RestartTime += Time.realtimeSinceStartup + 1f;
+                RestartTime += Time.realtimeSinceStartup + 1f;
 
-			#if UNITY_ANDROID || UNITY_IOS
-			Handheld.Vibrate();
-			#endif
-		});
-	}
+#if UNITY_ANDROID || UNITY_IOS
+                Handheld.Vibrate();
+#endif
+            });
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Error: " + e.Message);
+        }
+    }
 
-	/// <summary>
-	/// The Update method from unity need to be propagated
-	/// </summary>
-	void Update()
-	{
-		if (BarcodeScanner != null)
-		{
-			BarcodeScanner.Update();
-		}
+    /// <summary>
+    /// The Update method from unity need to be propagated
+    /// </summary>
+    void Update()
+    {
+        if (BarcodeScanner != null)
+        {
+            BarcodeScanner.Update();
+        }
 
-		// Check if the Scanner need to be started or restarted
-		if (RestartTime != 0 && RestartTime < Time.realtimeSinceStartup)
-		{
-			StartScanner();
-			RestartTime = 0;
-		}
-	}
+        // Check if the Scanner need to be started or restarted
+        if (RestartTime != 0 && RestartTime < Time.realtimeSinceStartup)
+        {
+            StartScanner();
+            RestartTime = 0;
+        }
+    }
 
-	#region UI Buttons
+    #region UI Buttons
 
 
-	/// <summary>
-	/// This coroutine is used because of a bug with unity (http://forum.unity3d.com/threads/closing-scene-with-active-webcamtexture-crashes-on-android-solved.363566/)
-	/// Trying to stop the camera in OnDestroy provoke random crash on Android
-	/// </summary>
-	/// <param name="callback"></param>
-	/// <returns></returns>
-	public IEnumerator StopCamera(Action callback)
-	{
-		// Stop Scanning
-		Image = null;
-		BarcodeScanner.Destroy();
-		BarcodeScanner = null;
+    /// <summary>
+    /// This coroutine is used because of a bug with unity (http://forum.unity3d.com/threads/closing-scene-with-active-webcamtexture-crashes-on-android-solved.363566/)
+    /// Trying to stop the camera in OnDestroy provoke random crash on Android
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public IEnumerator StopCamera(Action callback)
+    {
+        // Stop Scanning
+        Image = null;
+        BarcodeScanner.Destroy();
+        BarcodeScanner = null;
 
-		// Wait a bit
-		yield return new WaitForSeconds(0.1f);
+        // Wait a bit
+        yield return new WaitForSeconds(0.1f);
 
-		callback.Invoke();
-	}
+        callback.Invoke();
+    }
 
-	public void BtnFecharLeitor(){
-		
-		EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
+    public void BtnFecharLeitor()
+    {
 
-        StartCoroutine(StopCamera(() => {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
+
+        StartCoroutine(StopCamera(() =>
+        {
             SceneManager.UnloadSceneAsync("LeitorQRCode");
         }));
     }
 
-	#endregion
+    #endregion
 }

@@ -2,6 +2,7 @@
 using FirebaseModel;
 using Network;
 using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class Intro : MonoBehaviour
     public Slider sliderProgresso;
 
     private bool estaLogado = false;
+    private bool apiForaDoAr = false;
 
     private IEnumerator Start()
     {
@@ -50,6 +52,12 @@ public class Intro : MonoBehaviour
     {
         if (sliderProgresso.value == 1)
         {
+            if (apiForaDoAr)
+            {
+                txtCarregando.text = "Ops, aplicativo em manutenção! Tente novamente mais tarde!";
+                return;
+            }
+
             if (estaLogado)
             {
                 SceneManager.LoadSceneAsync("Main");
@@ -88,6 +96,7 @@ public class Intro : MonoBehaviour
             {
                 if (error != null)
                 {
+                    apiForaDoAr = true;
                     Debug.Log(error);
                     AlterarProgressoSlider(0.5f);
                     return;
@@ -113,4 +122,5 @@ public class Intro : MonoBehaviour
         FileManager.CreateFileDirectory(FileManager.Directories.produto);
     }
     #endregion
+
 }

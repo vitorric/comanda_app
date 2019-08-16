@@ -11,6 +11,7 @@ namespace APIModel
         public string icon;
         public int pontos;
         public int status;
+        public int statusFirebase;
         public string nome;
         public string descricao;
         public DateTime tempoDuracao;

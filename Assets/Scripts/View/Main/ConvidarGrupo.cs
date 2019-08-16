@@ -143,7 +143,7 @@ public class ConvidarGrupo : MonoBehaviour
     {
         Dictionary<string, object> form = new Dictionary<string, object>
         {
-            { "chaveAmigavel", TxtChaveAmigavel.text }
+            { "chaveAmigavel", TxtChaveAmigavel.text.ToUpper() }
         };
 
         StartCoroutine(ComandaAPI.ConvidarMembroGrupo(form,

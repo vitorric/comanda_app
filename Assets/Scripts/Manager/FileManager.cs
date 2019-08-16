@@ -72,7 +72,7 @@ public class FileManager
         }
     }    
 
-    public static Texture2D ConvertToTexture2D(byte[] bytes, int width = 1, int height = 1)
+    public static Texture2D ConvertToTexture2D(byte[] bytes, int width = 180, int height = 180)
     {
         Texture2D tex = new Texture2D(width, height);
         tex.LoadImage(bytes);

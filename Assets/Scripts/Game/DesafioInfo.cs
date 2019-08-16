@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿using APIModel;
+using Network;
+using Newtonsoft.Json;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +12,8 @@ public class DesafioInfo : MonoBehaviour
     public Button BtnFechar;
     public GameObject PnlInfo;
     public Text TxtValorPremio;
+    public Text TxtNomePremio;
+    public Texture2D ImgIconDinheiro;
     public RawImage IconPremio;
 
     private void Awake()
@@ -23,11 +29,45 @@ public class DesafioInfo : MonoBehaviour
     #endregion
 
     #region PreencherInfo
-    public void PreencherInfo(float valor, string icon)
+    public void PreencherInfo(Desafio.Premio premio, string icon)
     {
         this.gameObject.SetActive(true);
         PnlInfo.SetActive(true);
-        TxtValorPremio.text = Util.FormatarValores(valor);
+        TxtValorPremio.text = Util.FormatarValores(premio.quantidade);
+
+        if (string.IsNullOrEmpty(premio.produto))
+        {
+            TxtNomePremio.text = "CPGold";
+            IconPremio.texture = ImgIconDinheiro;
+
+            animarPnlInfo();
+        }
+        else
+        {
+            Dictionary<string, object> form = new Dictionary<string, object>()
+            {
+                { "produtoId", premio.produto }
+            };
+
+            StartCoroutine(ProdutoAPI.ObterProdutoCliente(form, 
+            (response, error) =>
+            {
+                TxtNomePremio.text = response.nome;
+
+                Main.Instance.ObterIcones(response.icon, FileManager.Directories.produto, (textura) =>
+                {
+                    IconPremio.texture = textura;
+                    IconPremio = Util.ImgResize(IconPremio, 180, 180);
+                    animarPnlInfo();
+                });
+            }));
+        }
+    }
+    #endregion
+
+    #region animarPnlInfo
+    private void animarPnlInfo()
+    {
 
         AnimacoesTween.AnimarObjeto(PnlInfo,
                     AnimacoesTween.TiposAnimacoes.Scala,

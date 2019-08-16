@@ -7,9 +7,13 @@ namespace APIModel
     {
         public string _id;
         public int precoItem;
-        public DateTime createdAt;
+        public string createdAt;
         public Estabelecimento estabelecimento;
         public ItemLoja itemLoja;
+        public Produto produto;
+        public string chaveUnica;
+        public string modoObtido;
+        public int quantidade;
         public InfoEntrega infoEntrega;
 
         public class Estabelecimento
@@ -20,12 +24,18 @@ namespace APIModel
         public class InfoEntrega
         {
             public bool jaEntregue;
-            public DateTime dataEntrega;
+            public string dataEntrega;
         }
 
         public class ItemLoja
         {
             public string nome;
+            public string icon;
+        }
+        public class Produto
+        {
+            public string nome;
+            public string icon;
         }
     }
 }

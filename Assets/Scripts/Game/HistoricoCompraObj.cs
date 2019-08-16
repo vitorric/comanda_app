@@ -7,27 +7,51 @@ using UnityEngine.UI;
 public class HistoricoCompraObj : MonoBehaviour {
 
 	public Text TxtNomeItem;
+    public Text txtQuantidade;
 	public Text TxtNomeEstabelecimento;
 	public Text TxtDataCompra;
-	public Text TxtCusto;
+    public Text txtModoObtido;
+    public Text txtChaveUnica;    
 	public Text TxtStatusEntrega;
-	public List<Color> corStatus;
 
-	public void PreencherInfo(HistoricoCompra historico){
-		TxtNomeItem.text = historico.itemLoja.nome;
-		TxtNomeEstabelecimento.text = historico.estabelecimento.nome;
-		TxtDataCompra.text = historico.createdAt.ToString("dd/MM/yyyy hh:mm");
-		TxtCusto.text = "- " + historico.precoItem;
+    public RawImage ImgIcon;
+    public Text TxtTipoHistorico;
+    public GameObject PnlCustoItem;
+    public Text TxtCusto;
 
-		if (historico.infoEntrega.jaEntregue){
-			TxtStatusEntrega.text = "Entregue";
-			TxtStatusEntrega.color = corStatus[0];
-		}
-		else
-		{
-			TxtStatusEntrega.text = "Pendente";
-			TxtStatusEntrega.color = corStatus[1];
-		}
-		
-	}
+    public void PreencherInfo(HistoricoCompra historico)
+    {
+        bool ehItemLoja = historico.itemLoja != null ? true : false;
+
+        txtQuantidade.text = $"<color=orange>{historico.quantidade}x</color>";
+		TxtNomeEstabelecimento.text = $"Estabelecimento: {historico.estabelecimento.nome}";
+		TxtDataCompra.text = $"Data: {historico.createdAt}";
+        txtModoObtido.text = $"Modo Obtido: <color=cyan>{historico.modoObtido}</color>";
+        txtChaveUnica.text = $"Chave Resgate: <color=green>{historico.chaveUnica}</color>";
+        TxtStatusEntrega.text = (historico.infoEntrega.jaEntregue) ? "<color=green>Sim</color>" : "<color=red>Não</color>";
+
+        if (ehItemLoja)
+        {
+            PnlCustoItem.SetActive(true);
+            TxtNomeItem.text = historico.itemLoja.nome;
+            TxtCusto.text = "- " + historico.precoItem;
+            TxtTipoHistorico.text = "<color=lightblue>Item da Loja</color>";
+            Main.Instance.ObterIcones(historico.itemLoja.icon, FileManager.Directories.item_Loja, (textura) =>
+            {
+                ImgIcon.texture = textura;
+                ImgIcon = Util.ImgResize(ImgIcon, 180, 180);
+            });
+        }
+        else
+        {
+            TxtNomeItem.text = historico.produto.nome;
+            TxtTipoHistorico.text = "<color=lightblue>Produto</color>";
+            Main.Instance.ObterIcones(historico.produto.icon, FileManager.Directories.produto, (textura) =>
+            {
+                ImgIcon.texture = textura;
+                ImgIcon = Util.ImgResize(ImgIcon, 180, 180);
+            });
+        }
+
+    }
 }
