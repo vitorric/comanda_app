@@ -227,5 +227,48 @@ namespace Network
 
         }
         #endregion
+
+        #region ListarHistoricoComanda
+        public static IEnumerator ListarHistoricoComanda(
+                Dictionary<string, object> properties,
+                Action<List<HistoricoComanda>, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("listar/historico/comanda",
+                 properties,
+                 (request) =>
+                 {
+                     try
+                     {
+                         if (request == null ||
+                         request.isNetworkError ||
+                         request.responseCode != 200)
+                         {
+                             done(null, requestError(request));
+                             return;
+                         }
+
+                         Retorno<List<HistoricoComanda>> retornoAPI =
+                                    JsonConvert.DeserializeObject<Retorno<List<HistoricoComanda>>>
+                                    (request.downloadHandler.text);
+
+                         if (retornoAPI.sucesso)
+                         {
+                             done(retornoAPI.retorno, null);
+                             return;
+                         }
+
+                         done(null, retornoAPI.mensagem);
+                     }
+                     catch (Exception ex)
+                     {
+                         done(null, msgErro);
+                         Debug.Log(ex.Message);
+                     }
+                 });
+
+        }
+        #endregion
     }
 }

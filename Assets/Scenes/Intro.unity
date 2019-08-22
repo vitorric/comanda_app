@@ -1588,6 +1588,7 @@ MonoBehaviour:
   txtProgresso: {fileID: 1694230160}
   txtCarregando: {fileID: 1336844158}
   sliderProgresso: {fileID: 1966891351}
+  firebaseManager: {fileID: 1894659364}
 --- !u!4 &614012070
 Transform:
   m_ObjectHideFlags: 0
@@ -1750,6 +1751,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 652062294}
   m_CullTransparentMesh: 0
+--- !u!1 &656968783
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 656968784}
+  - component: {fileID: 656968785}
+  m_Layer: 0
+  m_Name: GPSManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &656968784
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656968783}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1716903127}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &656968785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656968783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe0cb2a561976d4438a1d05e977cd05c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &669203295
 GameObject:
   m_ObjectHideFlags: 0
@@ -1814,7 +1858,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &719987845
 GameObject:
@@ -2059,7 +2103,7 @@ RectTransform:
   - {fileID: 1336844160}
   - {fileID: 1966891350}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -5158,7 +5202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4956024367747772, guid: 96158aa3d91918b49b04ef00dd8b5515, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96158aa3d91918b49b04ef00dd8b5515, type: 3}
@@ -5187,19 +5231,6 @@ MonoBehaviour:
   ObjAlertaResponse: {fileID: 1206063511}
   ImgSucesso: {fileID: 303913032}
   ImgErro: {fileID: 1132402044}
---- !u!114 &1716903124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1716903122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a2786468564a19438a960e54e66a653, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ConexaoOK: 1
 --- !u!114 &1716903125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5212,22 +5243,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8efa3702e077ff46ab8ca154f3efe3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deviceId: 
+  tokenFirebase: 
   Loader: {fileID: 1018123678}
   LevelUp: {fileID: 2094307179}
   PnlDesafioConquistado: {fileID: 192899787}
   DesafioConquistado: {fileID: 1961933630}
---- !u!114 &1716903126
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1716903122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 731774663c7d6604f8d07bfe4d7828e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1716903127 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4956024367747772, guid: 96158aa3d91918b49b04ef00dd8b5515,
@@ -5771,6 +5792,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873544793}
   m_CullTransparentMesh: 0
+--- !u!1 &1894659363
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1894659365}
+  - component: {fileID: 1894659364}
+  m_Layer: 0
+  m_Name: FirebaseManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1894659364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894659363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a2786468564a19438a960e54e66a653, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1894659365
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1894659363}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 261.2808, y: 933.27264, z: -70.18508}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1961933630 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5574265695716263002, guid: bf7b4ebae04c4614c8bf14e0d02b0133,

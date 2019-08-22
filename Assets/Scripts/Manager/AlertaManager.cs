@@ -25,7 +25,15 @@ public class AlertaManager : MonoBehaviour
     {
         PreenchaOsCampos,
         SenhasNaoConferem,
-        SairEstabComandaAberta
+        CPGoldInsuficiente,
+        SairEstabComandaAberta,
+        EmailNaoValido,
+        NomeSobreNome,
+        ApelidoMenor3Char,
+        SenhaMenor6Char,
+        PreenchaCPFValido,
+        Menor18Anos,
+        DataInvalida
     }
 
     private Dictionary<MsgAlerta, string> msgsApp;
@@ -44,7 +52,15 @@ public class AlertaManager : MonoBehaviour
         {
             { MsgAlerta.PreenchaOsCampos, "Preencha todos os campos!"},
             { MsgAlerta.SenhasNaoConferem, "Senhas não conferem!"},
-            { MsgAlerta.SairEstabComandaAberta, "Não é possível sair de um estabelecimento tendo uma comanda aberta!"}
+            { MsgAlerta.SairEstabComandaAberta, "Não é possível sair de um estabelecimento tendo uma comanda aberta!"},
+            { MsgAlerta.CPGoldInsuficiente, "CPGold insuficiente!"},
+            { MsgAlerta.NomeSobreNome, "Digite o nome e o sobrenome!"},
+            { MsgAlerta.EmailNaoValido, "Digite um email válido!"},
+            { MsgAlerta.ApelidoMenor3Char, "O apelido tem que ter no mínimo 3 caracteres!" },
+            { MsgAlerta.SenhaMenor6Char, "A senha tem que ter no mínimo 3 caracteres!"  },
+            { MsgAlerta.PreenchaCPFValido, "Preencha um CPF válido!"  },
+            { MsgAlerta.DataInvalida, "Digite uma data válida!"},
+            { MsgAlerta.Menor18Anos, "Desculpe, você precisa ter mais de 18 anos!"}
         };
     }
 

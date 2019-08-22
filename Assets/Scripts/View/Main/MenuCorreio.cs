@@ -94,6 +94,7 @@ public class MenuCorreio : MonoBehaviour
             PnlMensagemVazia.SetActive(false);
 
             verificarNotificacoes();
+            ordernarMensagens();
         }
     }
     #endregion
@@ -233,5 +234,17 @@ public class MenuCorreio : MonoBehaviour
     }
     #endregion
 
+    #region ordenarMensagens
+    private void ordernarMensagens()
+    {
+        for (int i=0; i < lstCorreioObj.Count; i++)
+        {
+            if (lstCorreioObj[i].mensagem.lida)
+            {
+                lstCorreioObj[i].gameObject.transform.SetAsLastSibling();
+            }
+        }
+    }
+    #endregion
 }
 

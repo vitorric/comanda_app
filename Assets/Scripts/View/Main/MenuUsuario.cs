@@ -296,7 +296,6 @@ public class MenuUsuario : MonoBehaviour
 
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        Main.Instance.PnlPopUp.SetActive(true);
         PnlAmigos.SetActive(true);
         AnimacoesTween.AnimarObjeto(PnlAmigos, AnimacoesTween.TiposAnimacoes.Scala, null, 0.5f, new Vector2(1, 1));
     }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ public class MaskField : MonoBehaviour {
         CEP
 	}
 
- 	public InputField inputField;
+ 	public TMP_InputField inputField;
 
     public tiposFormatacao TiposFormatacao;
 

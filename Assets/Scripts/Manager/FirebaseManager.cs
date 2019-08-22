@@ -1,28 +1,27 @@
 ﻿using APIModel;
 using Firebase;
 using Firebase.Database;
+using Firebase.Messaging;
 using Firebase.Unity.Editor;
-using FirebaseModel;
-using Network;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class FirebaseManager : MonoBehaviour
 {
-    public static FirebaseManager Instance { get; set; }
+    //public static FirebaseManager Instance { get; set; }
     public bool isReady { get; set; }
-    public bool ConexaoOK = true;
 
     private readonly string uRLFirebase = "https://comanda-3c059.firebaseio.com/";
 
     void Awake()
     {
-        if (Instance != null)
-            Destroy(this);
+        //if (Instance != null)
+        //    Destroy(this);
 
-        DontDestroyOnLoad(gameObject);
-        Instance = this;
+        //DontDestroyOnLoad(gameObject);
+        //Instance = this;
 
         isReady = false;
 
@@ -39,12 +38,33 @@ public class FirebaseManager : MonoBehaviour
                     app.SetEditorDatabaseUrl(app.Options.DatabaseUrl);
 
                 isReady = true;
+
+                FirebaseMessaging.TokenReceived += OnTokenReceived;
+                FirebaseMessaging.MessageReceived += OnMessageReceived;
             }
             else
             {
                 Debug.LogError("Could not resolve all Firebase dependencies: " + dependencyStatus);
             }
         });
+    }
+
+    public void OnTokenReceived(object sender, TokenReceivedEventArgs token)
+    {
+        Debug.Log("Received Registration Token: " + token.Token);
+        AppManager.Instance.tokenFirebase = token.Token;
+    }
+    public void OnMessageReceived(object sender, MessageReceivedEventArgs e)
+    {
+        foreach (KeyValuePair<string, string> item in e.Message.Data)
+        {
+            //Debug.Log("--------------------------" + e.Message.Notification.Body);
+            //Debug.Log("--------------------------" + e.Message.RawData);
+            //Debug.Log("--------------------------" + JsonConvert.SerializeObject(e.Message.Data));
+            //Debug.LogFormat($"{item.Key}: {item.Value}");
+
+            //AlertManager.Instance.ShowMessage(e.Message.Notification.Body);
+        }
     }
 
 
@@ -118,8 +138,8 @@ public class FirebaseManager : MonoBehaviour
     }
     #endregion
 
-    private void OnApplicationQuit()
-    {
-        FirebaseDatabase.DefaultInstance.App.Dispose();   
-    }
+    //private void OnApplicationQuit()
+    //{
+    //    FirebaseDatabase.DefaultInstance.App.Dispose();   
+    //}
 }

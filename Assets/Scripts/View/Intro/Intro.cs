@@ -1,8 +1,5 @@
 ﻿using APIModel;
-using FirebaseModel;
 using Network;
-using Newtonsoft.Json;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,9 +11,13 @@ public class Intro : MonoBehaviour
     public Text txtProgresso;
     public Text txtCarregando;
     public Slider sliderProgresso;
+    public FirebaseManager firebaseManager;
 
     private bool estaLogado = false;
     private bool apiForaDoAr = false;
+
+    Cliente.Credenciais credenciais;
+    FacebookManager fbManager;
 
     private IEnumerator Start()
     {
@@ -26,18 +27,31 @@ public class Intro : MonoBehaviour
         Screen.fullScreen = false;
 #endif
 
-        yield return new WaitUntil(() => FirebaseManager.Instance.isReady);
+        yield return new WaitUntil(() => firebaseManager.isReady);
 
         criarDiretoriosImagens();
 
         AlterarProgressoSlider(0.3f);
 
-        yield return StartCoroutine(relogar());
+        credenciais = AppManager.Instance.ObterCredenciais();
 
-        AlterarProgressoSlider(0.2f);
+        fbManager = new FacebookManager()
+        {
+            tipoLogin = (credenciais == null) ? "normal" : credenciais.tipoLogin,
+            relogar = relogar
+        };
 
-        if (estaLogado)
-            buscarClienteNoFireBase();
+        fbManager.Init();
+
+        if (credenciais != null)
+        {
+            if (credenciais.tipoLogin == "normal")
+                relogar("normal");
+
+            yield break;
+        }
+
+        AlterarProgressoSlider(0.7f);
     }
 
     #region Manipula o progresso
@@ -64,7 +78,7 @@ public class Intro : MonoBehaviour
                 return;
             }
 
-            SceneManager.LoadScene("Login");
+            SceneManager.LoadSceneAsync("Login");
         }
     }
     #endregion
@@ -72,45 +86,62 @@ public class Intro : MonoBehaviour
     #region buscarClienteNoFireBase
     private async void buscarClienteNoFireBase()
     {
-        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(AppManager.Instance.Obter());
+        Cliente.ClienteLogado = await firebaseManager.ObterUsuario(AppManager.Instance.Obter());
 
         AlterarProgressoSlider(0.2f);
     }
     #endregion
 
-    #region Post Login Cliente
-    private IEnumerator relogar()
+    #region relogar
+    private void relogar(string tipoLogin)
     {
-        Cliente.Credenciais credenciais = AppManager.Instance.ObterCredenciais();
-
         if (credenciais != null)
         {
-            Dictionary<string, object> data = new Dictionary<string, object>
+            StartCoroutine(postLoginCliente(tipoLogin));
+        }
+    }
+    #endregion
+
+    #region Post Login Cliente
+    private IEnumerator postLoginCliente(string tipoLogin)
+    {
+        Dictionary<string, object> data = new Dictionary<string, object>
             {
                 { "email", credenciais.email },
-                { "password", credenciais.password }
+                { "password", credenciais.password },
+                { "tipoLogin", tipoLogin },
+                { "deviceId", AppManager.Instance.deviceId },
+                { "tokenFirebase", AppManager.Instance.tokenFirebase }
             };
 
-            yield return StartCoroutine(ClienteAPI.ClienteLogin(data,
-            (response, error) =>
+        yield return StartCoroutine(ClienteAPI.ClienteLogin(data,
+        (response, error) =>
+        {
+            if (error != null)
             {
-                if (error != null)
-                {
-                    apiForaDoAr = true;
-                    Debug.Log(error);
-                    AlterarProgressoSlider(0.5f);
-                    return;
-                }
+                apiForaDoAr = true;
+                Debug.Log(error);
+                AlterarProgressoSlider(0.5f);
+                return;
+            }
 
-                estaLogado = true;
-                AppManager.Instance.RefazerToken(response.token);
-                AlterarProgressoSlider(0.3f);
-            }));
+            estaLogado = true;
 
-            yield break;
-        }
+            AppManager.Instance.RefazerToken(response.token);
+            AlterarProgressoSlider(0.3f);
 
-        AlterarProgressoSlider(0.5f);
+            buscarClienteNoFirebase();
+        }));
+    }
+    #endregion
+
+    #region buscarClienteNoFirebase
+    private void buscarClienteNoFirebase()
+    {
+        AlterarProgressoSlider(0.2f);
+
+        if (estaLogado)
+            buscarClienteNoFireBase();
     }
     #endregion
 

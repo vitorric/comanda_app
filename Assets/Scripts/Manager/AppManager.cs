@@ -12,6 +12,11 @@ public class AppManager : MonoBehaviour
     public const float TEMPO_ANIMACAO_FECHAR_MODAL = 0.1f;
     public const float TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO = 0.1f;
 
+    [HideInInspector]
+    public string deviceId = "";
+    [HideInInspector]
+    public string tokenFirebase;
+
     public GameObject Loader;
     public GameObject LevelUp;
     public GameObject PnlDesafioConquistado;
@@ -27,6 +32,8 @@ public class AppManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         Instance = this;
+
+        deviceId = SystemInfo.deviceUniqueIdentifier;
 
         lstDesafiosCompletados = new List<Desafio>();
     }

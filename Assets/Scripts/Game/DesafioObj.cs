@@ -67,7 +67,8 @@ public class DesafioObj : MonoBehaviour
         }
         else
         {
-            TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
+            //TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
+            TxtTempoRestante.text = string.Format("{0}d {1:00}h {2:00}m {3:00}s", ts.Days, ts.Hours, ts.Minutes, ts.Seconds);
             Invoke("rodarRelogio", 1f);
         }
     }
@@ -77,30 +78,12 @@ public class DesafioObj : MonoBehaviour
     public void PreencherInfo(Desafio desafio, Cliente.Desafio desafioCliente)
     {
         Desafio = desafio;
-        DesafioCliente = desafioCliente;
 
         TxtTituloConquista.text = desafio.nome;
         TxtDescricaoConquista.text = desafio.descricao;
 
         lstImgGrupos.ForEach(x => x.SetActive(desafio.emGrupo));
-
-        int progressoUsuario = 0;
-
-        if (DesafioCliente != null)
-        {
-            progressoUsuario = DesafioCliente.progresso;
-
-            if (DesafioCliente.concluido)
-            {
-                esconderTodosPaineis();
-                PnlConquista.SetActive(true);
-            }
-        }
-
-        BarraProgresso.value = (float)progressoUsuario / (float)desafio.objetivo.quantidade;
-
-        TxtProgresso.text = progressoUsuario + "/" + desafio.objetivo.quantidade;
-
+        AtualizarProgresso(desafioCliente);
         rodarRelogio();
         //obterIcone();
     }
@@ -136,6 +119,29 @@ public class DesafioObj : MonoBehaviour
     }
     #endregion
 
+    #region AtualizarProgresso
+    public void AtualizarProgresso(Cliente.Desafio desafioCliente)
+    {
+        DesafioCliente = desafioCliente;
+
+        int progressoUsuario = 0;
+        if (DesafioCliente != null)
+        {
+            progressoUsuario = DesafioCliente.progresso;
+
+            if (DesafioCliente.concluido)
+            {
+                esconderTodosPaineis();
+                PnlConquista.SetActive(true);
+            }
+        }
+
+        BarraProgresso.value = (float)progressoUsuario / (float)Desafio.objetivo.quantidade;
+
+        TxtProgresso.text = progressoUsuario + "/" + Desafio.objetivo.quantidade;
+    }
+    #endregion
+
     #region configurarPainelAlerta
     private void configurarPainelAlerta()
     {
@@ -144,12 +150,6 @@ public class DesafioObj : MonoBehaviour
             PnlConquista.SetActive(false);
             PnlTempoEsgotado.SetActive(true);
         }
-        //else if (conquistaUsuario != null && conquistaUsuario.concluido)
-        //{
-        //    PnlConquista.SetActive(false);
-        //    PnlConquistaConcluida.SetActive(true);
-        //    TxtDataConclusao.text = conquistaUsuario.dataConclusao.ToShortDateString();
-        //}
     }
     #endregion
 

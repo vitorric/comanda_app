@@ -36,7 +36,6 @@ public class Main : MonoBehaviour
     public GameObject PnlUpLevel;
 
     [Header("Geral")]
-    public GameObject PnlPopUp;
     public Configuracoes ConfigApp;
     public GameObject PnlNaoEstaNoEstabelecimento;
     public GameObject PnlEstaNoEstabelecimento;
@@ -52,6 +51,7 @@ public class Main : MonoBehaviour
     //private GenericFirebase<string> comandaClienteFirebase;
     private GenericFirebase<Cliente.ConfigClienteAtual> clienteConfigAtualFirebase;
     private GenericFirebase<Cliente.AvatarInfo> clienteAvatarInfoFirebase;
+    private ClienteFirebase clieteGoldFirebase;
 
     void Awake()
     {
@@ -83,6 +83,7 @@ public class Main : MonoBehaviour
         //comandaClienteFirebase.Watch(false);
         clienteConfigAtualFirebase.Watch(false);
         clienteAvatarInfoFirebase.Watch(false);
+        clieteGoldFirebase.WatchGoldPorEstab(Cliente.ClienteLogado._id, false);
         MenuComanda.IniciarWatchComanda(false);
         MenuCorreio.PararWatch();
         MenuEstabelecimento.PararWatch();
@@ -134,8 +135,35 @@ public class Main : MonoBehaviour
             }
         };
 
+        clieteGoldFirebase = new ClienteFirebase()
+        {
+            AcaoGoldPorEstabelecimento = (goldEstab, tipoAcao) =>
+            {
+                if (tipoAcao == ClienteFirebase.TipoAcao.Adicionar)
+                {
+                    Cliente.ClienteLogado.goldPorEstabelecimento.Add(goldEstab);
+                    return;
+                }
+
+                int indexGold = Cliente.ClienteLogado.goldPorEstabelecimento.FindIndex(x => x.estabelecimento == goldEstab.estabelecimento);
+
+                if (tipoAcao == ClienteFirebase.TipoAcao.Modificar)
+                {
+                    Cliente.ClienteLogado.goldPorEstabelecimento.RemoveAt(indexGold);
+                    Cliente.ClienteLogado.goldPorEstabelecimento.Add(goldEstab);
+                    MenuEstabelecimento.AtualizarInfoGold(goldEstab.estabelecimento);
+                }
+
+                if (tipoAcao == ClienteFirebase.TipoAcao.Remover)
+                {
+                    Cliente.ClienteLogado.goldPorEstabelecimento.RemoveAt(indexGold);
+                }
+            }
+        };
+
         clienteConfigAtualFirebase.Watch(true);
         clienteAvatarInfoFirebase.Watch(true);
+        clieteGoldFirebase.WatchGoldPorEstab(Cliente.ClienteLogado._id, true);
     }
     #endregion
 
@@ -150,7 +178,7 @@ public class Main : MonoBehaviour
 
     private void atualizarExp()
     {
-        int pctExp = Cliente.ClienteLogado.AtualizarPctExp();
+        int pctExp = Cliente.ClienteLogado.RetornarPctExp();
 
         TxtLevel.text = Cliente.ClienteLogado.avatar.info.level.ToString();
         TxtPctExp.text = pctExp + "%";

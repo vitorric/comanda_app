@@ -1,20 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using APIModel;
 using FirebaseModel;
 using Network;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Login : MonoBehaviour
 {
+    public FirebaseManager firebaseManager;
+
     [Header("Canvas")]
     public Canvas PnlLogin;
     public Canvas PnlRecuperarSenha;
-    public Canvas PnlCadasEtapa1;
-    public Canvas PnlCadasEtapa2;
+    public Canvas[] PnlEtapas;
 
     [Header("Button")]
     public Button BtnEntrar;
@@ -22,10 +27,14 @@ public class Login : MonoBehaviour
     public Button BtnRecupSenha;
     public Button BtnRecupSenhaVoltar;
     public Button BtnRecupSenhaEnviar;
+    public Button BtnEtapa0Voltar;
+    public Button BtnEtapa0Continuar;
     public Button BtnEtapa1Voltar;
     public Button BtnEtapa1Continuar;
     public Button BtnEtapa2Voltar;
-    public Button BtnEtapa2Confirmar;
+    public Button BtnEtapa2Continuar;
+    public Button BtnEtapa3Voltar;
+    public Button BtnEtapa3Confirmar;
     public Button BtnEdicaoAvatar;
 
     [Header("Toggle")]
@@ -33,37 +42,44 @@ public class Login : MonoBehaviour
     public Toggle BtnSexoFem;
 
     [Header("Tela de Login")]
-    public InputField TxtEmail;
-    public InputField TxtSenha;
+    public TMP_InputField TxtEmail;
+    public TMP_InputField TxtSenha;
 
     [Header("Recuperar Senha")]
-    public InputField TxtEmailRecSenha;
+    public TMP_InputField TxtEmailRecSenha;
 
-
-    [Header("Cadastrar")]
-    //public List<GameObject> PnlCadastrarEtapas;
+    [Header("Cadastro Etapa - 0")]
+    public TMP_InputField TxtEmailCadastro;
+    public TMP_InputField TxtNomeCadastro;
 
     [Header("Cadastro Etapa - 1")]
-    public InputField TxtEmailCadastro;
-    public InputField TxtNomeCadastro;
-    public InputField TxtApelidoCadastro;
-    public InputField TxtSenhaCadastro;
-    public InputField TxtSenhaCadastroConfirm;
+    public TMP_InputField TxtCPFCadastro;
+    public TMP_InputField TxtDataNascCadastro;
 
     [Header("Cadastro Etapa - 2")]
+    public TMP_InputField TxtApelidoCadastro;
     public AvatarObj PnlAvatar;
+
+    [Header("Cadastro Etapa - 3")]
+    public TMP_InputField TxtSenhaCadastro;
+    public TMP_InputField TxtSenhaCadastroConfirm;
+
+    private string tipoLogin = "normal";
+    FacebookManager fbManager;
 
     #region Awake
     void Awake()
     {
         if (Application.isEditor)
         {
-            TxtEmail.text = "email1@email.com";
+            TxtEmail.text = "arus@email.com";
             TxtSenha.text = "1234";
         }
 
-        configurarListener();
+        fbManager = new FacebookManager() { cadastrar = cadastroSocial };
 
+        configurarListener();
+        configurarInputListener();
     }
     #endregion
 
@@ -71,20 +87,53 @@ public class Login : MonoBehaviour
     private void configurarListener()
     {
         BtnEntrar.onClick.AddListener(() => BtnLogar());
-        BtnCadastrar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(0, BtnCadastrar.gameObject));
+        BtnCadastrar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(0));
         BtnRecupSenha.onClick.AddListener(() => BtnAbrirPnlRecuperarSenha());
         BtnRecupSenhaVoltar.onClick.AddListener(() => BtnRecuperarSenhaVoltarLogin());
         BtnRecupSenhaEnviar.onClick.AddListener(() => BtnRecuperarSenha());
-        BtnEtapa1Voltar.onClick.AddListener(() => BtnCadastrarVoltar(0, BtnEtapa1Voltar.gameObject));
-        BtnEtapa1Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(1, BtnEtapa1Continuar.gameObject));
-        BtnEtapa2Voltar.onClick.AddListener(() => BtnCadastrarVoltar(1, BtnEtapa2Voltar.gameObject));
-        BtnEtapa2Confirmar.onClick.AddListener(() => BtnConfirmarCadastro());
+
+        BtnEtapa0Voltar.onClick.AddListener(() => BtnCadastrarVoltar(0));
+        BtnEtapa1Voltar.onClick.AddListener(() => BtnCadastrarVoltar(1));
+        BtnEtapa2Voltar.onClick.AddListener(() => BtnCadastrarVoltar(2));
+        BtnEtapa3Voltar.onClick.AddListener(() => BtnCadastrarVoltar(3));
+
+
+        BtnEtapa0Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(1));
+        BtnEtapa1Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(2));
+        BtnEtapa2Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(3));
+        BtnEtapa3Confirmar.onClick.AddListener(() => BtnConfirmarCadastro());
+
         BtnEdicaoAvatar.onClick.AddListener(() => BtnAbrirEdicaoAvatar());
 
         BtnSexoMasc.onValueChanged.AddListener((result) => ChkChanged(BtnSexoMasc.gameObject, true));
         BtnSexoFem.onValueChanged.AddListener((result) => ChkChanged(BtnSexoFem.gameObject, true));
     }
     #endregion
+
+    #region configurarInputListener
+    private void configurarInputListener()
+    {
+        TxtEmail.onSubmit.AddListener(delegate { TxtSenha.Select(); });
+        TxtSenha.onSubmit.AddListener(delegate { logar(); });
+
+        //etapa 0
+        TxtEmailCadastro.onSubmit.AddListener(delegate { TxtNomeCadastro.Select(); });
+        TxtNomeCadastro.onSubmit.AddListener(delegate { avancarEtapa(1); TxtCPFCadastro.Select(); });
+
+        //etapa 1
+        //TxtCPFCadastro.onValueChanged.AddListener(delegate { Util.FormatarCPF(TxtCPFCadastro); });
+        TxtCPFCadastro.onSubmit.AddListener(delegate { TxtDataNascCadastro.Select(); });
+        //TxtDataNascCadastro.onValueChanged.AddListener(delegate { Util.FormatarDataNasc(TxtDataNascCadastro); });
+        TxtDataNascCadastro.onSubmit.AddListener(delegate { avancarEtapa(2); TxtApelidoCadastro.Select(); });
+
+        //etapa 2 nao tem
+        //etapa 3
+        TxtSenhaCadastro.onSubmit.AddListener(delegate { TxtSenhaCadastro.Select(); });
+        TxtSenhaCadastroConfirm.onSubmit.AddListener(delegate { cadastrar(); });
+
+    }
+    #endregion
+
 
     #region Botoes
 
@@ -126,7 +175,7 @@ public class Login : MonoBehaviour
     #endregion
 
     #region BtnCadastrarAvantarEtapa
-    public void BtnCadastrarAvantarEtapa(int etapa, GameObject objClicado)
+    public void BtnCadastrarAvantarEtapa(int etapa)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
         avancarEtapa(etapa);
@@ -134,7 +183,7 @@ public class Login : MonoBehaviour
     #endregion
 
     #region BtnCadastrarVoltar
-    public void BtnCadastrarVoltar(int etapa, GameObject objClicado)
+    public void BtnCadastrarVoltar(int etapa)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
         voltarEtapa(etapa);
@@ -197,7 +246,10 @@ public class Login : MonoBehaviour
         Dictionary<string, object> form = new Dictionary<string, object>
         {
             { "email", TxtEmail.text },
-            { "password", Util.GerarHashMd5(TxtSenha.text) }
+            { "password", Util.GerarHashMd5(TxtSenha.text) },
+            { "tipoLogin", tipoLogin },
+            { "deviceId", AppManager.Instance.deviceId },
+            { "tokenFirebase", AppManager.Instance.tokenFirebase }
         };
 
         AppManager.Instance.AtivarLoader();
@@ -217,7 +269,8 @@ public class Login : MonoBehaviour
             JsonConvert.SerializeObject(new Cliente.Credenciais
             {
                 email = TxtEmail.text,
-                password = Util.GerarHashMd5(TxtSenha.text)
+                password = Util.GerarHashMd5(TxtSenha.text),
+                tipoLogin = tipoLogin
             }));
 
             buscarClienteNoFireBase();
@@ -272,17 +325,91 @@ public class Login : MonoBehaviour
     #endregion
 
     #region avancarEtapa
-    private void avancarEtapa(int etapa)
+    private void avancarEtapa(int proximaEtapa)
     {
-        if (etapa == 1)
+        int etapaAtual = proximaEtapa - 1;
+
+        //nome e email
+        if (etapaAtual == 0)
         {
             if (TxtEmailCadastro.text == string.Empty ||
-                        TxtSenhaCadastro.text == string.Empty ||
-                        TxtSenhaCadastroConfirm.text == string.Empty ||
-                        TxtApelidoCadastro.text == string.Empty ||
-                        TxtNomeCadastro.text == string.Empty)
+                TxtNomeCadastro.text == string.Empty)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                return;
+            }
+
+            if (!verificarEmailValido(TxtEmailCadastro.text))
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.EmailNaoValido, false));
+                return;
+            }
+
+            if (TxtNomeCadastro.text.Split(' ').Length < 2)
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.NomeSobreNome, false));
+                return;
+            }
+        }
+
+        //cpf e data nasc
+        if (etapaAtual == 1)
+        {
+            if (TxtDataNascCadastro.text == string.Empty ||
+                TxtCPFCadastro.text == string.Empty)
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                return;
+            }
+
+            if (!verificarCPFValido(TxtCPFCadastro.text))
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaCPFValido, false));
+                return;
+            }
+
+            if (!verificarDataValido(TxtDataNascCadastro.text))
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.DataInvalida, false));
+                return;
+            }
+
+            if (!verificarMaiorIdade(TxtDataNascCadastro.text))
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.Menor18Anos, false));
+                return;
+            }
+        }
+
+        //apelido e avatar
+        if (etapaAtual == 2)
+        {
+            if (TxtApelidoCadastro.text == string.Empty)
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                return;
+            }
+
+            if (TxtApelidoCadastro.text.Length < 3)
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.ApelidoMenor3Char, false));
+                return;
+            }
+        }
+
+        //confirmacao senha e criacao
+        if (etapaAtual == 3)
+        {
+            if (TxtSenhaCadastro.text == string.Empty ||
+                TxtSenhaCadastroConfirm.text == string.Empty)
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                return;
+            }
+
+            if (TxtSenhaCadastro.text.Length < 6)
+            {
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhaMenor6Char, false));
                 return;
             }
 
@@ -293,45 +420,59 @@ public class Login : MonoBehaviour
             }
         }
 
-        if (etapa == 0)
+        if (proximaEtapa == 0)
         {
             PnlLogin.enabled = false;
             LimparFormCadastro();
-            PnlCadasEtapa1.enabled = true;
-        }
-
-        if (etapa == 1)
-        {
-            PnlCadasEtapa1.enabled = false;
-            PnlCadasEtapa2.enabled = true;
+            PnlEtapas[0].enabled = true;
             return;
         }
+
+        if (etapaAtual > -1)
+            PnlEtapas[etapaAtual].enabled = false;
+
+        PnlEtapas[proximaEtapa].enabled = true;
+
+        //if (proximaEtapa == 1)
+        //{
+        //    PnlCadasEtapa1.enabled = false;
+        //    PnlCadasEtapa2.enabled = true;
+        //    return;
+        //}
 
     }
     #endregion
 
     #region voltarEtapa
-    private void voltarEtapa(int etapa)
+    private void voltarEtapa(int etapaAtual)
     {
-        PnlLogin.enabled = false;
-        PnlCadasEtapa1.enabled = false;
-        PnlCadasEtapa2.enabled = false;
+        int etapaAnterior = etapaAtual - 1;
 
-        if (etapa == 0)
+        PnlEtapas[etapaAtual].enabled = false;
+
+        if (etapaAnterior < 0)
         {
             PnlLogin.enabled = true;
             return;
         }
-        if (etapa == 1)
-        {
-            PnlCadasEtapa1.enabled = true;
-            return;
-        }
-        if (etapa == 2)
-        {
-            PnlCadasEtapa2.enabled = true;
-        }
 
+        PnlEtapas[etapaAnterior].enabled = true;
+
+    }
+    #endregion
+
+    #region cadastroSocial
+    private void cadastroSocial(string socialId, string nome, string email, string tipo)
+    {
+        TxtSenhaCadastro.gameObject.SetActive(false);
+        TxtSenhaCadastroConfirm.gameObject.SetActive(false);
+        TxtEmailCadastro.text = socialId;
+        TxtNomeCadastro.text = nome;
+
+        TxtEmailCadastro.interactable = false;
+        TxtNomeCadastro.interactable = false;
+
+        avancarEtapa(1);
     }
     #endregion
 
@@ -346,7 +487,12 @@ public class Login : MonoBehaviour
             { "apelido", TxtApelidoCadastro.text },
             { "nome", TxtNomeCadastro.text },
             { "sexo", (BtnSexoMasc.isOn) ? "Masculino" : "Feminino" },
-            { "avatar", JsonConvert.SerializeObject(prepararAvatarCadastro()) }
+            { "avatar", JsonConvert.SerializeObject(prepararAvatarCadastro()) },
+            { "tipoLogin", tipoLogin },
+            { "deviceId", AppManager.Instance.deviceId },
+            { "tokenFirebase", AppManager.Instance.tokenFirebase },
+            { "cpf", TxtCPFCadastro.text },
+            { "dataNascimento", Util.formatarDataParaAPI(TxtDataNascCadastro.text) }
         };
 
         AppManager.Instance.AtivarLoader();
@@ -379,12 +525,12 @@ public class Login : MonoBehaviour
     #region buscarNoFireBase
     private async void buscarClienteNoFireBase()
     {
-        Cliente.ClienteLogado = await FirebaseManager.Instance.ObterUsuario(AppManager.Instance.Obter());
+        Cliente.ClienteLogado = await firebaseManager.ObterUsuario(AppManager.Instance.Obter());
 
         SceneManager.LoadSceneAsync("Main");
     }
 
-    #region 
+    #region prepararAvatarCadastro
     private Dictionary<string, object> prepararAvatarCadastro()
     {
         Dictionary<string, object> avatarDic = new Dictionary<string, object>
@@ -411,6 +557,30 @@ public class Login : MonoBehaviour
 
     #endregion
 
+    #region verificarEmailValido
+    private bool verificarEmailValido(string email)
+    {
+        Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+        Match match = regex.Match(email);
+        if (match.Success)
+            return true;
+        else
+            return false;
+    }
+    #endregion
+
+    #region verificarCPFValido
+    private bool verificarCPFValido(string cpf)
+    {
+        Regex regex = new Regex(@"^\d{3}\.\d{3}\.\d{3}-\d{2}$");
+        Match match = regex.Match(cpf);
+        if (match.Success)
+            return true;
+        else
+            return false;
+    }
+    #endregion
+
     #endregion
 
     #region Metodos Publicos
@@ -423,6 +593,8 @@ public class Login : MonoBehaviour
         TxtSenhaCadastroConfirm.text = string.Empty;
         TxtApelidoCadastro.text = string.Empty;
         TxtNomeCadastro.text = string.Empty;
+        TxtCPFCadastro.text = string.Empty;
+        TxtDataNascCadastro.text = string.Empty;
         BtnSexoMasc.isOn = true;
         BtnSexoFem.isOn = false;
 
@@ -449,6 +621,32 @@ public class Login : MonoBehaviour
             BtnSexoMasc.isOn = true;
         else
             BtnSexoFem.isOn = true;
+    }
+    #endregion
+
+    #region verificarDataValido
+    private bool verificarDataValido(string data)
+    {
+        Regex regex = new Regex(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
+
+        //Verify whether date entered in dd/MM/yyyy format.
+        bool isValid = regex.IsMatch(data.Trim());
+
+        //Verify whether entered date is Valid date.
+        DateTime dt;
+        isValid = DateTime.TryParseExact(data, "dd/MM/yyyy", new CultureInfo("pt-BR"), DateTimeStyles.None, out dt);
+
+        return isValid;
+    }
+    #endregion
+
+    #region verificarMaiorIdade
+    private bool verificarMaiorIdade(string data)
+    {
+        int idade = Util.CalcularIdade(Convert.ToDateTime(data));
+
+        return (idade > 18) ? true : false;
+
     }
     #endregion
 

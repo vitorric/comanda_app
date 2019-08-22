@@ -5,13 +5,16 @@ using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Util  {
+public class Util
+{
 
-	public static string formatarDataParaAPI(string data){
+    public static string formatarDataParaAPI(string data)
+    {
 
         if (!string.IsNullOrEmpty(data))
         {
@@ -21,9 +24,9 @@ public class Util  {
         }
 
         return null;
-	}
+    }
 
-	public static string FormatarValores(double valor)
+    public static string FormatarValores(double valor)
     {
         string valorFormatado = string.Empty;
 
@@ -40,11 +43,11 @@ public class Util  {
         return valorFormatado;
     }
 
-	public static double Floor10(double x)
+    public static double Floor10(double x)
     {
         return Math.Floor(x * 10) / 10;
     }
-    
+
     public static string GerarHashMd5(string input)
     {
         MD5 md5Hash = MD5.Create();
@@ -94,5 +97,16 @@ public class Util  {
         y = x * (height / width);
         rawImage.rectTransform.sizeDelta = new Vector2(x, y);
         return rawImage;
+    }
+
+    public static int CalcularIdade(DateTime DataNascimento)
+    {
+        int anos = DateTime.Now.Year - DataNascimento.Year;
+
+        if (DateTime.Now.Month < DataNascimento.Month || (DateTime.Now.Month == DataNascimento.Month && DateTime.Now.Day < DataNascimento.Day))
+
+            anos--;
+
+        return anos;
     }
 }

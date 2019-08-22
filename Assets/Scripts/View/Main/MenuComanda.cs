@@ -47,6 +47,11 @@ public class MenuComanda : MonoBehaviour
     public Text LblValorPago;
     public Text LblValorRestante;
 
+    [Header("Historico Comanda")]
+    public Canvas CanvasHistoricoComanda;
+    public Transform ScvHistoricoComanda;
+    public HistoricoComandaObj HistoricoComandaRef;
+
     [HideInInspector]
     public ComandaFirebase ComandaFirebase;
     [HideInInspector]
@@ -337,7 +342,8 @@ public class MenuComanda : MonoBehaviour
         //é feito essa conferencia pra nao ficar batendo toda hora na rota do avatar
         if (grupoComanda.Integrante != null && grupo.avatarAlterado.Subtract(grupoComanda.Integrante.avatarAlterado).TotalSeconds <= 0)
         {
-            grupoComanda.PreencherInfo(grupo, null, clienteLogadoEhLider, (clienteId, nomeCliente) => {
+            grupoComanda.PreencherInfo(grupo, null, clienteLogadoEhLider, (clienteId, nomeCliente) =>
+            {
                 ConvidarGrupo.AbrirPnlTransferirLideranca(clienteId, nomeCliente);
             });
 
@@ -356,7 +362,8 @@ public class MenuComanda : MonoBehaviour
                 return;
             }
 
-            grupoComanda.PreencherInfo(grupo, response, clienteLogadoEhLider, (clienteId, nomeCliente) => {
+            grupoComanda.PreencherInfo(grupo, response, clienteLogadoEhLider, (clienteId, nomeCliente) =>
+            {
                 ConvidarGrupo.AbrirPnlTransferirLideranca(clienteId, nomeCliente);
             });
 
@@ -375,7 +382,7 @@ public class MenuComanda : MonoBehaviour
 
         if (lstGrupoComanda != null && lstGrupoComanda.Count > 0)
         {
-            for (int i =0; i < lstGrupoComanda.Count; i++)
+            for (int i = 0; i < lstGrupoComanda.Count; i++)
             {
                 yield return new WaitUntil(() => lstGrupoComanda[i].Integrante != null);
 
@@ -419,19 +426,38 @@ public class MenuComanda : MonoBehaviour
     #region btnAbrirHistoriaCompra
     private void btnAbrirHistoriaCompra()
     {
-        //PnlPopUp.AbrirPopUp(PnlHistoricoComanda, () =>
-        //{
+        PnlPopUp.AbrirPopUpCanvas(CanvasHistoricoComanda, PnlHistoricoComanda, () =>
+        {
+            Dictionary<string, object> form = new Dictionary<string, object>()
+            {
+                { "comandaId", ComandaId }
+            };
 
-        //});
+            StartCoroutine(ComandaAPI.ListarHistoricoComanda(form, (response, error) =>
+            {
+                if (error != null)
+                {
+                    Debug.Log(error);
+                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    return;
+                }
+
+                for (int i =0; i < response.Count; i++)
+                {
+                    HistoricoComandaObj historicoObj = Instantiate(HistoricoComandaRef, ScvHistoricoComanda);
+                    historicoObj.PreencherInfo(response[i]);
+                }
+            }));
+        });
     }
     #endregion
 
     #region btnFecharHistoricoCompra
     private void btnFecharHistoricoCompra()
     {
-        PnlPopUp.FecharPopUpSemDesligarPopUP(PnlHistoricoComanda, () =>
+        PnlPopUp.FecharPnlCanvas(CanvasHistoricoComanda, PnlHistoricoComanda, () =>
         {
-
+            ScvHistoricoComanda.GetComponentsInChildren<HistoricoComandaObj>().ToList().ForEach(x => Destroy(x.gameObject));
         });
     }
     #endregion

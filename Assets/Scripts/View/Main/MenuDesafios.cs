@@ -61,7 +61,7 @@ public class MenuDesafios : MonoBehaviour
             }
         };
 
-        ClienteFirebase.Watch(Cliente.ClienteLogado._id, true);
+        ClienteFirebase.WatchDesafios(Cliente.ClienteLogado._id, true);
 
         listarDesafiosConcluidos();
     }
@@ -205,6 +205,7 @@ public class MenuDesafios : MonoBehaviour
             {
                 if (desafio.concluido)
                 {
+                    Main.Instance.MenuEstabelecimento.DeletarDesafioCompletado(desafioObj.Desafio);
                     Destroy(desafioObj.gameObject);
                     return;
                 }
@@ -216,6 +217,7 @@ public class MenuDesafios : MonoBehaviour
             });
 
             desafioObj.PreencherInfo(response, desafio);
+            Main.Instance.MenuEstabelecimento.AlterarProgressoDesafio(desafio);
         }));
     }
     #endregion
@@ -223,7 +225,7 @@ public class MenuDesafios : MonoBehaviour
     #region PararWatch
     public void PararWatch()
     {
-        ClienteFirebase.Watch(Cliente.ClienteLogado._id, false);
+        ClienteFirebase.WatchDesafios(Cliente.ClienteLogado._id, false);
     }
     #endregion
 

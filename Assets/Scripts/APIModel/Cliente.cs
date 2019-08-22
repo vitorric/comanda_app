@@ -18,6 +18,7 @@ namespace APIModel
         {
             public string email;
             public string password;
+            public string tipoLogin;
         }
 
         public partial class Dados
@@ -39,7 +40,7 @@ namespace APIModel
             public ConfigApp configApp;
             public ConfigClienteAtual configClienteAtual;
 
-            public int AtualizarPctExp()
+            public int RetornarPctExp()
             {
                 return Mathf.FloorToInt(((float)this.avatar.info.exp / (float)this.avatar.info.expProximoLevel) * 100f);
             }
@@ -66,15 +67,15 @@ namespace APIModel
                 return 0;
             }
 
-            public int AlterarGoldEstabelecimento(string idEstabelecimento, int quantidadeGold, bool adicionar)
-            {
-                if (adicionar)
-                    this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento).gold += quantidadeGold;
-                else
-                    this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento).gold -= quantidadeGold;
+            //public int AlterarGoldEstabelecimento(string idEstabelecimento, int quantidadeGold, bool adicionar)
+            //{
+            //    if (adicionar)
+            //        this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento).gold += quantidadeGold;
+            //    else
+            //        this.goldPorEstabelecimento.Find(x => x.estabelecimento == idEstabelecimento).gold -= quantidadeGold;
 
-                return RetornoGoldEstabelecimento(idEstabelecimento);
-            }
+            //    return RetornoGoldEstabelecimento(idEstabelecimento);
+            //}
         }
 
         public partial class Avatar

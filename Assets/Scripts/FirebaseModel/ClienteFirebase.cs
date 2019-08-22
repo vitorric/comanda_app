@@ -15,10 +15,33 @@ namespace FirebaseModel
         }
 
         public Action<Cliente.Desafio, TipoAcao> AcaoDesafio;
+        public Action<Cliente.GoldPorEstabelecimento, TipoAcao> AcaoGoldPorEstabelecimento;
 
-        public void Watch(string clienteId, bool ehParaAdicionar)
+        public void WatchGoldPorEstab(string clienteId, bool ehParaAdicionar)
+        {
+
+            var goldPorEstabelecimento = FirebaseDatabase.DefaultInstance.GetReference("clientes/" + clienteId + "/goldPorEstabelecimento");
+
+            if (ehParaAdicionar)
+            {
+                goldPorEstabelecimento.ChildAdded += goldPorEstabelecimentoAdicionar;
+                goldPorEstabelecimento.ChildChanged += goldPorEstabelecimentoModificar;
+                goldPorEstabelecimento.ChildRemoved += goldPorEstabelecimentoRemover;
+                return;
+            }
+
+            if (!ehParaAdicionar)
+            {
+                goldPorEstabelecimento.ChildAdded -= goldPorEstabelecimentoAdicionar;
+                goldPorEstabelecimento.ChildChanged -= goldPorEstabelecimentoModificar;
+                goldPorEstabelecimento.ChildRemoved -= goldPorEstabelecimentoRemover;
+            }
+        }
+
+        public void WatchDesafios(string clienteId, bool ehParaAdicionar)
         {
             var desafiosCliente = FirebaseDatabase.DefaultInstance.GetReference("desafios/" + clienteId);
+
 
             if (ehParaAdicionar)
             {
@@ -33,7 +56,6 @@ namespace FirebaseModel
                 desafiosCliente.ChildAdded -= desafioAdicionar;
                 desafiosCliente.ChildChanged -= desafioModificar;
                 desafiosCliente.ChildChanged -= desafioRemover;
-                return;
             }
         }
 
@@ -121,5 +143,84 @@ namespace FirebaseModel
 
         #endregion
 
+        #region AcoesGoldPorEstabelecimento
+
+        #region goldPorEstabelecimentoAdicionar
+        private void goldPorEstabelecimentoAdicionar(object sender, ChildChangedEventArgs e)
+        {
+            if (e.DatabaseError != null)
+            {
+                Debug.LogError(e.DatabaseError.Message);
+                return;
+            }
+
+            try
+            {
+                AcaoGoldPorEstabelecimento(tratarSnapshotGoldPorEstabelecimento(e.Snapshot), TipoAcao.Adicionar);
+            }
+            catch (Exception x)
+            {
+                Debug.LogError(x.Message);
+                throw x;
+            }
+        }
+        #endregion
+
+        #region goldPorEstabelecimentoModificar
+        private void goldPorEstabelecimentoModificar(object sender, ChildChangedEventArgs e)
+        {
+            if (e.DatabaseError != null)
+            {
+                Debug.LogError(e.DatabaseError.Message);
+                return;
+            }
+
+            try
+            {
+                AcaoGoldPorEstabelecimento(tratarSnapshotGoldPorEstabelecimento(e.Snapshot), TipoAcao.Modificar);
+            }
+            catch (Exception x)
+            {
+                Debug.LogError(x.Message);
+                throw x;
+            }
+        }
+        #endregion
+
+        #region goldPorEstabelecimentoRemover
+        private void goldPorEstabelecimentoRemover(object sender, ChildChangedEventArgs e)
+        {
+            if (e.DatabaseError != null)
+            {
+                Debug.LogError(e.DatabaseError.Message);
+                return;
+            }
+
+            try
+            {
+                AcaoGoldPorEstabelecimento(tratarSnapshotGoldPorEstabelecimento(e.Snapshot), TipoAcao.Remover);
+            }
+            catch (Exception x)
+            {
+                Debug.LogError(x.Message);
+                throw x;
+            }
+        }
+        #endregion
+
+        #region tratarSnapshotDesafio
+        private Cliente.GoldPorEstabelecimento tratarSnapshotGoldPorEstabelecimento(DataSnapshot ds)
+        {
+            Cliente.GoldPorEstabelecimento goldPorEstabelecimento = new Cliente.GoldPorEstabelecimento
+            {
+                gold = Convert.ToInt32(ds.Child("gold").Value),
+                estabelecimento = Convert.ToString(ds.Child("estabelecimento").Value)
+            };
+
+            return goldPorEstabelecimento;
+        }
+        #endregion
+
+        #endregion
     }
 }

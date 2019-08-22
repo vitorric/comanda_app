@@ -75,8 +75,9 @@ public class ItemObj : MonoBehaviour
         }
         else
         {
-            TxtTempo.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
+            //TxtTempo.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
             //txtTime.text = ts.ToString(@"hh\h\ mm\m\ ss\s");
+            TxtTempo.text = string.Format("{0}d {1:00}h {2:00}m {3:00}s", ts.Days, ts.Hours, ts.Minutes, ts.Seconds);
             Invoke("rodarRelogio", 1f);
         }
     }
@@ -120,6 +121,8 @@ public class ItemObj : MonoBehaviour
         }
         else if (!Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento && Cliente.ClienteLogado.configClienteAtual.estabelecimento != estabelecimentoId)
         {
+            Debug.Log(Cliente.ClienteLogado.configClienteAtual.estabelecimento);
+            Debug.Log(estabelecimentoId);
             alerta = "É necessário estar no estabelecimento";
             corAlerta = 3;
         }
@@ -128,7 +131,6 @@ public class ItemObj : MonoBehaviour
             alerta = "Esgotado";
             corAlerta = 2;
         }
-
 
         if (!string.IsNullOrEmpty(alerta))
         {
@@ -150,21 +152,21 @@ public class ItemObj : MonoBehaviour
 
         if (ItemLoja.preco > gold)
         {
-            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.CPGoldInsuficiente, false));
             return;
         }
 
         Button btnConfirmarCompra = Main.Instance.MenuEstabelecimento.BtnConfirmarCompraItem;
 
         btnConfirmarCompra.onClick.RemoveAllListeners();
-        btnConfirmarCompra.onClick.AddListener(() => confirmarCompraItem(btnConfirmarCompra.gameObject));
+        btnConfirmarCompra.onClick.AddListener(() => confirmarCompraItem());
 
         Main.Instance.MenuEstabelecimento.PreencherInfoConfirmacaoItem(ItemLoja, gold);
     }
     #endregion
 
     #region confirmarCompraItem
-    private void confirmarCompraItem(GameObject objClicado)
+    private void confirmarCompraItem()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Compra_Item);
 
@@ -180,25 +182,12 @@ public class ItemObj : MonoBehaviour
         StartCoroutine(ClienteAPI.ClienteComprarItem(data,
         (response, error) =>
         {
-            APIManager.Retorno<string> retornoAPI =
-                JsonConvert.DeserializeObject<APIManager.Retorno<string>>(response);
-
-            if (retornoAPI.sucesso)
+            if (error != null)
             {
-                int novoGold = usuario.AlterarGoldEstabelecimento(estabelecimentoId, (int)ItemLoja.preco, false);
-                Cliente.ClienteLogado = usuario;
-
-                Main.Instance.MenuEstabelecimento.AtualizarInfoGold(estabelecimentoId, novoGold);
-
-                ItemLoja.quantidadeDisponivel -= 1;
-                configurarPainelAlerta();
+                Debug.Log(error);
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
             }
-            else
-            {
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-            }
-
-            //StartCoroutine(FindObjectOfType<Alerta>().ChamarAlerta(retornoAPI.msg, comunicadorAPI.PnlPrincipal));
 
         }));
     }

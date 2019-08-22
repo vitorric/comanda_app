@@ -414,22 +414,54 @@ public class MenuEstabelecimento : MonoBehaviour
     #region PreencherInfoConfirmacaoItem
     public void PreencherInfoConfirmacaoItem(ItemLoja item, float dinheiroEstab)
     {
-        // IconItem;
-        PnlConfirmarItemCompra.SetActive(true);
-        TxtNomeCompraItem.text = item.nome;
-        TxtCaixaCompraItem.text = dinheiroEstab.ToString();
-        TxtCustoCompraItem.text = "- " + item.preco.ToString();
-        TxtSaldoCompraItem.text = (dinheiroEstab - item.preco).ToString();
+        PnlPopUp.AbrirPopUp(
+               PnlConfirmarItemCompra, 
+               () =>
+               {
+                   TxtNomeCompraItem.text = item.nome;
+                   TxtCaixaCompraItem.text = dinheiroEstab.ToString();
+                   TxtCustoCompraItem.text = "- " + item.preco.ToString();
+                   TxtSaldoCompraItem.text = (dinheiroEstab - item.preco).ToString();
+
+                   Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) => {
+                       IconItem.texture = textura;
+                       IconItem = Util.ImgResize(IconItem, 180, 180);
+                   });
+               });
     }
     #endregion
 
     #region AtualizarInfoGold
     //quando se compra um item
-    public void AtualizarInfoGold(string _idEstab, int novoGold)
+    public void AtualizarInfoGold(string _idEstab)
     {
-        string gold = Util.FormatarValores(novoGold);
-        TxtGoldEstabInfo.text = gold;
+        if (TxtGoldEstabInfo.gameObject.activeInHierarchy)
+            TxtGoldEstabInfo.text = Util.FormatarValores(Cliente.ClienteLogado.RetornoGoldEstabelecimento(_idEstab));
     }
     #endregion
 
+    #region DeletarDesafioCompletado
+    public void DeletarDesafioCompletado(Desafio desafio)
+    {
+        int indexDesafio = lstDesafios.FindIndex(x => x.Desafio._id == desafio._id);
+
+        if (indexDesafio > -1)
+        {
+            Destroy(lstDesafios[indexDesafio].gameObject);
+            lstDesafios.RemoveAt(indexDesafio);
+        }
+    }
+    #endregion
+
+    #region AlterarProgressoDesafio
+    public void AlterarProgressoDesafio(Cliente.Desafio desafioCliente)
+    {
+        int indexDesafio = lstDesafios.FindIndex(x => x.Desafio._id == desafioCliente._id);
+
+        if (indexDesafio > -1)
+        {
+            lstDesafios[indexDesafio].AtualizarProgresso(desafioCliente);
+        }
+    }
+    #endregion
 }

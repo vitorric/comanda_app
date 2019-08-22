@@ -62,6 +62,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\ConsoleBase.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\LogView.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\MenuBase.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AccessTokenMenu.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppEvents.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppLinks.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\AppRequests.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\DialogShare.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\GraphRequest.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\MainMenu.cs" />
+    <Compile Include="Assets\FacebookSDK\Examples\Scripts\SubMenus\Pay.cs" />
     <Compile Include="Assets\Scripts\API\API.cs" />
     <Compile Include="Assets\Scripts\API\AvatarAPI.cs" />
     <Compile Include="Assets\Scripts\API\ClienteAPI.cs" />
@@ -78,6 +89,7 @@
     <Compile Include="Assets\Scripts\APIModel\Desafio.cs" />
     <Compile Include="Assets\Scripts\APIModel\DesafioConcluido.cs" />
     <Compile Include="Assets\Scripts\APIModel\Estabelecimento.cs" />
+    <Compile Include="Assets\Scripts\APIModel\HistoricoComanda.cs" />
     <Compile Include="Assets\Scripts\APIModel\HistoricoCompra.cs" />
     <Compile Include="Assets\Scripts\APIModel\ItemLoja.cs" />
     <Compile Include="Assets\Scripts\APIModel\Produto.cs" />
@@ -97,6 +109,7 @@
     <Compile Include="Assets\Scripts\Game\DesafioObj.cs" />
     <Compile Include="Assets\Scripts\Game\EstabelecimentoObj.cs" />
     <Compile Include="Assets\Scripts\Game\GrupoObj.cs" />
+    <Compile Include="Assets\Scripts\Game\HistoricoComandaObj.cs" />
     <Compile Include="Assets\Scripts\Game\HistoricoCompraObj.cs" />
     <Compile Include="Assets\Scripts\Game\ItemComandaObj.cs" />
     <Compile Include="Assets\Scripts\Game\ItemObj.cs" />
@@ -105,10 +118,11 @@
     <Compile Include="Assets\Scripts\Game\PnlDecisao.cs" />
     <Compile Include="Assets\Scripts\Game\SlotItemPersonagem.cs" />
     <Compile Include="Assets\Scripts\Manager\AlertaManager.cs" />
-    <Compile Include="Assets\Scripts\Manager\APIManager.cs" />
     <Compile Include="Assets\Scripts\Manager\AppManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\FacebookManager.cs" />
     <Compile Include="Assets\Scripts\Manager\FileManager.cs" />
     <Compile Include="Assets\Scripts\Manager\FirebaseManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\GPSManager.cs" />
     <Compile Include="Assets\Scripts\Manager\TestManager.cs" />
     <Compile Include="Assets\Scripts\QRCode\LeitoQRCode.cs" />
     <Compile Include="Assets\Scripts\Util\Animacoes.cs" />
@@ -181,13 +195,33 @@
     <Compile Include="Assets\Third\unity-ui-extensions\Scripts\Layout\ScrollSnapBase.cs" />
     <Compile Include="Assets\Third\unity-ui-extensions\Scripts\Layout\VerticalScrollSnap.cs" />
     <None Include="Assets\Third\ColorPick\Resources\Shaders\Compute\GenerateSVTexture.compute" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\Third\unity-ui-extensions\Shaders\SoftMaskShader.shader" />
     <None Include="Assets\Third\PlayerPrefsEditor\README.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-database-unity\maven-metadata.xml" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\Third\JsonDotNet\link.xml" />
     <None Include="Assets\Third\Demigiant\DOTween\readme.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\FacebookSDK\link.xml" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-messaging-unity\maven-metadata.xml" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
@@ -407,11 +441,29 @@
     <Reference Include="Vuforia.UnityExtensions">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.12f1/Editor/Data/PlaybackEngines/VuforiaSupport/Managed/Runtime/Vuforia.UnityExtensions.dll</HintPath>
     </Reference>
+    <Reference Include="Facebook.Unity">
+      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/FacebookSDK/Plugins/Facebook.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.Unity.Gameroom">
+      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/FacebookSDK/Plugins/Gameroom/Facebook.Unity.Gameroom.dll</HintPath>
+    </Reference>
+    <Reference Include="FacebookNamedPipeClient">
+      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/FacebookSDK/Plugins/Gameroom/FacebookNamedPipeClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.Unity.Settings">
+      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/FacebookSDK/Plugins/Settings/Facebook.Unity.Settings.dll</HintPath>
+    </Reference>
     <Reference Include="Firebase.App">
       <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
     </Reference>
     <Reference Include="Firebase.Auth">
       <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Firebase.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Database">
+      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Firebase.Database.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Messaging">
+      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Firebase.Messaging.dll</HintPath>
     </Reference>
     <Reference Include="Firebase.Platform">
       <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
@@ -424,9 +476,6 @@
     </Reference>
     <Reference Include="Google.Sharpen">
       <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Google.Sharpen.dll</HintPath>
-    </Reference>
-    <Reference Include="Firebase.Database">
-      <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Firebase/Plugins/Mono/Firebase.Database.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Compat">
       <HintPath>C:/Users/HPENVYST20/Desktop/Comanda/comanda_app/Assets/Parse/Plugins/dotNet45/Unity.Compat.dll</HintPath>
