@@ -79,5 +79,18 @@ Altere o caminho de conexão para o caminho da API que foi iniciado anteriorment
 ## Exemplos de Tela
 
 <p align="center">
-  <img src="https://uploaddeimagens.com.br/imagens/login-png-bf757101-45d2-49b8-bf6c-c8afa930ca3a" width="200">
+  <img src="https://uploaddeimagens.com.br/images/002/315/757/full/Login.PNG?1567476878" width="200">
+  <img src="https://uploaddeimagens.com.br/images/002/315/759/full/EdicaoAvatar.PNG?1567476904" width="200">
+  <img src="https://uploaddeimagens.com.br/images/002/315/760/full/levelUp.PNG?1567476929" width="200">
+</p>
+
+<p align="center">
+  <img src="https://uploaddeimagens.com.br/images/002/315/764/full/InfoEstab.PNG?1567477206" width="200">
+  <img src="https://uploaddeimagens.com.br/images/002/315/766/full/DesafioEstab.PNG?1567477226" width="200">
+  <img src="https://uploaddeimagens.com.br/images/002/315/765/full/ItemEstab.PNG?1567477217" width="200">
+</p>
+
+<p align="center">
+  <img src="https://uploaddeimagens.com.br/images/002/315/768/full/Comanda.PNG?1567477279" width="200">
+  <img src="https://uploaddeimagens.com.br/images/002/315/770/full/DesafioProgresso.PNG?1567477290" width="200">
 </p>
