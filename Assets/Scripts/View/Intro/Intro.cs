@@ -1,5 +1,6 @@
 ﻿using APIModel;
 using Network;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,10 +44,12 @@ public class Intro : MonoBehaviour
 
         fbManager.Init();
 
+        Debug.Log(JsonConvert.SerializeObject(credenciais));
+
         if (credenciais != null)
         {
             if (credenciais.tipoLogin == "normal")
-                relogar("normal");
+                relogar("normal", null);
 
             yield break;
         }
@@ -93,23 +96,32 @@ public class Intro : MonoBehaviour
     #endregion
 
     #region relogar
-    private void relogar(string tipoLogin)
+    private void relogar(string tipoLogin, string socialId)
     {
         if (credenciais != null)
         {
-            StartCoroutine(postLoginCliente(tipoLogin));
+
+            if (tipoLogin == "normal")
+            {
+                StartCoroutine(postLoginCliente());
+                return;
+            }
+
+            if (tipoLogin == "facebook")
+            {
+                StartCoroutine(postLoginFacebook(socialId));
+            }
         }
     }
     #endregion
 
     #region Post Login Cliente
-    private IEnumerator postLoginCliente(string tipoLogin)
+    private IEnumerator postLoginCliente()
     {
         Dictionary<string, object> data = new Dictionary<string, object>
             {
                 { "email", credenciais.email },
                 { "password", credenciais.password },
-                { "tipoLogin", tipoLogin },
                 { "deviceId", AppManager.Instance.deviceId },
                 { "tokenFirebase", AppManager.Instance.tokenFirebase }
             };
@@ -131,6 +143,43 @@ public class Intro : MonoBehaviour
             AlterarProgressoSlider(0.3f);
 
             buscarClienteNoFirebase();
+        }));
+    }
+    #endregion
+
+    #region Post Login Facebook
+    private IEnumerator postLoginFacebook(string socialId)
+    {
+        Dictionary<string, object> data = new Dictionary<string, object>
+            {
+                { "socialId", socialId },
+                { "deviceId", AppManager.Instance.deviceId },
+                { "tokenFirebase", AppManager.Instance.tokenFirebase }
+            };
+
+        yield return StartCoroutine(ClienteAPI.ClienteLoginFacebook(data,
+        (response, error) =>
+        {
+            if (error != null)
+            {
+                apiForaDoAr = true;
+                Debug.Log(error);
+                AlterarProgressoSlider(0.5f);
+                return;
+            }
+
+            if (response != null)
+            {
+                estaLogado = true;
+
+                AppManager.Instance.RefazerToken(response.token);
+                AlterarProgressoSlider(0.3f);
+
+                buscarClienteNoFirebase();
+                return;
+            }
+
+            AlterarProgressoSlider(0.5f);
         }));
     }
     #endregion

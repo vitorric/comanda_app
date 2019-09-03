@@ -6,7 +6,7 @@ using UnityEngine;
 public class FacebookManager
 {
     public string tipoLogin;
-    public Action<string> relogar;
+    public Action<string, string> relogar;
     public Action<string, string, string, string> cadastrar;
 
     public void Init()
@@ -36,7 +36,9 @@ public class FacebookManager
                 // Get data from Facebook to personalize the player's experience
                 if (tipoLogin == "facebook")
                 {
-                    relogar("facebook");
+                    var aToken = AccessToken.CurrentAccessToken;
+
+                    relogar("facebook", aToken.UserId);
                 }
             }
             else
@@ -70,8 +72,14 @@ public class FacebookManager
 
     public void LoginFacebook()
     {
+        AppManager.Instance.AtivarLoader();
         var perms = new List<string>() { "public_profile", "email" };
         FB.LogInWithReadPermissions(perms, AuthCallback);
+    }
+
+    public void LogoutFacebook()
+    {
+        FB.LogOut();
     }
 
     private void AuthCallback(ILoginResult result)
@@ -92,6 +100,7 @@ public class FacebookManager
         }
         else
         {
+            AppManager.Instance.DesativarLoaderAsync();
             //SetMsg("Falha ao conectar com o Facebook");
             Debug.Log("User cancelled login");
         }
@@ -101,9 +110,11 @@ public class FacebookManager
     {
         if (result.Error == null)
         {
+            string email = result.ResultDictionary.ContainsKey("email") ? result.ResultDictionary["email"].ToString() : null;
+
             cadastrar(result.ResultDictionary["id"].ToString(),
                       result.ResultDictionary["name"].ToString(),
-                      result.ResultDictionary["email"].ToString(),
+                      email,
                       "facebook");
         }
         else

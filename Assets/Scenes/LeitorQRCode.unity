@@ -389,7 +389,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Voltar
+  m_Text: VOLTAR
 --- !u!222 &99746867
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -919,10 +919,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1271f7521947dc64494706b0dd3ba361, type: 3}
---- !u!224 &1003480498 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 224678906476498294, guid: 1271f7521947dc64494706b0dd3ba361,
-    type: 3}
+--- !u!4 &1003480498 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 1003480497}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1073485978

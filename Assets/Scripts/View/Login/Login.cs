@@ -24,6 +24,7 @@ public class Login : MonoBehaviour
     [Header("Button")]
     public Button BtnEntrar;
     public Button BtnCadastrar;
+    public Button BtnFacebook;
     public Button BtnRecupSenha;
     public Button BtnRecupSenhaVoltar;
     public Button BtnRecupSenhaEnviar;
@@ -65,6 +66,7 @@ public class Login : MonoBehaviour
     public TMP_InputField TxtSenhaCadastroConfirm;
 
     private string tipoLogin = "normal";
+    private string socialId = string.Empty;
     FacebookManager fbManager;
 
     #region Awake
@@ -88,6 +90,7 @@ public class Login : MonoBehaviour
     {
         BtnEntrar.onClick.AddListener(() => BtnLogar());
         BtnCadastrar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(0));
+        BtnFacebook.onClick.AddListener(() => btnFacebook());
         BtnRecupSenha.onClick.AddListener(() => BtnAbrirPnlRecuperarSenha());
         BtnRecupSenhaVoltar.onClick.AddListener(() => BtnRecuperarSenhaVoltarLogin());
         BtnRecupSenhaEnviar.onClick.AddListener(() => BtnRecuperarSenha());
@@ -101,7 +104,7 @@ public class Login : MonoBehaviour
         BtnEtapa0Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(1));
         BtnEtapa1Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(2));
         BtnEtapa2Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(3));
-        BtnEtapa3Confirmar.onClick.AddListener(() => BtnConfirmarCadastro());
+        BtnEtapa3Confirmar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(4));
 
         BtnEdicaoAvatar.onClick.AddListener(() => BtnAbrirEdicaoAvatar());
 
@@ -118,18 +121,18 @@ public class Login : MonoBehaviour
 
         //etapa 0
         TxtEmailCadastro.onSubmit.AddListener(delegate { TxtNomeCadastro.Select(); });
-        TxtNomeCadastro.onSubmit.AddListener(delegate { avancarEtapa(1); TxtCPFCadastro.Select(); });
+        TxtNomeCadastro.onSubmit.AddListener(delegate { StartCoroutine(avancarEtapa(1)); TxtCPFCadastro.Select(); });
 
         //etapa 1
         //TxtCPFCadastro.onValueChanged.AddListener(delegate { Util.FormatarCPF(TxtCPFCadastro); });
         TxtCPFCadastro.onSubmit.AddListener(delegate { TxtDataNascCadastro.Select(); });
         //TxtDataNascCadastro.onValueChanged.AddListener(delegate { Util.FormatarDataNasc(TxtDataNascCadastro); });
-        TxtDataNascCadastro.onSubmit.AddListener(delegate { avancarEtapa(2); TxtApelidoCadastro.Select(); });
+        TxtDataNascCadastro.onSubmit.AddListener(delegate { StartCoroutine(avancarEtapa(2)); TxtApelidoCadastro.Select(); });
 
         //etapa 2 nao tem
         //etapa 3
-        TxtSenhaCadastro.onSubmit.AddListener(delegate { TxtSenhaCadastro.Select(); });
-        TxtSenhaCadastroConfirm.onSubmit.AddListener(delegate { cadastrar(); });
+        TxtSenhaCadastro.onSubmit.AddListener(delegate { TxtSenhaCadastroConfirm.Select(); });
+        TxtSenhaCadastroConfirm.onSubmit.AddListener(delegate { StartCoroutine(avancarEtapa(4)); });
 
     }
     #endregion
@@ -143,6 +146,13 @@ public class Login : MonoBehaviour
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
         logar();
         //AnimacoesTween.AnimarObjeto(BtnEntrar.gameObject, AnimacoesTween.TiposAnimacoes.Button_Click, () => logar(), AppManager.TEMPO_ANIMACAO_ABRIR_CLICK_BOTAO);
+    }
+    #endregion
+
+    #region btnFacebook
+    private void btnFacebook()
+    {
+        fbManager.LoginFacebook();
     }
     #endregion
 
@@ -178,7 +188,7 @@ public class Login : MonoBehaviour
     public void BtnCadastrarAvantarEtapa(int etapa)
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
-        avancarEtapa(etapa);
+        StartCoroutine(avancarEtapa(etapa));
     }
     #endregion
 
@@ -248,6 +258,7 @@ public class Login : MonoBehaviour
             { "email", TxtEmail.text },
             { "password", Util.GerarHashMd5(TxtSenha.text) },
             { "tipoLogin", tipoLogin },
+            { "socialId", socialId},
             { "deviceId", AppManager.Instance.deviceId },
             { "tokenFirebase", AppManager.Instance.tokenFirebase }
         };
@@ -325,9 +336,13 @@ public class Login : MonoBehaviour
     #endregion
 
     #region avancarEtapa
-    private void avancarEtapa(int proximaEtapa)
+    private IEnumerator avancarEtapa(int proximaEtapa)
     {
         int etapaAtual = proximaEtapa - 1;
+
+        Dictionary<string, object> form = new Dictionary<string, object>();
+
+        bool podeAvancar = false;
 
         //nome e email
         if (etapaAtual == 0)
@@ -336,20 +351,40 @@ public class Login : MonoBehaviour
                 TxtNomeCadastro.text == string.Empty)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
-                return;
+                yield break;
             }
 
             if (!verificarEmailValido(TxtEmailCadastro.text))
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.EmailNaoValido, false));
-                return;
+                yield break;
             }
 
             if (TxtNomeCadastro.text.Split(' ').Length < 2)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.NomeSobreNome, false));
-                return;
+                yield break;
             }
+
+            form.Add("email", TxtEmailCadastro.text);
+
+            AppManager.Instance.AtivarLoader();
+
+            yield return StartCoroutine(ClienteAPI.ClienteCadastrarValidarEmail(form, (sucesso, error) =>
+            {
+                if (error != null)
+                {
+                    Debug.Log(error);
+                    AppManager.Instance.DesativarLoaderAsync();
+
+                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    return;
+                }
+
+                podeAvancar = true;
+
+                AppManager.Instance.DesativarLoaderAsync();
+            }));
         }
 
         //cpf e data nasc
@@ -359,26 +394,46 @@ public class Login : MonoBehaviour
                 TxtCPFCadastro.text == string.Empty)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
-                return;
+                yield break;
             }
 
             if (!verificarCPFValido(TxtCPFCadastro.text))
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaCPFValido, false));
-                return;
+                yield break;
             }
 
             if (!verificarDataValido(TxtDataNascCadastro.text))
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.DataInvalida, false));
-                return;
+                yield break;
             }
 
             if (!verificarMaiorIdade(TxtDataNascCadastro.text))
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.Menor18Anos, false));
-                return;
+                yield break;
             }
+
+            form.Add("cpf", TxtCPFCadastro.text);
+
+            AppManager.Instance.AtivarLoader();
+
+            yield return StartCoroutine(ClienteAPI.ClienteCadastrarValidarCPF(form, (sucesso, error) =>
+            {
+                if (error != null)
+                {
+                    Debug.Log(error);
+                    AppManager.Instance.DesativarLoaderAsync();
+
+                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    return;
+                }
+
+                podeAvancar = true;
+
+                AppManager.Instance.DesativarLoaderAsync();
+            }));
         }
 
         //apelido e avatar
@@ -387,51 +442,91 @@ public class Login : MonoBehaviour
             if (TxtApelidoCadastro.text == string.Empty)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
-                return;
+                yield break;
             }
 
             if (TxtApelidoCadastro.text.Length < 3)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.ApelidoMenor3Char, false));
-                return;
+                yield break;
             }
+
+            form.Add("apelido", TxtApelidoCadastro.text);
+
+            AppManager.Instance.AtivarLoader();
+
+            yield return StartCoroutine(ClienteAPI.ClienteCadastrarValidarApelido(form, (sucesso, error) =>
+            {
+                if (error != null)
+                {
+                    Debug.Log(error);
+                    AppManager.Instance.DesativarLoaderAsync();
+
+                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    return;
+                }
+
+                if (tipoLogin == "normal")
+                {
+                    podeAvancar = true;
+
+                    AppManager.Instance.DesativarLoaderAsync();
+                }
+                else
+                {
+                    StartCoroutine(cadastrar());
+                }
+            }));
         }
 
         //confirmacao senha e criacao
         if (etapaAtual == 3)
         {
+            if (tipoLogin != "normal")
+            {
+                StartCoroutine(cadastrar());
+                yield break;
+            }
+
             if (TxtSenhaCadastro.text == string.Empty ||
                 TxtSenhaCadastroConfirm.text == string.Empty)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
-                return;
+                yield break;
             }
 
             if (TxtSenhaCadastro.text.Length < 6)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhaMenor6Char, false));
-                return;
+                yield break;
             }
 
             if (ValidarSenhas() == false)
             {
                 StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhasNaoConferem, false));
-                return;
+                yield break;
             }
+
+            StartCoroutine(cadastrar());
+
+            yield break;
         }
+
 
         if (proximaEtapa == 0)
         {
             PnlLogin.enabled = false;
-            LimparFormCadastro();
             PnlEtapas[0].enabled = true;
-            return;
+            yield break;
         }
 
-        if (etapaAtual > -1)
-            PnlEtapas[etapaAtual].enabled = false;
+        if (podeAvancar)
+        {
+            if (etapaAtual > -1)
+                PnlEtapas[etapaAtual].enabled = false;
 
-        PnlEtapas[proximaEtapa].enabled = true;
+            PnlEtapas[proximaEtapa].enabled = true;
+        }
 
         //if (proximaEtapa == 1)
         //{
@@ -452,6 +547,7 @@ public class Login : MonoBehaviour
 
         if (etapaAnterior < 0)
         {
+            LimparFormCadastro();
             PnlLogin.enabled = true;
             return;
         }
@@ -464,15 +560,54 @@ public class Login : MonoBehaviour
     #region cadastroSocial
     private void cadastroSocial(string socialId, string nome, string email, string tipo)
     {
-        TxtSenhaCadastro.gameObject.SetActive(false);
-        TxtSenhaCadastroConfirm.gameObject.SetActive(false);
-        TxtEmailCadastro.text = socialId;
-        TxtNomeCadastro.text = nome;
+        Dictionary<string, object> form = new Dictionary<string, object>
+        {
+            { "socialId", socialId },
+            { "deviceId", AppManager.Instance.deviceId },
+            { "tokenFirebase", AppManager.Instance.tokenFirebase }
+        };
 
-        TxtEmailCadastro.interactable = false;
-        TxtNomeCadastro.interactable = false;
+        StartCoroutine(ClienteAPI.ClienteLoginFacebook(form, (response, error) => {
 
-        avancarEtapa(1);
+            if (error != null)
+            {
+                Debug.Log(error);
+                AppManager.Instance.DesativarLoaderAsync();
+                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                return;
+            }
+
+            if (response != null)
+            {
+
+                AppManager.Instance.GravarSession(response.token, response._id,
+                JsonConvert.SerializeObject(new Cliente.Credenciais
+                {
+                    email = TxtEmail.text,
+                    tipoLogin = tipoLogin
+                }));
+
+                buscarClienteNoFireBase();
+
+                return;
+            }
+
+            LimparFormCadastro();
+
+            TxtEmailCadastro.text = email;
+            TxtNomeCadastro.text = nome;
+            this.socialId = socialId;
+            TxtEmailCadastro.interactable = (string.IsNullOrEmpty(email)) ? true : false;
+            TxtNomeCadastro.interactable = false;
+
+            tipoLogin = tipo;
+
+            PnlLogin.enabled = false;
+            PnlEtapas[0].enabled = true;
+
+            AppManager.Instance.DesativarLoaderAsync();
+        }));
+
     }
     #endregion
 
@@ -492,7 +627,8 @@ public class Login : MonoBehaviour
             { "deviceId", AppManager.Instance.deviceId },
             { "tokenFirebase", AppManager.Instance.tokenFirebase },
             { "cpf", TxtCPFCadastro.text },
-            { "dataNascimento", Util.formatarDataParaAPI(TxtDataNascCadastro.text) }
+            { "dataNascimento", Util.formatarDataParaAPI(TxtDataNascCadastro.text) },
+            { "socialId", socialId }
         };
 
         AppManager.Instance.AtivarLoader();
@@ -513,7 +649,8 @@ public class Login : MonoBehaviour
             JsonConvert.SerializeObject(new Cliente.Credenciais
             {
                 email = TxtEmailCadastro.text,
-                password = senha
+                password = senha,
+                tipoLogin = tipoLogin
             }));
 
             buscarClienteNoFireBase();
@@ -588,6 +725,13 @@ public class Login : MonoBehaviour
     #region LimparFormCadastro
     public void LimparFormCadastro()
     {
+        socialId = string.Empty;
+        tipoLogin = "normal";
+        TxtEmailCadastro.interactable = true;
+        TxtNomeCadastro.interactable = true;
+        TxtSenhaCadastro.gameObject.SetActive(true);
+        TxtSenhaCadastroConfirm.gameObject.SetActive(true);
+
         TxtEmailCadastro.text = string.Empty;
         TxtSenhaCadastro.text = string.Empty;
         TxtSenhaCadastroConfirm.text = string.Empty;
@@ -599,6 +743,8 @@ public class Login : MonoBehaviour
         BtnSexoFem.isOn = false;
 
         PnlAvatar.PreencherInfo("Masculino", null);
+
+        fbManager.LogoutFacebook();
     }
     #endregion
 
@@ -627,25 +773,39 @@ public class Login : MonoBehaviour
     #region verificarDataValido
     private bool verificarDataValido(string data)
     {
-        Regex regex = new Regex(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
+        try
+        {
+            Regex regex = new Regex(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
 
-        //Verify whether date entered in dd/MM/yyyy format.
-        bool isValid = regex.IsMatch(data.Trim());
+            //Verify whether date entered in dd/MM/yyyy format.
+            bool isValid = regex.IsMatch(data.Trim());
 
-        //Verify whether entered date is Valid date.
-        DateTime dt;
-        isValid = DateTime.TryParseExact(data, "dd/MM/yyyy", new CultureInfo("pt-BR"), DateTimeStyles.None, out dt);
+            //Verify whether entered date is Valid date.
+            DateTime dt;
+            isValid = DateTime.TryParseExact(data, "dd/MM/yyyy", new CultureInfo("pt-BR"), DateTimeStyles.None, out dt);
 
-        return isValid;
+            return isValid;
+        }
+        catch
+        {
+            return false;
+        }
     }
     #endregion
 
     #region verificarMaiorIdade
     private bool verificarMaiorIdade(string data)
     {
-        int idade = Util.CalcularIdade(Convert.ToDateTime(data));
-
-        return (idade > 18) ? true : false;
+        try
+        {
+            int idade = Util.CalcularIdade(Convert.ToDateTime(data, new CultureInfo("pt-BR")));
+            return (idade > 18) ? true : false;
+        }
+        catch (Exception e)
+        {
+            Debug.Log(Util.GetExceptionDetails(e));
+            return false;
+        }
 
     }
     #endregion

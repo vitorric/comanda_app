@@ -101,12 +101,21 @@ public class Util
 
     public static int CalcularIdade(DateTime DataNascimento)
     {
-        int anos = DateTime.Now.Year - DataNascimento.Year;
+        try
+        {
+            Debug.Log("DataNascimento: " + DataNascimento);
+            int anos = DateTime.Now.Year - DataNascimento.Year;
 
-        if (DateTime.Now.Month < DataNascimento.Month || (DateTime.Now.Month == DataNascimento.Month && DateTime.Now.Day < DataNascimento.Day))
+            if (DateTime.Now.Month < DataNascimento.Month || (DateTime.Now.Month == DataNascimento.Month && DateTime.Now.Day < DataNascimento.Day))
 
-            anos--;
+                anos--;
 
-        return anos;
+            return anos;
+        }
+        catch (Exception e)
+        {
+            Debug.Log(GetExceptionDetails(e));
+            return 0;
+        }
     }
 }

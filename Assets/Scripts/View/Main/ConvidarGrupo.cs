@@ -1,8 +1,8 @@
 ﻿using APIModel;
 using Network;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +23,7 @@ public class ConvidarGrupo : MonoBehaviour
 
     [Header("Enviar Convite Grupo")]
     public GameObject PnlConvidar;
-    public InputField TxtChaveAmigavel;
+    public TMP_InputField TxtChaveAmigavel;
 
     [Header("Convites Enviado")]
     public GameObject PnlConvitesEnviados;

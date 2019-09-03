@@ -2959,7 +2959,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Fechar
+  m_Text: FECHAR
 --- !u!222 &961758020
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5254,7 +5254,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Aleat\xF3rio"
+  m_Text: "ALEAT\xD3RIO"
 --- !u!222 &1974420190
 CanvasRenderer:
   m_ObjectHideFlags: 0

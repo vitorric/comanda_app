@@ -53,6 +53,52 @@ namespace Network
                 });
         }
         #endregion
+
+        //OK
+        #region ClienteLoginFacebook
+        public static IEnumerator ClienteLoginFacebook(
+               Dictionary<string, object> properties,
+               Action<Cliente.SessaoCliente, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("login/facebook",
+                properties,
+                (request) =>
+                {
+
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(null, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<Cliente.SessaoCliente> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<Cliente.SessaoCliente>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(retornoAPI.retorno, null);
+                            return;
+                        }
+
+                        done(null, retornoAPI.mensagem);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(null, msgErro);
+                    }
+                });
+        }
+        #endregion
+
         //OK
         #region ClienteRecuperarSenha
         public static IEnumerator ClienteRecuperarSenha(
@@ -131,6 +177,135 @@ namespace Network
                     {
                         Debug.Log(ex.Message);
                         done(null, msgErro);
+                    }
+                });
+        }
+        #endregion
+
+        //OK
+        #region ClienteCadastrarValidarCPF
+        public static IEnumerator ClienteCadastrarValidarCPF(
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("validar/cadastrar/cliente/cpf",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<bool> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<bool>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, msgErro);
+                    }
+                });
+        }
+        #endregion
+
+        //OK
+        #region ClienteCadastrarValidarEmail
+        public static IEnumerator ClienteCadastrarValidarEmail(
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("validar/cadastrar/cliente/email",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<bool> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<bool>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, msgErro);
+                    }
+                });
+        }
+        #endregion
+
+        //OK
+        #region ClienteCadastrarValidarApelido
+        public static IEnumerator ClienteCadastrarValidarApelido(
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("validar/cadastrar/cliente/apelido",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<bool> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<bool>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, msgErro);
                     }
                 });
         }

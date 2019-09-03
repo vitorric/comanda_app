@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using APIModel;
 using FirebaseModel;
 using Network;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 

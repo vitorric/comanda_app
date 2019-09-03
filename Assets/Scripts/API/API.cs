@@ -12,8 +12,8 @@ namespace Network
     public abstract class API
     {
         public const string CONTENT_TYPE_JSON = "application/json";
-        private const string urlBase = "http://192.168.0.101:3000/api/";
-        private const string urlBaseDownloadIcon = "http://192.168.0.101:3000/";
+        private const string urlBase = "http://localhost:3000/api/";
+        private const string urlBaseDownloadIcon = "http://localhost:3000/";
         //private const string urlBaseDownloadIcon = "http://93.188.164.122:3000/";
         //private const string urlBase = "http://93.188.164.122:3000/api/";
         internal const string msgErro = "Solicitação inválida, tente novamente!";
