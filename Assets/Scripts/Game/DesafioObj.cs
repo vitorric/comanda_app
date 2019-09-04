@@ -68,7 +68,23 @@ public class DesafioObj : MonoBehaviour
         else
         {
             //TxtTempoRestante.text = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours + (ts.Days * 24), ts.Minutes, ts.Seconds);
-            TxtTempoRestante.text = string.Format("{0}d {1:00}h {2:00}m {3:00}s", ts.Days, ts.Hours, ts.Minutes, ts.Seconds);
+            if (ts.Days > 0)
+            {
+                TxtTempoRestante.text = string.Format("{0:0}d {1:0}h", ts.Days, ts.Hours);
+            }
+            else if (ts.Days == 0 && ts.Hours > 0)
+            {
+                TxtTempoRestante.text = string.Format("{0:0}h {1:0}m", ts.Hours, ts.Minutes);
+            }
+            else if (ts.Hours == 0 && ts.Minutes > 0)
+            {
+                TxtTempoRestante.text = string.Format("{0:0}m", ts.Minutes);
+            }
+            else if (ts.Minutes == 0)
+            {
+                TxtTempoRestante.text = string.Format("{0:0}s", ts.Seconds);
+            }
+
             Invoke("rodarRelogio", 1f);
         }
     }
