@@ -1,5 +1,5 @@
 
-# Comanda Gameficada
+# Aplicativo - Comanda Gameficada
 
 ## Introdução
 Aplicativo de Comanda Gameficada desenvolvido em Unity3D. Este é um aplicativo que exibe a comanda de um cliente e disponibiliza desafios a serem cumpridos pelos mesmos, proporcionando prêmios ao serem finalizados.
