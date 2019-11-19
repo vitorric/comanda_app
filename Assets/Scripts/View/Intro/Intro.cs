@@ -24,9 +24,13 @@ public class Intro : MonoBehaviour
     {
 
 #if UNITY_STANDALONE
+        //PlayerPrefs.DeleteAll();
         Screen.SetResolution(480, 960, false);
         Screen.fullScreen = false;
 #endif
+
+        EasyAudioUtility.Instance.AjustarSomBG(0);
+        EasyAudioUtility.Instance.AjustarSomSFX(0);
 
         yield return new WaitUntil(() => firebaseManager.isReady);
 
@@ -133,7 +137,7 @@ public class Intro : MonoBehaviour
             {
                 apiForaDoAr = true;
                 Debug.Log(error);
-                AlterarProgressoSlider(0.5f);
+                AlterarProgressoSlider(0.7f);
                 return;
             }
 
@@ -164,7 +168,7 @@ public class Intro : MonoBehaviour
             {
                 apiForaDoAr = true;
                 Debug.Log(error);
-                AlterarProgressoSlider(0.5f);
+                AlterarProgressoSlider(0.7f);
                 return;
             }
 
@@ -200,6 +204,7 @@ public class Intro : MonoBehaviour
         FileManager.CreateFileDirectory(FileManager.Directories.desafio);
         FileManager.CreateFileDirectory(FileManager.Directories.item_Loja);
         FileManager.CreateFileDirectory(FileManager.Directories.produto);
+        FileManager.CreateFileDirectory(FileManager.Directories.estabelecimento);
     }
     #endregion
 

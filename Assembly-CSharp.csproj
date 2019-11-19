@@ -79,14 +79,17 @@
     <Compile Include="Assets\Scripts\API\ComandaAPI.cs" />
     <Compile Include="Assets\Scripts\API\CorreioAPI.cs" />
     <Compile Include="Assets\Scripts\API\DesafioAPI.cs" />
+    <Compile Include="Assets\Scripts\API\DesafioClienteAPI.cs" />
     <Compile Include="Assets\Scripts\API\DownloadAPI.cs" />
     <Compile Include="Assets\Scripts\API\EstabelecimentoAPI.cs" />
+    <Compile Include="Assets\Scripts\API\GPSAPI.cs" />
     <Compile Include="Assets\Scripts\API\ProdutoAPI.cs" />
     <Compile Include="Assets\Scripts\APIModel\Cliente.cs" />
     <Compile Include="Assets\Scripts\APIModel\Comanda.cs" />
     <Compile Include="Assets\Scripts\APIModel\ConvitesComanda.cs" />
     <Compile Include="Assets\Scripts\APIModel\Correio.cs" />
     <Compile Include="Assets\Scripts\APIModel\Desafio.cs" />
+    <Compile Include="Assets\Scripts\APIModel\DesafioCliente.cs" />
     <Compile Include="Assets\Scripts\APIModel\DesafioConcluido.cs" />
     <Compile Include="Assets\Scripts\APIModel\Estabelecimento.cs" />
     <Compile Include="Assets\Scripts\APIModel\HistoricoComanda.cs" />
@@ -131,6 +134,7 @@
     <Compile Include="Assets\Scripts\Util\ButtonControl.cs" />
     <Compile Include="Assets\Scripts\Util\CoresUtil.cs" />
     <Compile Include="Assets\Scripts\Util\MaskField.cs" />
+    <Compile Include="Assets\Scripts\Util\MaskField2.cs" />
     <Compile Include="Assets\Scripts\Util\SceneController.cs" />
     <Compile Include="Assets\Scripts\Util\ScrollRectEx.cs" />
     <Compile Include="Assets\Scripts\Util\TimeUtilities.cs" />

@@ -64,38 +64,18 @@ public class LeitoQRCode : MonoBehaviour
             {
                 BarcodeScanner.Stop();
 
-                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
 
-                Dictionary<string, object> data = new Dictionary<string, object>
-            {
-                { "estabelecimentoId", barCodeValue }
-            };
-
-                StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data,
-                (response, error) =>
+                StartCoroutine(StopCamera(() =>
                 {
-                    if (error != null)
-                    {
-                        Debug.Log(error);
-                        StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
-                        return;
-                    }
-
-                    if (response)
-                    {
-                        StartCoroutine(StopCamera(() =>
-                        {
-                            SceneManager.UnloadSceneAsync("LeitorQRCode");
-                        }));
-
-                        return;
-                    }
-
-                    if (!response)
-                    {
-                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                    }
+                    Main.Instance.EntrarNoEstab(barCodeValue);
+                    SceneManager.UnloadSceneAsync("LeitorQRCode");
                 }));
+                 
+
+                //StartCoroutine(StopCamera(() =>
+                //{
+                //    entrarEstab(barCodeValue);
+                //}));
 
                 RestartTime += Time.realtimeSinceStartup + 1f;
 
@@ -148,6 +128,57 @@ public class LeitoQRCode : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         callback.Invoke();
+    }
+
+    private void entrarEstab(string barCodeValue)
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Som_Camera);
+
+        Dictionary<string, string> coordenadas = new Dictionary<string, string>();
+
+        StartCoroutine(GPSManager.Instance.IniciarGPS((lat, longi, sucesso) =>
+        {
+            if (sucesso)
+            {
+                coordenadas.Add("lat", lat.ToString());
+                coordenadas.Add("long", longi.ToString());
+
+                Dictionary<string, object> data = new Dictionary<string, object>
+                        {
+                            { "estabelecimentoId", barCodeValue },
+                            { "coordenadas", coordenadas }
+                        };
+
+                StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(data,
+                (response, error) =>
+                {
+                    if (error != null)
+                    {
+                        Debug.Log(error);
+                        AlertaManager.Instance.ChamarAlertaMensagem(error, false);
+                        return;
+                    }
+
+                    if (response)
+                    {
+                        StartCoroutine(StopCamera(() =>
+                        {
+                            SceneManager.UnloadSceneAsync("LeitorQRCode");
+                        }));
+
+                        return;
+                    }
+
+                    if (!response)
+                    {
+                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+                    }
+                }));
+                return;
+            }
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.GPSError, false);
+        }));
+
     }
 
     public void BtnFecharLeitor()

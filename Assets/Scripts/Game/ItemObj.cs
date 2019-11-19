@@ -166,7 +166,7 @@ public class ItemObj : MonoBehaviour
 
         if (ItemLoja.preco > gold)
         {
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.CPGoldInsuficiente, false));
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.CPGoldInsuficiente, false);
             return;
         }
 
@@ -199,10 +199,11 @@ public class ItemObj : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
+            AlertaManager.Instance.ChamarAlertaResponse(true);
         }));
     }
     #endregion

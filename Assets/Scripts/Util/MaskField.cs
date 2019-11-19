@@ -34,7 +34,8 @@ public class MaskField : MonoBehaviour {
         int index = 0;
         int indexCaracteres = 0;
 
-        switch(TiposFormatacao){
+        switch(TiposFormatacao)
+        {
 			case tiposFormatacao.Dinheiro:
 			    caracteres = input.ToCharArray().ToList();
                 formatacao = "###.##.##,##".ToCharArray().ToList();

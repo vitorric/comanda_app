@@ -34,7 +34,7 @@ namespace Network
                          Retorno<bool> retornoAPI =
                                     JsonConvert.DeserializeObject<Retorno<bool>>
                                     (request.downloadHandler.text);
-
+                         Debug.Log(request.downloadHandler.text);
                          if (retornoAPI.sucesso)
                          {
                              done(retornoAPI.sucesso, null);
@@ -46,7 +46,7 @@ namespace Network
                      catch (Exception ex)
                      {
                          done(false, msgErro);
-                         Debug.Log(ex.Message);
+                         Debug.Log(Util.GetExceptionDetails(ex));                         
                      }
                  });
 

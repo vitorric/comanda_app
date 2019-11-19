@@ -8,13 +8,16 @@ public class DesafioConcluidoObj : MonoBehaviour
 {
     public Text TxtTituloDesafio;
     public Text TxtPremioDesafio;
+    public Text TxtGanhador;
+    public Text TxtBtnResgatarPremio;
     public Button BtnResgatarPremio;
     public GameObject PnlDesafioConquistado;
     public Text TxtNomePremio;
     public RawImage Icon;
     public Texture2D ImgIconDinheiro;
 
-    private Desafio desafio;
+    private DesafioCliente desafio;
+    private bool ganhouPremioProduto = true;
 
     private void Awake()
     {
@@ -26,35 +29,39 @@ public class DesafioConcluidoObj : MonoBehaviour
     }
 
     #region PreencherInfo
-    public void PreencherInfo(Desafio desafio)
+    public void PreencherInfo(DesafioCliente desafio)
     {
+        ganhouPremioProduto = true;
+        TxtGanhador.text = string.Empty;
+        TxtBtnResgatarPremio.text = "RESGATAR";
         this.desafio = desafio;
-        TxtTituloDesafio.text = desafio.nome;
+        TxtTituloDesafio.text = desafio.desafio.nome;
         TxtPremioDesafio.text = Util.FormatarValores(desafio.premio.quantidade);
 
-        if (string.IsNullOrEmpty(desafio.premio.produto))
+        if (desafio.premio.produto == null)
         {
             TxtNomePremio.text = "CPGold";
             Icon.texture = ImgIconDinheiro;
         }
         else
         {
-            Dictionary<string, object> form = new Dictionary<string, object>()
-            {
-                { "produtoId", desafio.premio.produto }
-            };
+            TxtNomePremio.text = desafio.premio.produto.nome;
 
-            StartCoroutine(ProdutoAPI.ObterProdutoCliente(form,
-            (response, error) =>
+            Main.Instance.ObterIcones(desafio.premio.produto.icon, FileManager.Directories.produto, (textura) =>
             {
-                TxtNomePremio.text = response.nome;
-
-                Main.Instance.ObterIcones(response.icon, FileManager.Directories.produto, (textura) =>
+                if (textura != null)
                 {
                     Icon.texture = textura;
                     Icon = Util.ImgResize(Icon, 180, 180);
-                });
-            }));
+                }
+            });
+
+            if (Cliente.ClienteLogado._id != desafio.premio.ganhador._id)
+            {
+                TxtGanhador.text = $"Ganhador: {desafio.premio.ganhador.nome}";
+                TxtBtnResgatarPremio.text = "OK";
+                ganhouPremioProduto = false;
+            }
         }
     }
     #endregion
@@ -66,7 +73,8 @@ public class DesafioConcluidoObj : MonoBehaviour
 
         Dictionary<string, object> form = new Dictionary<string, object>()
         {
-            { "desafioId", desafio._id }
+            { "desafioId", desafio.desafio._id },
+            { "ganhouPremioProduto", ganhouPremioProduto }
         };
 
         StartCoroutine(DesafioAPI.ResgatarPremioDesafio(form, (response, error) =>

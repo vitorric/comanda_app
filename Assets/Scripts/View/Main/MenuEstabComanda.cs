@@ -65,7 +65,7 @@ public class MenuEstabComanda : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 

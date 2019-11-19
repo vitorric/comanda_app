@@ -146,6 +146,7 @@ public class MenuCorreio : MonoBehaviour
     #region abrirPnlMensagem
     public void AbrirPnlMensagem(Correio.Mensagem mensagem)
     {
+        PnlDecisaoConviteGrupo.SetActive(false);
         this.mensagem = mensagem;
         TxtMensagem.text = mensagem.mensagemGrande;
         TxtTitulo.text = mensagem.titulo;
@@ -201,7 +202,7 @@ public class MenuCorreio : MonoBehaviour
                 if (error != null)
                 {
                     Debug.Log(error);
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                     return;
                 }
 
@@ -213,31 +214,47 @@ public class MenuCorreio : MonoBehaviour
     #region aceitarRecusarConviteGrupo
     private void aceitarRecusarConviteGrupo(bool aceitar)
     {
-        Dictionary<string, object> form = new Dictionary<string, object>()
+        Dictionary<string, string> coordenadas = new Dictionary<string, string>();
+
+        StartCoroutine(GPSManager.Instance.IniciarGPS((lat, longi, sucesso) =>
         {
-            {"comanda", mensagem.acao.comanda },
-            {"aceitou", aceitar }
-        };
-
-        StartCoroutine(ComandaAPI.RespostaConviteGrupo(form,
-            (response, error) =>
+            if (sucesso)
             {
-                if (error != null)
-                {
-                    Debug.Log(error);
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
-                    return;
-                }
+                coordenadas.Add("lat", lat.ToString());
+                coordenadas.Add("long", longi.ToString());
 
-                fecharPnlMensagem();
-            }));
+                Dictionary<string, object> form = new Dictionary<string, object>()
+                {
+                    {"comanda", mensagem.acao.comanda },
+                    {"aceitou", aceitar },
+                    { "coordenadas", coordenadas }
+                };
+
+                StartCoroutine(ComandaAPI.RespostaConviteGrupo(form,
+                    (response, error) =>
+                    {
+                        if (error != null)
+                        {
+                            Debug.Log(error);
+                            AlertaManager.Instance.ChamarAlertaMensagem(error, false);
+                            return;
+                        }
+
+                        fecharPnlMensagem();
+                    }));
+
+                return;
+            }
+
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.GPSError, false);
+        }));
     }
     #endregion
 
     #region ordenarMensagens
     private void ordernarMensagens()
     {
-        for (int i=0; i < lstCorreioObj.Count; i++)
+        for (int i = 0; i < lstCorreioObj.Count; i++)
         {
             if (lstCorreioObj[i].mensagem.lida)
             {

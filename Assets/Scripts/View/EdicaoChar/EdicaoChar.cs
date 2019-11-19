@@ -274,7 +274,6 @@ public class EdicaoChar : MonoBehaviour
     #region btnSalvarAlteracao
     private void btnSalvarAlteracao()
     {
-
         Dictionary<string, object> data = new Dictionary<string, object>
         {
             {   "corpo", PnlCharacter.Avatar.corpo  },
@@ -299,8 +298,9 @@ public class EdicaoChar : MonoBehaviour
 
             if (error != null)
             {
+                Debug.Log(JsonConvert.SerializeObject(response));
                 Debug.Log("btnSalvarAlteracao" + error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -308,11 +308,13 @@ public class EdicaoChar : MonoBehaviour
 
             AlertaManager.Instance.IniciarAlerta(response);
 
-            PnlCharacter.Avatar.info.level = Cliente.ClienteLogado.avatar.info.level;
-            PnlCharacter.Avatar.info.exp = Cliente.ClienteLogado.avatar.info.exp;
-            PnlCharacter.Avatar.info.expProximoLevel = Cliente.ClienteLogado.avatar.info.expProximoLevel;
+            Debug.Log(JsonConvert.SerializeObject(PnlCharacter.Avatar));
 
-            Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
+            //PnlCharacter.Avatar.info.level = Cliente.ClienteLogado.avatar.info.level;
+            //PnlCharacter.Avatar.info.exp = Cliente.ClienteLogado.avatar.info.exp;
+            //PnlCharacter.Avatar.info.expProximoLevel = Cliente.ClienteLogado.avatar.info.expProximoLevel;
+
+            //Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
 
             fecharCena(true);
 

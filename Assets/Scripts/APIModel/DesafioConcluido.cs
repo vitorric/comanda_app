@@ -13,6 +13,7 @@ namespace APIModel
             public Estabelecimento estabelecimento;
             public string dataConclusao;
             public Desafio desafio;
+            public Premio premio;
         }
 
         public class Desafio
@@ -21,7 +22,6 @@ namespace APIModel
             public string nome;
             public string icon;
             public string descricao;
-            public Premio premio;
             public Objetivo objetivo;
         }
 

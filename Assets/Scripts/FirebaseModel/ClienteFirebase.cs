@@ -14,7 +14,7 @@ namespace FirebaseModel
             Remover
         }
 
-        public Action<Cliente.Desafio, TipoAcao> AcaoDesafio;
+        public Action<DesafioCliente, TipoAcao> AcaoDesafio;
         public Action<Cliente.GoldPorEstabelecimento, TipoAcao> AcaoGoldPorEstabelecimento;
 
         public void WatchGoldPorEstab(string clienteId, bool ehParaAdicionar)
@@ -126,16 +126,51 @@ namespace FirebaseModel
         #endregion
 
         #region tratarSnapshotDesafio
-        private Cliente.Desafio tratarSnapshotDesafio(DataSnapshot ds)
+        private DesafioCliente tratarSnapshotDesafio(DataSnapshot ds)
         {
-            Cliente.Desafio desafio = new Cliente.Desafio
+            DesafioCliente desafio = new DesafioCliente
             {
                 _id = Convert.ToString(ds.Child("_id").Value),
                 concluido = Convert.ToBoolean(ds.Child("concluido").Value),
                 resgatouPremio = Convert.ToBoolean(ds.Child("resgatouPremio").Value),
                 progresso = Convert.ToInt32(ds.Child("progresso").Value),
-                estabelecimento = Convert.ToString(ds.Child("estabelecimento").Value)
+                estabelecimento = Convert.ToString(ds.Child("estabelecimento").Value),
+                desafio = new DesafioCliente.Desafio
+                {
+                    _id = Convert.ToString(ds.Child("desafio").Child("_id").Value),
+                    nome = Convert.ToString(ds.Child("desafio").Child("nome").Value),
+                    icon = Convert.ToString(ds.Child("desafio").Child("icon").Value),
+                    tempoDuracao = Convert.ToDateTime(ds.Child("desafio").Child("tempoDuracao").Value),
+                }
             };
+
+            if (ds.Child("premio").Exists)
+            {
+                desafio.premio = new DesafioCliente.Premio
+                {
+                    quantidade = Convert.ToInt32(ds.Child("premio").Child("quantidade").Value),
+                    tipo = Convert.ToString(ds.Child("premio").Child("tipo").Value)
+                };
+
+                if (ds.Child("premio").Child("ganhador").Exists)
+                {
+                    desafio.premio.ganhador = new DesafioCliente.Ganhador
+                    {
+                        _id = Convert.ToString(ds.Child("premio").Child("ganhador").Child("_id").Value),
+                        nome = Convert.ToString(ds.Child("premio").Child("ganhador").Child("nome").Value)
+                    };
+                }
+
+                if (ds.Child("premio").Child("produto").Exists)
+                {
+                    desafio.premio.produto = new DesafioCliente.Produto
+                    {
+                        _id = Convert.ToString(ds.Child("premio").Child("produto").Child("_id").Value),
+                        nome = Convert.ToString(ds.Child("premio").Child("produto").Child("nome").Value),
+                        icon = Convert.ToString(ds.Child("premio").Child("produto").Child("nome").Value)
+                    };
+                }
+            }
 
             return desafio;
         }

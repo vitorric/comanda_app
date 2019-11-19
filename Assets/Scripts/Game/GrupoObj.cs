@@ -3,6 +3,7 @@ using Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,11 +61,11 @@ public class GrupoObj : MonoBehaviour
     {
         if (Integrante.jaPagou)
         {
-            LblValor.text = Integrante.valorPago.ToString("C2");
+            LblValor.text = Integrante.valorPago.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
             return;
         }
 
-        LblValor.text = valor.ToString("C2");
+        LblValor.text = valor.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
     }
     #endregion
 }

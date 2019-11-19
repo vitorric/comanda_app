@@ -41,7 +41,7 @@ public class DesafioObj : MonoBehaviour
 
     //private Cliente.Conquista conquistaUsuario;
     public Desafio Desafio;
-    public Cliente.Desafio DesafioCliente;
+    public DesafioCliente DesafioCliente;
 
     private void Awake()
     {
@@ -91,7 +91,7 @@ public class DesafioObj : MonoBehaviour
     #endregion
 
     #region PreencherInfo
-    public void PreencherInfo(Desafio desafio, Cliente.Desafio desafioCliente)
+    public void PreencherInfo(Desafio desafio, DesafioCliente desafioCliente)
     {
         Desafio = desafio;
 
@@ -122,21 +122,22 @@ public class DesafioObj : MonoBehaviour
         TxtTituloConquista.text = desafioConcluido.desafio.nome;
         TxtDescricaoConquista.text = desafioConcluido.desafio.descricao;
         txtNomePremio.text =
-            (desafioConcluido.desafio.premio.produto == null) ?
-                $"{desafioConcluido.desafio.premio.quantidade} x CPGold" :
-                $"{desafioConcluido.desafio.premio.quantidade} x {desafioConcluido.desafio.premio.produto.nome}";
+            (desafioConcluido.premio.produto == null) ?
+                $"{desafioConcluido.premio.quantidade} x CPGold" :
+                $"{desafioConcluido.premio.quantidade} x {desafioConcluido.premio.produto.nome}";
         TxtDataConclusao.text = desafioConcluido.dataConclusao;
 
 
         Main.Instance.ObterIcones(desafioConcluido.desafio.icon, FileManager.Directories.desafio, (textura) =>
         {
-            PreencherIcone(textura);
+            if (textura != null)
+                PreencherIcone(textura);
         });
     }
     #endregion
 
     #region AtualizarProgresso
-    public void AtualizarProgresso(Cliente.Desafio desafioCliente)
+    public void AtualizarProgresso(DesafioCliente desafioCliente)
     {
         DesafioCliente = desafioCliente;
 
@@ -176,7 +177,7 @@ public class DesafioObj : MonoBehaviour
             Main.Instance.MenuEstabelecimento.CanvasDesafioInfo,
             Main.Instance.MenuEstabelecimento.DesafioInfo.gameObject, () =>
             {
-                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio, Desafio.icon);
+                Main.Instance.MenuEstabelecimento.DesafioInfo.PreencherInfo(Desafio.premio);
             });
 
     }

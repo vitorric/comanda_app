@@ -63,7 +63,7 @@ public class MenuDesafios : MonoBehaviour
 
         ClienteFirebase.WatchDesafios(Cliente.ClienteLogado._id, true);
 
-        listarDesafiosConcluidos();
+        //listarDesafiosConcluidos();
     }
 
     #region configurarListener
@@ -86,7 +86,7 @@ public class MenuDesafios : MonoBehaviour
     #endregion
 
     #region adicionarDesafio
-    private void adicionarDesafio(Cliente.Desafio desafio)
+    private void adicionarDesafio(DesafioCliente desafio)
     {
         if (desafio != null)
         {
@@ -99,7 +99,7 @@ public class MenuDesafios : MonoBehaviour
     #endregion
 
     #region modificarDesafio
-    private void modificarDesafio(Cliente.Desafio desafio)
+    private void modificarDesafio(DesafioCliente desafio)
     {
         DesafioObj desafioObj = lstDesafiosProgresso.Find(x => x.DesafioCliente._id == desafio._id);
 
@@ -115,7 +115,9 @@ public class MenuDesafios : MonoBehaviour
                     txtDesafioProgressoVazio.SetActive(true);
                 }
 
-                listarDesafiosConcluidos();
+                //listarDesafiosConcluidos();
+
+                obterDesafioConcluido(desafio.desafio._id);
             }
 
             obterDesafio(desafio, desafioObj, false);
@@ -124,7 +126,7 @@ public class MenuDesafios : MonoBehaviour
     #endregion
 
     #region removerDesafio
-    private void removerDesafio(Cliente.Desafio desafio)
+    private void removerDesafio(DesafioCliente desafio)
     {
         DesafioObj desafioObj = lstDesafiosProgresso.Find(x => x.DesafioCliente._id == desafio._id);
 
@@ -158,12 +160,13 @@ public class MenuDesafios : MonoBehaviour
     #endregion
 
     #region obterDesafio
-    private void obterDesafio(Cliente.Desafio desafio, DesafioObj desafioObj, bool ehAdicao)
+    private void obterDesafio(DesafioCliente desafio, DesafioObj desafioObj, bool ehAdicao)
     {
         Dictionary<string, object> form = new Dictionary<string, object>
         {
-            { "desafioId", desafio._id }
+            { "desafioId", desafio.desafio._id }
         };
+
 
         StartCoroutine(DesafioAPI.ObterDesafio(form,
         (response, error) =>
@@ -171,7 +174,7 @@ public class MenuDesafios : MonoBehaviour
             if (error != null)
             {
                 Debug.Log("obterDesafio: " + error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -187,8 +190,9 @@ public class MenuDesafios : MonoBehaviour
                     lstDesafiosConcluido.Add(desafio._id);
 
                     if (!desafio.resgatouPremio)
-                        AppManager.Instance.AtivarDesafioCompletado(response);
+                        AppManager.Instance.AtivarDesafioCompletado(desafio);
 
+                    obterDesafioConcluido(desafio.desafio._id);
                     return;
                 }
 
@@ -199,7 +203,7 @@ public class MenuDesafios : MonoBehaviour
 
 
             if (desafio.concluido && !desafio.resgatouPremio)
-                AppManager.Instance.AtivarDesafioCompletado(response);
+                AppManager.Instance.AtivarDesafioCompletado(desafio);
 
             if (!ehAdicao)
             {
@@ -213,7 +217,8 @@ public class MenuDesafios : MonoBehaviour
 
             Main.Instance.ObterIcones(response.icon, FileManager.Directories.desafio, (textura) =>
             {
-                desafioObj.PreencherIcone(textura);
+                if (textura != null)
+                    desafioObj.PreencherIcone(textura);
             });
 
             desafioObj.PreencherInfo(response, desafio);
@@ -230,7 +235,7 @@ public class MenuDesafios : MonoBehaviour
     #endregion
 
     #region BuscarDesafio
-    public Cliente.Desafio BuscarDesafio(string _id)
+    public DesafioCliente BuscarDesafio(string _id)
     {
         DesafioObj clienteDesafio = null;
 
@@ -271,6 +276,27 @@ public class MenuDesafios : MonoBehaviour
                     DesafioObj desafioObj = Instantiate(DesafioObjRef, SvcDesafioConcluido);
                     desafioObj.PreencherInfoConcluido(response.desafios[i]);
                 }
+            }
+        }));
+    }
+    #endregion
+
+    #region obterDesafioConcluido
+    private void obterDesafioConcluido(string desafioId)
+    {
+        Dictionary<string, object> form = new Dictionary<string, object>()
+        {
+            { "desafioId", desafioId }
+        };
+
+        StartCoroutine(DesafioAPI.ObterDesafioConcluido(form, (response, error) =>
+        {
+            if (response != null)
+            {
+                txtDesafioConcluidoVazio.SetActive(false);
+
+                DesafioObj desafioObj = Instantiate(DesafioObjRef, SvcDesafioConcluido);
+                desafioObj.PreencherInfoConcluido(response);
             }
         }));
     }

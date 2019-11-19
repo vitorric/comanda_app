@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -179,7 +180,7 @@ public class MenuComanda : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -289,7 +290,8 @@ public class MenuComanda : MonoBehaviour
 
             Main.Instance.ObterIcones(produto.infoProduto.icon, FileManager.Directories.produto, (textura) =>
             {
-                itemComandaObj.PreencherIcone(textura);
+                if (textura != null)
+                    itemComandaObj.PreencherIcone(textura);
             });
             itemComandaObj.PreencherInfo(produto);
             lstProdutosComanda.Add(itemComandaObj);
@@ -358,7 +360,7 @@ public class MenuComanda : MonoBehaviour
             if (error != null)
             {
                 Debug.Log("ObterAvatar: " + error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -400,9 +402,9 @@ public class MenuComanda : MonoBehaviour
 
         valorRestante = valorTotalComanda - valorPago;
 
-        LblValorTotal.text = valorTotalComanda.ToString("C2");
-        LblValorPago.text = "- " + valorPago.ToString("C2");
-        LblValorRestante.text = valorRestante.ToString("C2");
+        LblValorTotal.text = valorTotalComanda.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
+        LblValorPago.text = "- " + valorPago.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
+        LblValorRestante.text = valorRestante.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
 
         //+1 porque conta com o usuario do app que nao esta na lista
         if (lstGrupoComanda != null && lstGrupoComanda.Count > 0)
@@ -416,7 +418,7 @@ public class MenuComanda : MonoBehaviour
             lstGrupoComanda.ForEach(x => x.preencherValorAPagar(valorAPagarGrupo));
 
         if (ClienteComanda != null)
-            LblValorAPagarGrupo.text = valorAPagarGrupo.ToString("C2");
+            LblValorAPagarGrupo.text = valorAPagarGrupo.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
 
     }
     #endregion
@@ -438,11 +440,11 @@ public class MenuComanda : MonoBehaviour
                 if (error != null)
                 {
                     Debug.Log(error);
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                     return;
                 }
 
-                for (int i =0; i < response.Count; i++)
+                for (int i = 0; i < response.Count; i++)
                 {
                     HistoricoComandaObj historicoObj = Instantiate(HistoricoComandaRef, ScvHistoricoComanda);
                     historicoObj.PreencherInfo(response[i]);

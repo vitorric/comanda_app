@@ -48,8 +48,18 @@ public class AvatarObj : MonoBehaviour
                 orelha = avatar.orelha,
                 corPele = avatar.corPele,
                 corCabelo = avatar.corCabelo,
-                corBarba = avatar.corBarba
+                corBarba = avatar.corBarba,
             };
+
+            if (avatar.info != null)
+            {
+                this.Avatar.info = new Cliente.AvatarInfo
+                {
+                    exp = avatar.info.exp,
+                    expProximoLevel = avatar.info.expProximoLevel,
+                    level = avatar.info.level
+                };
+            }
         }
         else
         {

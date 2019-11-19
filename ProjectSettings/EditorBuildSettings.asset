@@ -20,7 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/EdicaoChar.unity
     guid: 449233b74a2473e46a026524c428d9ed
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Cena_Testes.unity
     guid: e338a26484cbbb84b8d886231f99c275
   m_configObjects: {}

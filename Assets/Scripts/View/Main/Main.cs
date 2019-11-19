@@ -172,6 +172,13 @@ public class Main : MonoBehaviour
         TxtApelido.text = Cliente.ClienteLogado.apelido;
         PreencherAvatares.Invoke();
         atualizarExp();
+
+        if (!Application.isEditor)
+        {
+            EasyAudioUtility.Instance.AjustarSomBG(Cliente.ClienteLogado.configApp.somFundo);
+            EasyAudioUtility.Instance.AjustarSomSFX(Cliente.ClienteLogado.configApp.somGeral);
+        }
+
     }
 
     private void atualizarExp()
@@ -242,26 +249,7 @@ public class Main : MonoBehaviour
         {
             PnlDecisao.AbrirPainelConviteEstab(() =>
             {
-                Dictionary<string, object> form = new Dictionary<string, object>
-                {
-                    { "estabelecimentoId", Cliente.ClienteLogado.configClienteAtual.estabelecimento } //na web
-                };
-
-                StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(form,
-                (response, error) =>
-                {
-                    if (error != null)
-                    {
-                        Debug.Log(error);
-                        StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
-                        return;
-                    }
-
-                    if (!response)
-                    {
-                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
-                    }
-                }));
+                EntrarNoEstab(Cliente.ClienteLogado.configClienteAtual.estabelecimento);
             },
             () =>
             {
@@ -270,7 +258,7 @@ public class Main : MonoBehaviour
                     if (error != null)
                     {
                         Debug.Log(error);
-                        StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                        AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                         return;
                     }
 
@@ -287,20 +275,94 @@ public class Main : MonoBehaviour
     }
     #endregion
 
+    #region EntrarNoEstab
+    public void EntrarNoEstab(string estabelecimentoId)
+    {
+        Dictionary<string, string> coordenadas = new Dictionary<string, string>();
+        Debug.Log(estabelecimentoId);
+        StartCoroutine(GPSManager.Instance.IniciarGPS((lat, longi, sucesso) =>
+        {
+            if (sucesso)
+            {
+                coordenadas.Add("lat", lat.ToString());
+                coordenadas.Add("long", longi.ToString());
+
+                Dictionary<string, object> form = new Dictionary<string, object>
+                        {
+                            { "estabelecimentoId", estabelecimentoId },
+                            { "coordenadas", coordenadas }//na web
+                        };
+
+                StartCoroutine(ClienteAPI.EntrarNoEstabelecimento(form,
+                (response, error) =>
+                {
+                    if (error != null)
+                    {
+                        Debug.Log(error);
+                        AlertaManager.Instance.ChamarAlertaMensagem(error, false);
+                        return;
+                    }
+
+                    if (!response)
+                    {
+                        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
+                    }
+                }));
+
+                return;
+            }
+
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.GPSError, false);
+        }));
+    }
+    #endregion
+
     #region clienteEstaNoEstab
     private bool clienteEstaNoEstab()
     {
         //esta no estabelecimento
         if (Cliente.ClienteLogado.configClienteAtual.estaEmUmEstabelecimento)
         {
-            PnlEstaNoEstabelecimento.SetActive(true);
-            PnlNaoEstaNoEstabelecimento.SetActive(false);
+            Dictionary<string, string> coordenadas = new Dictionary<string, string>();
 
-            if (!string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda) && string.IsNullOrEmpty(MenuComanda.ComandaId))
+            StartCoroutine(GPSManager.Instance.IniciarGPS((lat, longi, sucesso) =>
             {
-                bool temComanda = (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda)) ? false : true;
-                MenuComanda.IniciarWatchComanda(temComanda);
-            }
+                //if (sucesso)
+                //{
+                coordenadas.Add("lat", lat.ToString());
+                coordenadas.Add("long", longi.ToString());
+
+                Dictionary<string, object> data = new Dictionary<string, object>
+                    {
+                        { "estabelecimentoId", Cliente.ClienteLogado.configClienteAtual.estabelecimento },
+                        { "coordenadas", coordenadas }
+                    };
+
+                StartCoroutine(GPSAPI.ValidarClienteEstabelecimento(data,
+                    (response, error) =>
+                    {
+                        if (error != null)
+                        {
+                            Debug.Log(error);
+                            AlertaManager.Instance.ChamarAlertaMensagem(error, false);
+                            return;
+                        }
+
+                        PnlEstaNoEstabelecimento.SetActive(true);
+                        PnlNaoEstaNoEstabelecimento.SetActive(false);
+
+                        if (!string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda) && string.IsNullOrEmpty(MenuComanda.ComandaId))
+                        {
+                            bool temComanda = (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda)) ? false : true;
+                            MenuComanda.IniciarWatchComanda(temComanda);
+                        }
+
+                    }));
+                return;
+                //}
+
+                //AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.GPSError, false));
+            }));
 
             //comandaClienteFirebase.Watch(true);
 
@@ -325,7 +387,7 @@ public class Main : MonoBehaviour
 
         //comandaClienteFirebase.Watch(false);
 
-        if (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda) && !String.IsNullOrEmpty(MenuComanda.ComandaId))
+        if (string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda) && !string.IsNullOrEmpty(MenuComanda.ComandaId))
         {
             MenuComanda.IniciarWatchComanda(false);
         }
@@ -346,7 +408,9 @@ public class Main : MonoBehaviour
 
             StartCoroutine(DownloadAPI.DownloadImage(nomeIcon, tipo.ToString(), (texture, bytes) =>
             {
-                FileManager.SaveFile(tipo, nomeIcon, bytes);
+                if (texture != null)
+                    FileManager.SaveFile(tipo, nomeIcon, bytes);
+
                 callback(texture);
             }));
         }

@@ -53,7 +53,7 @@ public class MembroConvidadoObj : MonoBehaviour
             if (error != null)
             {
                 Debug.Log("btnDesconvidar: " + error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 

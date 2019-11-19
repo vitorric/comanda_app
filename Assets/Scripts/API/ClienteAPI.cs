@@ -55,6 +55,51 @@ namespace Network
         #endregion
 
         //OK
+        #region ClienteLogin
+        public static IEnumerator Deslogar(
+               Dictionary<string, object> properties,
+               Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("deslogar/cliente",
+                properties,
+                (request) =>
+                {
+
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<Cliente.SessaoCliente> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<Cliente.SessaoCliente>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, msgErro);
+                    }
+                });
+        }
+        #endregion
+
+        //OK
         #region ClienteLoginFacebook
         public static IEnumerator ClienteLoginFacebook(
                Dictionary<string, object> properties,
@@ -107,7 +152,7 @@ namespace Network
         {
             var done = wrapCallback(doneCallback);
 
-            yield return Post("recuperar_senha/cliente",
+            yield return Post("solicitar/recuperar_senha",
                  properties,
                  (request) =>
                  {
@@ -396,6 +441,7 @@ namespace Network
                 });
         }
         #endregion
+
 
         #region ClienteComprarItem
         public static IEnumerator ClienteComprarItem(

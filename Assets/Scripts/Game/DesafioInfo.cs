@@ -29,7 +29,7 @@ public class DesafioInfo : MonoBehaviour
     #endregion
 
     #region PreencherInfo
-    public void PreencherInfo(Desafio.Premio premio, string icon)
+    public void PreencherInfo(Desafio.Premio premio)
     {
         this.gameObject.SetActive(true);
         PnlInfo.SetActive(true);
@@ -56,8 +56,12 @@ public class DesafioInfo : MonoBehaviour
 
                 Main.Instance.ObterIcones(response.icon, FileManager.Directories.produto, (textura) =>
                 {
-                    IconPremio.texture = textura;
-                    IconPremio = Util.ImgResize(IconPremio, 180, 180);
+                    if (textura = null)
+                    {
+                        IconPremio.texture = textura;
+                        IconPremio = Util.ImgResize(IconPremio, 180, 180);
+                    }
+
                     animarPnlInfo();
                 });
             }));

@@ -3,6 +3,7 @@ using Firebase;
 using Firebase.Database;
 using Firebase.Messaging;
 using Firebase.Unity.Editor;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -56,16 +57,8 @@ public class FirebaseManager : MonoBehaviour
     }
     public void OnMessageReceived(object sender, MessageReceivedEventArgs e)
     {
-        foreach (KeyValuePair<string, string> item in e.Message.Data)
-        {
-            //Debug.Log("--------------------------" + e.Message.Notification.Body);
-            //Debug.Log("--------------------------" + e.Message.RawData);
-            //Debug.Log("--------------------------" + JsonConvert.SerializeObject(e.Message.Data));
-            //Debug.LogFormat($"{item.Key}: {item.Value}");
-
-            //AlertManager.Instance.ShowMessage(e.Message.Notification.Body);
-        }
-    }
+        AlertaManager.Instance.ChamarAlertaNotificacao(e.Message.Notification.Body);
+    }    
 
 
     #region ObterUsuario

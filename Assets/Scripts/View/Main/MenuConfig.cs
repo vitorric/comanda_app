@@ -12,7 +12,8 @@ public class MenuConfig : MonoBehaviour
     public Button BtnSairApp;
 
     public GameObject PnlConfigApp;
-    public GameObject PnlConfigPerfil;
+
+    public Button BtnTermosUso;
 
     [Header("Menu Config App")]
     public Slider SliderSomFundo;
@@ -38,6 +39,7 @@ public class MenuConfig : MonoBehaviour
     {
         //BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
         BtnSairApp.onClick.AddListener(() => btnDeslogar());
+        BtnTermosUso.onClick.AddListener(() => Application.OpenURL("http://93.188.164.122/termouso"));
     }
     #endregion
 
@@ -46,11 +48,38 @@ public class MenuConfig : MonoBehaviour
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        FindObjectOfType<Main>().PararWatch();
-        EasyAudioUtility.Instance.AjustarSomSFX(1);
-        EasyAudioUtility.Instance.AjustarSomBG(1);
-        PlayerPrefs.DeleteAll();
-        SceneManager.LoadScene("Login");
+        deslogar();
+    }
+    #endregion
+
+    #region deslogar
+    private void deslogar()
+    {
+        Dictionary<string, object> form = new Dictionary<string, object>
+        {
+            { "deviceId", AppManager.Instance.deviceId }
+        };
+
+        alterarConfigSom();
+
+        StartCoroutine(ClienteAPI.Deslogar(form, (response, error) =>
+        {
+            if (error != null)
+            {
+                Debug.Log(error);
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
+                return;
+            }
+
+            if (response)
+            {
+                FindObjectOfType<Main>().PararWatch();
+                EasyAudioUtility.Instance.AjustarSomSFX(0);
+                EasyAudioUtility.Instance.AjustarSomBG(0);
+                PlayerPrefs.DeleteAll();
+                SceneManager.LoadScene("Login");
+            }
+        }));
     }
     #endregion
 
@@ -90,7 +119,8 @@ public class MenuConfig : MonoBehaviour
     {
         TxtPctSomFundo.text = Mathf.FloorToInt(value * 100) + "%";
 
-        EasyAudioUtility.Instance.AjustarSomBG(value);
+        if (!Application.isEditor)
+            EasyAudioUtility.Instance.AjustarSomBG(value);
     }
     #endregion
 
@@ -99,7 +129,8 @@ public class MenuConfig : MonoBehaviour
     {
         TxtPctSomGeral.text = Mathf.FloorToInt(value * 100) + "%";
 
-        EasyAudioUtility.Instance.AjustarSomSFX(value);
+        if (!Application.isEditor)
+            EasyAudioUtility.Instance.AjustarSomSFX(value);
     }
     #endregion
 

@@ -16,6 +16,7 @@ namespace APIModel
         public string celular;
         public string horarioAtendimentoInicio;
         public string horarioAtendimentoFim;
+        public string icon;
         public Endereco endereco;
         public ConfigEstabelecimentoAtual configEstabelecimentoAtual;
 

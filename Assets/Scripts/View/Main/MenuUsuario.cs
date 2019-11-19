@@ -181,7 +181,7 @@ public class MenuUsuario : MonoBehaviour
                 Debug.Log(error);
                 StartCoroutine(AppManager.Instance.DesativarLoader());
 
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -201,7 +201,7 @@ public class MenuUsuario : MonoBehaviour
             LblPerfilExp.text = Cliente.ClienteLogado.avatar.info.exp + "/" + Cliente.ClienteLogado.avatar.info.expProximoLevel;
             LblPerfilLevel.text = Cliente.ClienteLogado.avatar.info.level.ToString();
             LblPerfilPontos.text = Cliente.ClienteLogado.pontos.ToString();
-            LblPerfilGold.text = Cliente.ClienteLogado.RetornarGoldTotal().ToString();
+            //LblPerfilGold.text = Cliente.ClienteLogado.RetornarGoldTotal().ToString();
             LblChaveAmigavel.text = Cliente.ClienteLogado.chaveAmigavel;
         }
         catch (Exception e)
@@ -272,7 +272,7 @@ public class MenuUsuario : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
 
                 return;
             }

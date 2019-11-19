@@ -97,7 +97,7 @@ public class MenuEstabelecimento : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -105,6 +105,12 @@ public class MenuEstabelecimento : MonoBehaviour
             {
                 EstabelecimentoObj objEstab = Instantiate(EstabelecimentoRef, ScvEstabelecimentos);
                 objEstab.PreencherInfo(estabelecimento, Cliente.ClienteLogado.RetornoGoldEstabelecimento(estabelecimento._id));
+
+                Main.Instance.ObterIcones(estabelecimento.icon, FileManager.Directories.estabelecimento, (textura) =>
+                {
+                    if (textura != null)
+                        objEstab.PreencherIcone(textura);
+                });
             }
         }));
     }
@@ -127,7 +133,7 @@ public class MenuEstabelecimento : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(Cliente.ClienteLogado.configClienteAtual.comanda))
         {
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SairEstabComandaAberta, false));
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SairEstabComandaAberta, false);
             return;
         }
 
@@ -137,7 +143,7 @@ public class MenuEstabelecimento : MonoBehaviour
             if (error != null)
             {
                 Debug.Log(error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -301,7 +307,8 @@ public class MenuEstabelecimento : MonoBehaviour
 
             Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) =>
             {
-                objItemShop.PreencherIcone(textura);
+                if (textura != null)
+                    objItemShop.PreencherIcone(textura);
             });
 
             objItemShop.PreencherInfo(item, lojaAberta, estabelecimentoId);
@@ -346,13 +353,14 @@ public class MenuEstabelecimento : MonoBehaviour
             if (Main.Instance.MenuDesafio.ConferirDesafioConcluido(desafio._id))
                 return;
 
-            Cliente.Desafio clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
+            DesafioCliente clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
 
             DesafioObj objDesafio = Instantiate(ConquistaRef, ScvConquista);
 
             Main.Instance.ObterIcones(desafio.icon, FileManager.Directories.desafio, (textura) =>
             {
-                objDesafio.PreencherIcone(textura);
+                if (textura != null)
+                    objDesafio.PreencherIcone(textura);
             });
 
             lstDesafios.Add(objDesafio);
@@ -380,7 +388,7 @@ public class MenuEstabelecimento : MonoBehaviour
 
         if (objItemDesafio != null)
         {
-            Cliente.Desafio clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
+            DesafioCliente clienteDesafio = Main.Instance.MenuDesafio.BuscarDesafio(desafio._id);
             objItemDesafio.PreencherInfo(desafio, clienteDesafio);
         }
     }
@@ -415,7 +423,7 @@ public class MenuEstabelecimento : MonoBehaviour
     public void PreencherInfoConfirmacaoItem(ItemLoja item, float dinheiroEstab)
     {
         PnlPopUp.AbrirPopUp(
-               PnlConfirmarItemCompra, 
+               PnlConfirmarItemCompra,
                () =>
                {
                    TxtNomeCompraItem.text = item.nome;
@@ -423,9 +431,13 @@ public class MenuEstabelecimento : MonoBehaviour
                    TxtCustoCompraItem.text = "- " + item.preco.ToString();
                    TxtSaldoCompraItem.text = (dinheiroEstab - item.preco).ToString();
 
-                   Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) => {
-                       IconItem.texture = textura;
-                       IconItem = Util.ImgResize(IconItem, 180, 180);
+                   Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) =>
+                   {
+                       if (textura != null)
+                       {
+                           IconItem.texture = textura;
+                           IconItem = Util.ImgResize(IconItem, 180, 180);
+                       }
                    });
                });
     }
@@ -449,12 +461,15 @@ public class MenuEstabelecimento : MonoBehaviour
         {
             Destroy(lstDesafios[indexDesafio].gameObject);
             lstDesafios.RemoveAt(indexDesafio);
+
+            if (lstDesafios.Count == 0)
+                PnlConquistaVazio.SetActive(true);
         }
     }
     #endregion
 
     #region AlterarProgressoDesafio
-    public void AlterarProgressoDesafio(Cliente.Desafio desafioCliente)
+    public void AlterarProgressoDesafio(DesafioCliente desafioCliente)
     {
         int indexDesafio = lstDesafios.FindIndex(x => x.Desafio._id == desafioCliente._id);
 

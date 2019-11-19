@@ -8,18 +8,14 @@ public class AlertaManager : MonoBehaviour
 
     public static AlertaManager Instance { get; set; }
 
-
-    public GameObject PnlPai;
-    public GameObject ObjAlertaMensagem;
     public Text TxtMensagem;
     public Button BtnFechar;
+    public Animator animator;
 
-    public GameObject ObjAlertaResponse;
+    [Header("Response")]
+    public Animator animatorResponse;
     public RawImage ImgSucesso;
     public RawImage ImgErro;
-
-
-    private bool animando = false;
 
     public enum MsgAlerta
     {
@@ -33,7 +29,9 @@ public class AlertaManager : MonoBehaviour
         SenhaMenor6Char,
         PreenchaCPFValido,
         Menor18Anos,
-        DataInvalida
+        DataInvalida,
+        EhNecessarioAceitarOsTermos,
+        GPSError
     }
 
     private Dictionary<MsgAlerta, string> msgsApp;
@@ -60,19 +58,21 @@ public class AlertaManager : MonoBehaviour
             { MsgAlerta.SenhaMenor6Char, "A senha tem que ter no mínimo 6 caracteres!"  },
             { MsgAlerta.PreenchaCPFValido, "Preencha um CPF válido!"  },
             { MsgAlerta.DataInvalida, "Digite uma data válida!"},
-            { MsgAlerta.Menor18Anos, "Desculpe, você precisa ter mais de 18 anos!"}
+            { MsgAlerta.Menor18Anos, "Desculpe, você precisa ter mais de 18 anos!" },
+            { MsgAlerta.EhNecessarioAceitarOsTermos, "É necessário aceitar os termos para finalizar o cadastro!" },
+            { MsgAlerta.GPSError, "GPS desabilitado ou fora de cobertura!" }
         };
     }
 
     public void IniciarAlerta(bool sucesso)
     {
-        StartCoroutine(ChamarAlertaResponse(sucesso));
+        ChamarAlertaResponse(sucesso);
     }
 
-    public IEnumerator ChamarAlertaResponse(bool sucesso)
+    public void ChamarAlertaResponse(bool sucesso)
     {
-        ObjAlertaResponse.SetActive(true);
-
+        ImgSucesso.gameObject.SetActive(false);
+        ImgErro.gameObject.SetActive(false);
 
         if (sucesso)
         {
@@ -85,28 +85,11 @@ public class AlertaManager : MonoBehaviour
             ImgErro.gameObject.SetActive(true);
         }
 
-        if (!animando)
-        {
-            animando = true;
-
-
-            PnlPai.SetActive(true);
-            StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, -10, 805));
-            yield return new WaitForSeconds(1.5f);
-            StartCoroutine(Animacoes.Mover(ObjAlertaResponse, Animacoes.Posicao.Y, 10, 1165));
-            yield return new WaitForSeconds(0.6f);
-            PnlPai.SetActive(false);
-            ObjAlertaResponse.SetActive(false);
-            ImgSucesso.gameObject.SetActive(false);
-            ImgErro.gameObject.SetActive(false);
-            animando = false;
-        }
+        animatorResponse.SetTrigger("show");
     }
 
-    public IEnumerator ChamarAlertaMensagem(string mensagem, bool sucesso)
+    public void ChamarAlertaMensagem(string mensagem, bool sucesso)
     {
-        ObjAlertaMensagem.SetActive(true);
-
         if (sucesso)
         {
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Success);
@@ -116,26 +99,12 @@ public class AlertaManager : MonoBehaviour
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
         }
 
-        if (!animando)
-        {
-            animando = true;
-
-            PnlPai.SetActive(true);
-            TxtMensagem.text = mensagem;
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, -10, 805));
-            yield return new WaitForSeconds(2);
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, 10, 1165));
-            yield return new WaitForSeconds(0.6f);
-            PnlPai.SetActive(false);
-            animando = false;
-            ObjAlertaMensagem.SetActive(false);
-        }
+        animator.SetTrigger("show");
+        TxtMensagem.text = mensagem;
     }
 
-    public IEnumerator ChamarAlertaMensagem(MsgAlerta msgAlerta, bool sucesso)
+    public void ChamarAlertaMensagem(MsgAlerta msgAlerta, bool sucesso)
     {
-        ObjAlertaMensagem.SetActive(true);
-
         if (sucesso)
         {
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Success);
@@ -145,25 +114,21 @@ public class AlertaManager : MonoBehaviour
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Error);
         }
 
-        if (!animando)
-        {
-            animando = true;
+        TxtMensagem.text = msgsApp[msgAlerta];
+        animator.SetTrigger("show");
+    }
 
-            PnlPai.SetActive(true);
-            TxtMensagem.text = msgsApp[msgAlerta];
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, -10, 805));
-            yield return new WaitForSeconds(2);
-            StartCoroutine(Animacoes.Mover(ObjAlertaMensagem, Animacoes.Posicao.Y, 10, 1165));
-            yield return new WaitForSeconds(0.6f);
-            PnlPai.SetActive(false);
-            animando = false;
-            ObjAlertaMensagem.SetActive(false);
-        }
+    public void ChamarAlertaNotificacao(string mensagem)
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.MailSound);
+
+        TxtMensagem.text = mensagem;
+        animator.SetTrigger("show");
     }
 
     private void fechar()
     {
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
-        PnlPai.SetActive(false);
+        animator.SetTrigger("hide");
     }
 }

@@ -38,8 +38,11 @@ public class HistoricoCompraObj : MonoBehaviour {
             TxtTipoHistorico.text = "<color=lightblue>Item da Loja</color>";
             Main.Instance.ObterIcones(historico.itemLoja.icon, FileManager.Directories.item_Loja, (textura) =>
             {
-                ImgIcon.texture = textura;
-                ImgIcon = Util.ImgResize(ImgIcon, 180, 180);
+                if (textura != null)
+                {
+                    ImgIcon.texture = textura;
+                    ImgIcon = Util.ImgResize(ImgIcon, 180, 180);
+                }
             });
         }
         else
@@ -48,8 +51,11 @@ public class HistoricoCompraObj : MonoBehaviour {
             TxtTipoHistorico.text = "<color=lightblue>Produto</color>";
             Main.Instance.ObterIcones(historico.produto.icon, FileManager.Directories.produto, (textura) =>
             {
-                ImgIcon.texture = textura;
-                ImgIcon = Util.ImgResize(ImgIcon, 180, 180);
+                if (textura != null)
+                {
+                    ImgIcon.texture = textura;
+                    ImgIcon = Util.ImgResize(ImgIcon, 180, 180);
+                }
             });
         }
 

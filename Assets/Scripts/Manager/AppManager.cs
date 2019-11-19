@@ -22,7 +22,7 @@ public class AppManager : MonoBehaviour
     public GameObject PnlDesafioConquistado;
     public DesafioConcluidoObj DesafioConquistado;
 
-    private List<Desafio> lstDesafiosCompletados;
+    private List<DesafioCliente> lstDesafiosCompletados;
 
     // Update is called once per frame
     void Awake()
@@ -35,7 +35,7 @@ public class AppManager : MonoBehaviour
 
         deviceId = SystemInfo.deviceUniqueIdentifier;
 
-        lstDesafiosCompletados = new List<Desafio>();
+        lstDesafiosCompletados = new List<DesafioCliente>();
     }
 
     #region Loader
@@ -67,7 +67,7 @@ public class AppManager : MonoBehaviour
     #endregion
 
     #region Desafio
-    public void AtivarDesafioCompletado(Desafio desafio)
+    public void AtivarDesafioCompletado(DesafioCliente desafio)
     {
         if (lstDesafiosCompletados.Count == 0)
         {
@@ -85,7 +85,7 @@ public class AppManager : MonoBehaviour
         DesafioConquistado.PreencherInfo(lstDesafiosCompletados[0]);
     }
 
-    public void RemoverDesafioDaLista(Desafio desafio)
+    public void RemoverDesafioDaLista(DesafioCliente desafio)
     {
         lstDesafiosCompletados.Remove(desafio);
     }

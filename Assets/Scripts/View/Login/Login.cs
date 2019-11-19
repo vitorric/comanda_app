@@ -36,11 +36,19 @@ public class Login : MonoBehaviour
     public Button BtnEtapa2Continuar;
     public Button BtnEtapa3Voltar;
     public Button BtnEtapa3Confirmar;
+    public Button BtnEtapa4Voltar;
+    public Button BtnEtapa4Confirmar;
     public Button BtnEdicaoAvatar;
+    public Button BtnExibirSenha;
+
+    [Header("Textures")]
+    public Texture2D iconExibirSenha;
+    public Texture2D iconEsconderSenha;
 
     [Header("Toggle")]
     public Toggle BtnSexoMasc;
     public Toggle BtnSexoFem;
+    public Toggle BtnTermoAceite;
 
     [Header("Tela de Login")]
     public TMP_InputField TxtEmail;
@@ -69,13 +77,15 @@ public class Login : MonoBehaviour
     private string socialId = string.Empty;
     FacebookManager fbManager;
 
+    private bool exibindoSenha = false;
+
     #region Awake
     void Awake()
     {
         if (Application.isEditor)
         {
-            TxtEmail.text = "arus@email.com";
-            TxtSenha.text = "1234";
+            TxtEmail.text = "@email.com";
+            TxtSenha.text = "123456";
         }
 
         fbManager = new FacebookManager() { cadastrar = cadastroSocial };
@@ -99,17 +109,22 @@ public class Login : MonoBehaviour
         BtnEtapa1Voltar.onClick.AddListener(() => BtnCadastrarVoltar(1));
         BtnEtapa2Voltar.onClick.AddListener(() => BtnCadastrarVoltar(2));
         BtnEtapa3Voltar.onClick.AddListener(() => BtnCadastrarVoltar(3));
+        BtnEtapa4Voltar.onClick.AddListener(() => BtnCadastrarVoltar(4));
 
 
         BtnEtapa0Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(1));
         BtnEtapa1Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(2));
         BtnEtapa2Continuar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(3));
         BtnEtapa3Confirmar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(4));
+        BtnEtapa4Confirmar.onClick.AddListener(() => BtnCadastrarAvantarEtapa(5));
 
         BtnEdicaoAvatar.onClick.AddListener(() => BtnAbrirEdicaoAvatar());
 
         BtnSexoMasc.onValueChanged.AddListener((result) => ChkChanged(BtnSexoMasc.gameObject, true));
         BtnSexoFem.onValueChanged.AddListener((result) => ChkChanged(BtnSexoFem.gameObject, true));
+        BtnTermoAceite.onValueChanged.AddListener((result) => ChkChangedTermoAceite(BtnTermoAceite.gameObject, true));
+
+        BtnExibirSenha.onClick.AddListener(() => showHidePassword());
     }
     #endregion
 
@@ -164,6 +179,25 @@ public class Login : MonoBehaviour
         PnlRecuperarSenha.enabled = true;
         PnlLogin.enabled = false;
         TxtEmailRecSenha.text = string.Empty;
+    }
+    #endregion
+
+    #region showHidePassword
+    private void showHidePassword()
+    {
+        if (exibindoSenha)
+        {
+            exibindoSenha = false;
+            BtnExibirSenha.GetComponentInChildren<RawImage>().texture = iconEsconderSenha;
+            TxtSenha.contentType = TMP_InputField.ContentType.Password;
+            TxtSenha.Select();
+            return;
+        }
+
+        exibindoSenha = true;
+        BtnExibirSenha.GetComponentInChildren<RawImage>().texture = iconExibirSenha;
+        TxtSenha.contentType = TMP_InputField.ContentType.Standard;
+        TxtSenha.Select();
     }
     #endregion
 
@@ -240,6 +274,19 @@ public class Login : MonoBehaviour
     }
     #endregion
 
+    #region ChkChangedTermoAceite
+    public void ChkChangedTermoAceite(GameObject objClicado, bool tocarSom = false)
+    {
+        if (UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == objClicado)
+        {
+            if (tocarSom)
+                EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+
+            BtnEtapa4Confirmar.interactable = BtnTermoAceite.isOn;
+        }
+    }
+    #endregion
+
     #endregion
 
     #region Metodos privados
@@ -249,7 +296,7 @@ public class Login : MonoBehaviour
     {
         if (TxtEmail.text == string.Empty || TxtSenha.text == string.Empty)
         {
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
             return;
         }
 
@@ -272,7 +319,7 @@ public class Login : MonoBehaviour
             {
                 Debug.Log(error);
                 AppManager.Instance.DesativarLoaderAsync();
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -296,7 +343,7 @@ public class Login : MonoBehaviour
 
         if (TxtEmailRecSenha.text == string.Empty)
         {
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+            AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
             return;
         }
 
@@ -314,11 +361,11 @@ public class Login : MonoBehaviour
                 Debug.Log(error);
                 AppManager.Instance.DesativarLoaderAsync();
 
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(response, true));
+            AlertaManager.Instance.ChamarAlertaMensagem(response, true);
 
             fecharPnlRecuperarSenha();
 
@@ -350,19 +397,19 @@ public class Login : MonoBehaviour
             if (TxtEmailCadastro.text == string.Empty ||
                 TxtNomeCadastro.text == string.Empty)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
 
             if (!verificarEmailValido(TxtEmailCadastro.text))
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.EmailNaoValido, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.EmailNaoValido, false);
                 yield break;
             }
 
             if (TxtNomeCadastro.text.Split(' ').Length < 2)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.NomeSobreNome, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.NomeSobreNome, false);
                 yield break;
             }
 
@@ -377,7 +424,7 @@ public class Login : MonoBehaviour
                     Debug.Log(error);
                     AppManager.Instance.DesativarLoaderAsync();
 
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                     return;
                 }
 
@@ -393,25 +440,25 @@ public class Login : MonoBehaviour
             if (TxtDataNascCadastro.text == string.Empty ||
                 TxtCPFCadastro.text == string.Empty)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
 
             if (!verificarCPFValido(TxtCPFCadastro.text))
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaCPFValido, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaCPFValido, false);
                 yield break;
             }
 
             if (!verificarDataValido(TxtDataNascCadastro.text))
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.DataInvalida, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.DataInvalida, false);
                 yield break;
             }
 
             if (!verificarMaiorIdade(TxtDataNascCadastro.text))
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.Menor18Anos, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.Menor18Anos, false);
                 yield break;
             }
 
@@ -426,7 +473,7 @@ public class Login : MonoBehaviour
                     Debug.Log(error);
                     AppManager.Instance.DesativarLoaderAsync();
 
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                     return;
                 }
 
@@ -441,13 +488,13 @@ public class Login : MonoBehaviour
         {
             if (TxtApelidoCadastro.text == string.Empty)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
 
             if (TxtApelidoCadastro.text.Length < 3)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.ApelidoMenor3Char, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.ApelidoMenor3Char, false);
                 yield break;
             }
 
@@ -462,7 +509,7 @@ public class Login : MonoBehaviour
                     Debug.Log(error);
                     AppManager.Instance.DesativarLoaderAsync();
 
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                     return;
                 }
 
@@ -479,7 +526,6 @@ public class Login : MonoBehaviour
             }));
         }
 
-        //confirmacao senha e criacao
         if (etapaAtual == 3)
         {
             if (tipoLogin != "normal")
@@ -491,22 +537,37 @@ public class Login : MonoBehaviour
             if (TxtSenhaCadastro.text == string.Empty ||
                 TxtSenhaCadastroConfirm.text == string.Empty)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
 
             if (TxtSenhaCadastro.text.Length < 6)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhaMenor6Char, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhaMenor6Char, false);
                 yield break;
             }
 
             if (ValidarSenhas() == false)
             {
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhasNaoConferem, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.SenhasNaoConferem, false);
                 yield break;
             }
 
+            BtnTermoAceite.isOn = false;
+            BtnEtapa4Confirmar.interactable = false;
+
+            podeAvancar = true;
+        }
+
+        //confirmacao senha e criacao
+        if (etapaAtual == 4)
+        {
+
+            if (!BtnTermoAceite.isOn)
+            {
+                AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.EhNecessarioAceitarOsTermos, false);
+                yield break;
+            }
             StartCoroutine(cadastrar());
 
             yield break;
@@ -515,6 +576,7 @@ public class Login : MonoBehaviour
 
         if (proximaEtapa == 0)
         {
+            LimparFormCadastro();
             PnlLogin.enabled = false;
             PnlEtapas[0].enabled = true;
             yield break;
@@ -573,7 +635,7 @@ public class Login : MonoBehaviour
             {
                 Debug.Log(error);
                 AppManager.Instance.DesativarLoaderAsync();
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
@@ -641,7 +703,7 @@ public class Login : MonoBehaviour
                 Debug.Log(error);
                 AppManager.Instance.DesativarLoaderAsync();
 
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 

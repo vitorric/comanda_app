@@ -16,7 +16,8 @@ public class EasyAudioUtility : MonoBehaviour
         Compra_Item,
         Som_Camera,
         AchievWin,
-        AchievResgate
+        AchievResgate,
+        MailSound
     }
 
     //Static reference
@@ -79,7 +80,6 @@ public class EasyAudioUtility : MonoBehaviour
 
     public void AjustarSomBG(float volume)
     {
-
         EasyAudioUtility_Helper h = Array.Find(helper, item => item.name == Som.Background.ToString());
 
         h.source.volume = volume * (1f + UnityEngine.Random.Range(-h.volumeVariance / 2f, h.volumeVariance / 2f));

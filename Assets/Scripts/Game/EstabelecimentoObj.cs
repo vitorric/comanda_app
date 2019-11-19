@@ -17,6 +17,8 @@ public class EstabelecimentoObj : MonoBehaviour
     public Text TxtAtendimento;
     public Text TxtPessoas;
     public Text TxtGold;
+
+    public RawImage Icon;
     public GameObject PnlBloqueio;
 
     private Estabelecimento estabelecimento;
@@ -49,4 +51,11 @@ public class EstabelecimentoObj : MonoBehaviour
     }
     #endregion
 
+    #region PreencherIcone
+    public void PreencherIcone(Texture2D icone)
+    {
+        Icon.texture = icone;
+        Icon = Util.ImgResize(Icon, 180, 180);
+    }
+    #endregion
 }

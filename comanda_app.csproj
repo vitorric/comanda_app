@@ -770,6 +770,7 @@
     <Compile Include="Assets\Scripts\Util\ButtonControl.cs" />
     <Compile Include="Assets\Scripts\Util\CoresUtil.cs" />
     <Compile Include="Assets\Scripts\Util\MaskField.cs" />
+    <Compile Include="Assets\Scripts\Util\MaskField2.cs" />
     <Compile Include="Assets\Scripts\Util\SceneController.cs" />
     <Compile Include="Assets\Scripts\Util\ScrollRectEx.cs" />
     <Compile Include="Assets\Scripts\Util\TimeUtilities.cs" />

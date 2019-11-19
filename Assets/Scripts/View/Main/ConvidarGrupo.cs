@@ -114,7 +114,7 @@ public class ConvidarGrupo : MonoBehaviour
                 if (error != null)
                 {
                     Debug.Log("ConvitesEnviadoGrupo: " + error);
-                    StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                    AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                     return;
                 }
 
@@ -153,12 +153,12 @@ public class ConvidarGrupo : MonoBehaviour
             if (error != null)
             {
                 Debug.Log("ConvidarMembroGrupo: " + error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 
             TxtChaveAmigavel.text = string.Empty;
-            StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(response, true));
+            AlertaManager.Instance.ChamarAlertaMensagem(response, true);
         }));
     }
     #endregion
@@ -179,7 +179,7 @@ public class ConvidarGrupo : MonoBehaviour
             if (error != null)
             {
                 Debug.Log("TransferirLiderancaGrupo: " + error);
-                StartCoroutine(AlertaManager.Instance.ChamarAlertaMensagem(error, false));
+                AlertaManager.Instance.ChamarAlertaMensagem(error, false);
                 return;
             }
 

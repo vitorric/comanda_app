@@ -9,7 +9,8 @@ public class FileManager
     {
         produto,
         item_Loja,
-        desafio
+        desafio,
+        estabelecimento
     }
 
     public static string FilePath(Directories directory, string fileName)
@@ -65,6 +66,7 @@ public class FileManager
             Directory.Delete(FilePath(Directories.desafio, string.Empty), true);
             Directory.Delete(FilePath(Directories.item_Loja, string.Empty), true);
             Directory.Delete(FilePath(Directories.produto, string.Empty), true);
+            Directory.Delete(FilePath(Directories.estabelecimento, string.Empty), true);
         }
         catch (System.Exception ex)
         {

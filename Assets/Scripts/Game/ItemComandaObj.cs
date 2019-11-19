@@ -1,6 +1,7 @@
 ﻿using APIModel;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +21,7 @@ public class ItemComandaObj : MonoBehaviour
 
         LblNome.text = produto.infoProduto.nome;
         LblQuantidade.text = produto.quantidade + "x";
-        LblValor.text = produto.precoTotal.ToString("C2");
+        LblValor.text = produto.precoTotal.ToString("C2", CultureInfo.GetCultureInfo("pt-BR"));
     }
 
     #region PreencherIcone

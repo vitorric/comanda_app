@@ -135,14 +135,5 @@ namespace APIModel
             public bool conviteEstabPendente;
             public string comanda;
         }
-
-        public partial class Desafio
-        {
-            public string _id;
-            public bool concluido;
-            public string estabelecimento;
-            public int progresso;
-            public bool resgatouPremio;
-        }
     }
 }
