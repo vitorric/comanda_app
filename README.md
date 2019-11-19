@@ -7,7 +7,7 @@ Aplicativo de Comanda Gameficada desenvolvido em Unity3D. Este é um aplicativo 
 ## Preparação
 Antes de iniciar, é necessário iniciar a API, pois sem ela, o aplicativo não irá funcionar. Acesse  [aqui](https://github.com/vitorric/comanda_api) e siga os passos.
 
-Após isso, instale o  [Unity3D]([https://unity3d.com/pt/get-unity/download] localmente.
+Após isso, instale o  [Unity3D](https://unity3d.com/pt/get-unity/download) localmente.
 
  * **Versão do Unity3D**: 2019.1.12f1
 
