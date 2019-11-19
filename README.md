@@ -71,6 +71,10 @@ private  const  string urlBaseDownloadIcon =  "http://localhost:3000/";
 
 Altere o caminho de conexão para o caminho da API que foi iniciado anteriormente.
 
+## Build
+
+* A última versão do APK (Android) se encontra dentro da pasta Build.
+
 ## Tutorias
 
 * Como [configurar o SDK do facebook](https://developers.facebook.com/docs/unity/).
