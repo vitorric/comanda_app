@@ -154,7 +154,8 @@ public class MenuUsuario : MonoBehaviour
 
                     if (lstHistoricoCompra.Count == 0)
                     {
-                        TxtHistoricoVazio.SetActive(true);
+                        if (Cliente.ClienteLogado.concluiuTutorialProfile)
+                            TxtHistoricoVazio.SetActive(true);
                         return;
                     }
 
@@ -198,8 +199,6 @@ public class MenuUsuario : MonoBehaviour
             PnlAvatarInfo.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
 
             LblPerfilApelido.text = Cliente.ClienteLogado.apelido;
-            LblPerfilExp.text = Cliente.ClienteLogado.avatar.info.exp + "/" + Cliente.ClienteLogado.avatar.info.expProximoLevel;
-            LblPerfilLevel.text = Cliente.ClienteLogado.avatar.info.level.ToString();
             LblPerfilPontos.text = Cliente.ClienteLogado.pontos.ToString();
             //LblPerfilGold.text = Cliente.ClienteLogado.RetornarGoldTotal().ToString();
             LblChaveAmigavel.text = Cliente.ClienteLogado.chaveAmigavel;
@@ -234,7 +233,7 @@ public class MenuUsuario : MonoBehaviour
         if (tocarSom)
             EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
-        BtnSalvarInfo.gameObject.SetActive((numeroAba == 0) ? true : false);
+        //BtnSalvarInfo.gameObject.SetActive((numeroAba == 0) ? true : false);
         PnlAbasEdicao.ForEach(x => x.SetActive(false));
         PnlAbasEdicao[numeroAba].SetActive(true);
         buttonControl.TrocarAba(numeroAba);
@@ -249,6 +248,15 @@ public class MenuUsuario : MonoBehaviour
         PnlAvatarEdicao.PreencherInfo(Cliente.ClienteLogado.sexo, Cliente.ClienteLogado.avatar);
     }
     #endregion
+
+    #region PreencherInfoLevel
+    public void PreencherInfoLevel()
+    {
+        LblPerfilExp.text = ((int)Cliente.ClienteLogado.avatar.info.exp) + "/" + ((int)Cliente.ClienteLogado.avatar.info.expProximoLevel);
+        LblPerfilLevel.text = Cliente.ClienteLogado.avatar.info.level.ToString();
+    }
+    #endregion
+
 
 
 

@@ -1153,7 +1153,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: cf2a0d69cd887495288b41945e3efb87, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1b15a352d8ad64af49cacb2bde37cd85, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1914,7 +1914,6 @@ MonoBehaviour:
   BtnFechar: {fileID: 1794759361}
   animator: {fileID: 1794759364}
   animatorResponse: {fileID: 1206063515}
-  ObjAlertaResponse: {fileID: 1206063511}
   ImgSucesso: {fileID: 303913032}
   ImgErro: {fileID: 1132402044}
 --- !u!114 &1716903125
@@ -2157,6 +2156,12 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 114674009898462278, guid: 88730e18c6779834586cc3444ed4c79b,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 1b15a352d8ad64af49cacb2bde37cd85,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88730e18c6779834586cc3444ed4c79b, type: 3}
 --- !u!224 &1794759358 stripped

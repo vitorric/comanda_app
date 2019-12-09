@@ -55,7 +55,7 @@ namespace Network
         #endregion
 
         //OK
-        #region ClienteLogin
+        #region Deslogar
         public static IEnumerator Deslogar(
                Dictionary<string, object> properties,
                Action<bool, string> doneCallback = null)
@@ -442,7 +442,6 @@ namespace Network
         }
         #endregion
 
-
         #region ClienteComprarItem
         public static IEnumerator ClienteComprarItem(
                 Dictionary<string, object> properties,
@@ -644,6 +643,91 @@ namespace Network
                     {
                         Debug.Log(ex.Message);
                         done(null, msgErro);
+                    }
+                });
+        }
+        #endregion
+
+        #region AlterarExp
+        public static IEnumerator AlterarExp(
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("alterar/cliente/avatar/exp",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<bool> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<bool>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, msgErro);
+                    }
+                });
+        }
+        #endregion
+
+
+        #region ClienteConcluiuTutorial
+        public static IEnumerator ClienteConcluiuTutorial(
+                Dictionary<string, object> properties,
+                Action<bool, string> doneCallback = null)
+        {
+            var done = wrapCallback(doneCallback);
+
+            yield return Post("alterar/concluiu/tutorial",
+                properties,
+                (request) =>
+                {
+                    if (request == null ||
+                        request.isNetworkError ||
+                        request.responseCode != 200)
+                    {
+                        done(false, requestError(request));
+                        return;
+                    }
+
+                    try
+                    {
+                        Retorno<bool> retornoAPI =
+                                   JsonConvert.DeserializeObject<Retorno<bool>>
+                                   (request.downloadHandler.text);
+
+                        if (retornoAPI.sucesso)
+                        {
+                            done(true, null);
+                            return;
+                        }
+
+                        done(false, retornoAPI.mensagem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log(ex.Message);
+                        done(false, msgErro);
                     }
                 });
         }

@@ -18,6 +18,8 @@ public class MenuMain : MonoBehaviour
 
     public HorizontalScrollSnap HorizontalScrollSnap;
 
+    public TutorialManager TutorialManager;
+
     private Vector2 tamanhoPadraoBotao;
     private Vector2 tamanhoBotaoSelecionado;
     private Vector2 scalaIconBotaoSelecionado;
@@ -35,6 +37,7 @@ public class MenuMain : MonoBehaviour
         trocarPainel(2);
 
         HorizontalScrollSnap.OnSelectionPageChangedEvent.AddListener(trocarPainel);
+        HorizontalScrollSnap.OnSelectionChangeEndEvent.AddListener(checarTutorial);
         tocarSom = true;
     }
 
@@ -73,8 +76,14 @@ public class MenuMain : MonoBehaviour
 
     private void btnTrocarPainel(int indexPainel)
     {
-
         HorizontalScrollSnap.GoToScreen(indexPainel);
+
+    }
+
+    private void checarTutorial(int indexPainel)
+    {
+        if (indexPainel < 4)
+            TutorialManager.ChecarTutorial(indexPainel, 1);
     }
 
 }

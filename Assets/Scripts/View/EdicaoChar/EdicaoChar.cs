@@ -310,11 +310,11 @@ public class EdicaoChar : MonoBehaviour
 
             Debug.Log(JsonConvert.SerializeObject(PnlCharacter.Avatar));
 
-            //PnlCharacter.Avatar.info.level = Cliente.ClienteLogado.avatar.info.level;
-            //PnlCharacter.Avatar.info.exp = Cliente.ClienteLogado.avatar.info.exp;
-            //PnlCharacter.Avatar.info.expProximoLevel = Cliente.ClienteLogado.avatar.info.expProximoLevel;
+            PnlCharacter.Avatar.info.level = Cliente.ClienteLogado.avatar.info.level;
+            PnlCharacter.Avatar.info.exp = Cliente.ClienteLogado.avatar.info.exp;
+            PnlCharacter.Avatar.info.expProximoLevel = Cliente.ClienteLogado.avatar.info.expProximoLevel;
 
-            //Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
+            Cliente.ClienteLogado.avatar = PnlCharacter.Avatar;
 
             fecharCena(true);
 

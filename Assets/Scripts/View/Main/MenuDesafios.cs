@@ -14,6 +14,11 @@ public class MenuDesafios : MonoBehaviour
     [Header("Button Aba Config")]
     public ButtonControl buttonControl;
 
+    [Header("Botoes")]
+    public GameObject PnlRegraDesafio;
+    public Button BtnAbrirRegraDesafio;
+    public Button BtnFecharRegraDesafio;
+
     [Header("Paineis")]
     public List<GameObject> PnlAbasDesafio;
 
@@ -71,6 +76,24 @@ public class MenuDesafios : MonoBehaviour
     {
         buttonControl.BtnAbas[0].onClick.AddListener(() => mudarAba(0, true));
         buttonControl.BtnAbas[1].onClick.AddListener(() => mudarAba(1, true));
+        BtnAbrirRegraDesafio.onClick.AddListener(() => btnAbrirRegraDesafio());
+        BtnFecharRegraDesafio.onClick.AddListener(() => btnFecharRegraDesafio());
+    }
+    #endregion
+
+    #region btnAbrirRegraDesafio
+    private void btnAbrirRegraDesafio()
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        PnlRegraDesafio.SetActive(true);
+    }
+    #endregion
+
+    #region btnAbrirRegraDesafio
+    private void btnFecharRegraDesafio()
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
+        PnlRegraDesafio.SetActive(false);
     }
     #endregion
 

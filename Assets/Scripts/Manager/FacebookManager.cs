@@ -48,6 +48,8 @@ public class FacebookManager
                 if (tipoLogin == "facebook")
                 {
                     PlayerPrefs.DeleteAll();
+                    Debug.Log("erro relogin");
+                    relogar("facebook", null);
                 }
             }
         }

@@ -34,7 +34,7 @@ public class EstabelecimentoObj : MonoBehaviour
             TxtPessoas.text = estabelecimento.configEstabelecimentoAtual.clientesNoLocal.Count.ToString();
             TxtGold.text = Util.FormatarValores(gold);
             if (!estabelecimento.configEstabelecimentoAtual.estaAberta) PnlBloqueio.SetActive(true);
-            else configurarListener();
+            configurarListener();
         }
         catch (Exception e)
         {

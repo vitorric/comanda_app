@@ -84,6 +84,10 @@ public class FirebaseManager : MonoBehaviour
                                                           nome = Convert.ToString(task.Result.Child("nome").Value),
                                                           sexo = Convert.ToString(task.Result.Child("sexo").Value),
                                                           pontos = Convert.ToInt32(task.Result.Child("pontos").Value),
+                                                          concluiuTutorialGeral = (task.Result.HasChild("concluiuTutorialGeral")) ? Convert.ToBoolean(task.Result.Child("concluiuTutorialGeral").Value) : false,
+                                                          concluiuTutorialProfile = (task.Result.HasChild("concluiuTutorialProfile")) ? Convert.ToBoolean(task.Result.Child("concluiuTutorialProfile").Value) : false,
+                                                          concluiuTutorialCorreio = (task.Result.HasChild("concluiuTutorialCorreio")) ? Convert.ToBoolean(task.Result.Child("concluiuTutorialCorreio").Value) : false,
+                                                          concluiuTutorialDesafios = (task.Result.HasChild("concluiuTutorialDesafios")) ? Convert.ToBoolean(task.Result.Child("concluiuTutorialDesafios").Value) : false,
                                                           chaveAmigavel = Convert.ToString(task.Result.Child("chaveAmigavel").Value),
                                                           configApp = new Cliente.ConfigApp
                                                           {

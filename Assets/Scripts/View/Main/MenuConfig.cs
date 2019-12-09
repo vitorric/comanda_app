@@ -8,12 +8,23 @@ using UnityEngine.UI;
 
 public class MenuConfig : MonoBehaviour
 {
+    public MenuMain MenuMain;
+
     [Header("Botoes")]
     public Button BtnSairApp;
 
     public GameObject PnlConfigApp;
 
     public Button BtnTermosUso;
+    public Button BtnTutoriais;
+
+    [Header("Tela Tutorial")]
+    public GameObject PnlTutorial;
+    public Button BtnFecharTutorial;
+    public Button BtnTutoProfile;
+    public Button BtnTutoCorreio;
+    public Button BtnTutoGeral;
+    public Button BtnTutoDesafio;
 
     [Header("Menu Config App")]
     public Slider SliderSomFundo;
@@ -40,6 +51,12 @@ public class MenuConfig : MonoBehaviour
         //BtnPerfilConfig.onClick.AddListener(() => PnlPopUp.AbrirPopUp(PnlConfigPerfil, null));
         BtnSairApp.onClick.AddListener(() => btnDeslogar());
         BtnTermosUso.onClick.AddListener(() => Application.OpenURL("http://93.188.164.122/termouso"));
+        BtnTutoriais.onClick.AddListener(() => btnAbrirFecharTutorial(true));
+        BtnFecharTutorial.onClick.AddListener(() => btnAbrirFecharTutorial(false));
+        BtnTutoProfile.onClick.AddListener(() => iniciarTutorial(0));
+        BtnTutoCorreio.onClick.AddListener(() => iniciarTutorial(1));
+        BtnTutoGeral.onClick.AddListener(() => iniciarTutorial(2));
+        BtnTutoDesafio.onClick.AddListener(() => iniciarTutorial(3));
     }
     #endregion
 
@@ -49,6 +66,27 @@ public class MenuConfig : MonoBehaviour
         EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
 
         deslogar();
+    }
+    #endregion
+
+    #region btnAbrirFecharTutorial
+    private void btnAbrirFecharTutorial(bool ehParaAbrir)
+    {
+        if (ehParaAbrir)
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        else
+            EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_Cancel);
+
+        PnlTutorial.SetActive(ehParaAbrir);
+    }
+    #endregion
+
+    #region iniciarTutorial
+    private void iniciarTutorial(int tutorial)
+    {
+        EasyAudioUtility.Instance.Play(EasyAudioUtility.Som.Click_OK);
+        MenuMain.HorizontalScrollSnap.GoToScreen(tutorial);
+        MenuMain.TutorialManager.IniciarTutorial(tutorial);
     }
     #endregion
 

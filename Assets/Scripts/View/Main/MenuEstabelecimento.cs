@@ -23,6 +23,7 @@ public class MenuEstabelecimento : MonoBehaviour
 
     [Header("Estabelecimento Lista")]
     public Transform ScvEstabelecimentos;
+    public GameObject ObjLoaderLista;
     public EstabelecimentoObj EstabelecimentoRef;
 
     [Header("Estabelecimento Info")]
@@ -98,8 +99,11 @@ public class MenuEstabelecimento : MonoBehaviour
             {
                 Debug.Log(error);
                 AlertaManager.Instance.ChamarAlertaMensagem(error, false);
+                ObjLoaderLista.SetActive(false);
                 return;
             }
+
+            ObjLoaderLista.SetActive(false);
 
             foreach (Estabelecimento estabelecimento in response)
             {

@@ -120,6 +120,7 @@
     <Compile Include="Assets\Scripts\Game\MembroConvidadoObj.cs" />
     <Compile Include="Assets\Scripts\Game\PnlDecisao.cs" />
     <Compile Include="Assets\Scripts\Game\SlotItemPersonagem.cs" />
+    <Compile Include="Assets\Scripts\Game\Tutorial.cs" />
     <Compile Include="Assets\Scripts\Manager\AlertaManager.cs" />
     <Compile Include="Assets\Scripts\Manager\AppManager.cs" />
     <Compile Include="Assets\Scripts\Manager\FacebookManager.cs" />
@@ -127,12 +128,14 @@
     <Compile Include="Assets\Scripts\Manager\FirebaseManager.cs" />
     <Compile Include="Assets\Scripts\Manager\GPSManager.cs" />
     <Compile Include="Assets\Scripts\Manager\TestManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\TutorialManager.cs" />
     <Compile Include="Assets\Scripts\QRCode\LeitoQRCode.cs" />
     <Compile Include="Assets\Scripts\Util\Animacoes.cs" />
     <Compile Include="Assets\Scripts\Util\AnimacoesTween.cs" />
     <Compile Include="Assets\Scripts\Util\AnimarLoader.cs" />
     <Compile Include="Assets\Scripts\Util\ButtonControl.cs" />
     <Compile Include="Assets\Scripts\Util\CoresUtil.cs" />
+    <Compile Include="Assets\Scripts\Util\InputRequired.cs" />
     <Compile Include="Assets\Scripts\Util\MaskField.cs" />
     <Compile Include="Assets\Scripts\Util\MaskField2.cs" />
     <Compile Include="Assets\Scripts\Util\SceneController.cs" />

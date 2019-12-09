@@ -30,7 +30,7 @@ public class Intro : MonoBehaviour
 #endif
 
         EasyAudioUtility.Instance.AjustarSomBG(0);
-        EasyAudioUtility.Instance.AjustarSomSFX(0);
+        //EasyAudioUtility.Instance.AjustarSomSFX(0);
 
         yield return new WaitUntil(() => firebaseManager.isReady);
 
@@ -113,6 +113,12 @@ public class Intro : MonoBehaviour
 
             if (tipoLogin == "facebook")
             {
+                if (string.IsNullOrEmpty(socialId))
+                {
+                    AlterarProgressoSlider(0.7f);
+                    return;
+                }
+
                 StartCoroutine(postLoginFacebook(socialId));
             }
         }

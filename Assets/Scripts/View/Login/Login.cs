@@ -296,6 +296,9 @@ public class Login : MonoBehaviour
     {
         if (TxtEmail.text == string.Empty || TxtSenha.text == string.Empty)
         {
+            TxtEmail.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtEmail.text == string.Empty);
+            TxtSenha.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtSenha.text == string.Empty);
+
             AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
             return;
         }
@@ -309,6 +312,9 @@ public class Login : MonoBehaviour
             { "deviceId", AppManager.Instance.deviceId },
             { "tokenFirebase", AppManager.Instance.tokenFirebase }
         };
+
+        TxtEmail.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtSenha.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
 
         AppManager.Instance.AtivarLoader();
 
@@ -343,9 +349,13 @@ public class Login : MonoBehaviour
 
         if (TxtEmailRecSenha.text == string.Empty)
         {
+            TxtEmailRecSenha.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtEmailRecSenha.text == string.Empty);
+
             AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
             return;
         }
+
+        TxtEmailRecSenha.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
 
         Dictionary<string, object> form = new Dictionary<string, object>
         {
@@ -379,6 +389,7 @@ public class Login : MonoBehaviour
         PnlRecuperarSenha.enabled = false;
         PnlLogin.enabled = true;
         TxtEmailRecSenha.text = string.Empty;
+        TxtEmailRecSenha.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
     }
     #endregion
 
@@ -397,6 +408,9 @@ public class Login : MonoBehaviour
             if (TxtEmailCadastro.text == string.Empty ||
                 TxtNomeCadastro.text == string.Empty)
             {
+                TxtEmailCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtEmailCadastro.text == string.Empty);
+                TxtNomeCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtNomeCadastro.text == string.Empty);
+
                 AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
@@ -432,6 +446,9 @@ public class Login : MonoBehaviour
 
                 AppManager.Instance.DesativarLoaderAsync();
             }));
+
+            TxtEmailCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+            TxtNomeCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
         }
 
         //cpf e data nasc
@@ -440,6 +457,9 @@ public class Login : MonoBehaviour
             if (TxtDataNascCadastro.text == string.Empty ||
                 TxtCPFCadastro.text == string.Empty)
             {
+                TxtDataNascCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtDataNascCadastro.text == string.Empty);
+                TxtCPFCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtCPFCadastro.text == string.Empty);
+
                 AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
@@ -481,6 +501,9 @@ public class Login : MonoBehaviour
 
                 AppManager.Instance.DesativarLoaderAsync();
             }));
+
+            TxtDataNascCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+            TxtCPFCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
         }
 
         //apelido e avatar
@@ -488,6 +511,8 @@ public class Login : MonoBehaviour
         {
             if (TxtApelidoCadastro.text == string.Empty)
             {
+                TxtApelidoCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtApelidoCadastro.text == string.Empty);
+
                 AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
@@ -524,6 +549,8 @@ public class Login : MonoBehaviour
                     StartCoroutine(cadastrar());
                 }
             }));
+
+            TxtApelidoCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
         }
 
         if (etapaAtual == 3)
@@ -537,6 +564,10 @@ public class Login : MonoBehaviour
             if (TxtSenhaCadastro.text == string.Empty ||
                 TxtSenhaCadastroConfirm.text == string.Empty)
             {
+
+                TxtSenhaCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtSenhaCadastro.text == string.Empty);
+                TxtSenhaCadastroConfirm.GetComponent<InputRequired>().AtivarDesativarAlerta(TxtSenhaCadastroConfirm.text == string.Empty);
+
                 AlertaManager.Instance.ChamarAlertaMensagem(AlertaManager.MsgAlerta.PreenchaOsCampos, false);
                 yield break;
             }
@@ -555,6 +586,9 @@ public class Login : MonoBehaviour
 
             BtnTermoAceite.isOn = false;
             BtnEtapa4Confirmar.interactable = false;
+
+            TxtSenhaCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+            TxtSenhaCadastroConfirm.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
 
             podeAvancar = true;
         }
@@ -611,6 +645,8 @@ public class Login : MonoBehaviour
         {
             LimparFormCadastro();
             PnlLogin.enabled = true;
+            TxtEmail.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+            TxtSenha.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
             return;
         }
 
@@ -622,6 +658,8 @@ public class Login : MonoBehaviour
     #region cadastroSocial
     private void cadastroSocial(string socialId, string nome, string email, string tipo)
     {
+        tipoLogin = tipo;
+        Debug.Log("tipoLogin: " + tipoLogin);
         Dictionary<string, object> form = new Dictionary<string, object>
         {
             { "socialId", socialId },
@@ -645,7 +683,6 @@ public class Login : MonoBehaviour
                 AppManager.Instance.GravarSession(response.token, response._id,
                 JsonConvert.SerializeObject(new Cliente.Credenciais
                 {
-                    email = TxtEmail.text,
                     tipoLogin = tipoLogin
                 }));
 
@@ -801,6 +838,15 @@ public class Login : MonoBehaviour
         TxtNomeCadastro.text = string.Empty;
         TxtCPFCadastro.text = string.Empty;
         TxtDataNascCadastro.text = string.Empty;
+
+        TxtEmailCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtSenhaCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtSenhaCadastroConfirm.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtApelidoCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtNomeCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtCPFCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+        TxtDataNascCadastro.GetComponent<InputRequired>().AtivarDesativarAlerta(false);
+
         BtnSexoMasc.isOn = true;
         BtnSexoFem.isOn = false;
 

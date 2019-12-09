@@ -31,8 +31,6 @@ public class Main : MonoBehaviour
     public Text TxtPctExp;
     public Slider SliderExp;
 
-    public GameObject PnlUpLevel;
-
     [Header("Geral")]
     public Configuracoes ConfigApp;
     public GameObject PnlNaoEstaNoEstabelecimento;
@@ -43,6 +41,7 @@ public class Main : MonoBehaviour
     public MenuDesafios MenuDesafio;
 
     public UnityEvent PreencherAvatares;
+    public UnityEvent PreencherInfoLevel;
 
     private bool estabelecimentosCarregados = false;
 
@@ -130,6 +129,7 @@ public class Main : MonoBehaviour
                 }
 
                 atualizarExp();
+                PreencherInfoLevel.Invoke();
             }
         };
 
@@ -173,11 +173,11 @@ public class Main : MonoBehaviour
         PreencherAvatares.Invoke();
         atualizarExp();
 
-        if (!Application.isEditor)
-        {
+        //if (!Application.isEditor)
+        //{
             EasyAudioUtility.Instance.AjustarSomBG(Cliente.ClienteLogado.configApp.somFundo);
             EasyAudioUtility.Instance.AjustarSomSFX(Cliente.ClienteLogado.configApp.somGeral);
-        }
+        //}
 
     }
 

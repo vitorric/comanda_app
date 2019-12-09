@@ -1118,7 +1118,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Salvar
+  m_Text: SALVAR
 --- !u!222 &201686273
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5171,7 +5171,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Fechar
+  m_Text: FECHAR
 --- !u!222 &1965428730
 CanvasRenderer:
   m_ObjectHideFlags: 0

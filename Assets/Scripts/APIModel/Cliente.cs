@@ -34,6 +34,10 @@ namespace APIModel
             public string sexo;
             public int goldGeral;
             public int pontos;
+            public bool concluiuTutorialGeral;
+            public bool concluiuTutorialProfile;
+            public bool concluiuTutorialCorreio;
+            public bool concluiuTutorialDesafios;
             public List<GoldPorEstabelecimento> goldPorEstabelecimento;
             public Endereco endereco;
             public Avatar avatar;
