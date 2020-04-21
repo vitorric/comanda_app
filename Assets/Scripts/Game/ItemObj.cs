@@ -36,6 +36,11 @@ public class ItemObj : MonoBehaviour
     private bool pararConferenciaTempo = false;
     private bool lojaAberta = false;
 
+    private void Awake()
+    {
+        configurarListener();
+    }
+
     #region PreencherInfo
     public void PreencherInfo(ItemLoja itemLoja, bool lojaAberta, string _idEstabelecimento)
     {
@@ -50,7 +55,6 @@ public class ItemObj : MonoBehaviour
 
         configurarPainelAlerta();
 
-        configurarListener();
         rodarRelogio();
     }
     #endregion
@@ -153,6 +157,11 @@ public class ItemObj : MonoBehaviour
             PnlAlerta.GetComponent<Image>().color = CorPnlAlerta[corAlerta];
             TxtAlerta.color = CorTxtAlerta[corAlerta];
             PnlAlerta.SetActive(true);
+        }
+        else
+        {
+            BtnComprar.SetActive(true);
+            PnlAlerta.SetActive(false);
         }
     }
     #endregion

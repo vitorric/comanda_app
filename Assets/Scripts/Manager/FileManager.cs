@@ -8,7 +8,7 @@ public class FileManager
     public enum Directories
     {
         produto,
-        item_Loja,
+        item_loja,
         desafio,
         estabelecimento
     }
@@ -64,7 +64,7 @@ public class FileManager
         try
         {
             Directory.Delete(FilePath(Directories.desafio, string.Empty), true);
-            Directory.Delete(FilePath(Directories.item_Loja, string.Empty), true);
+            Directory.Delete(FilePath(Directories.item_loja, string.Empty), true);
             Directory.Delete(FilePath(Directories.produto, string.Empty), true);
             Directory.Delete(FilePath(Directories.estabelecimento, string.Empty), true);
         }

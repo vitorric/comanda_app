@@ -190,7 +190,6 @@ public class MenuDesafios : MonoBehaviour
             { "desafioId", desafio.desafio._id }
         };
 
-
         StartCoroutine(DesafioAPI.ObterDesafio(form,
         (response, error) =>
         {
@@ -223,7 +222,6 @@ public class MenuDesafios : MonoBehaviour
                 lstDesafiosProgresso.Add(desafioObj);
                 txtDesafioProgressoVazio.SetActive(false);
             }
-
 
             if (desafio.concluido && !desafio.resgatouPremio)
                 AppManager.Instance.AtivarDesafioCompletado(desafio);

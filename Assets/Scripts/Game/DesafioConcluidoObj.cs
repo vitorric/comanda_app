@@ -1,5 +1,6 @@
 ﻿using APIModel;
 using Network;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,9 +47,10 @@ public class DesafioConcluidoObj : MonoBehaviour
         else
         {
             TxtNomePremio.text = desafio.premio.produto.nome;
-
+            
             Main.Instance.ObterIcones(desafio.premio.produto.icon, FileManager.Directories.produto, (textura) =>
             {
+                Debug.Log(desafio.premio.produto.icon);
                 if (textura != null)
                 {
                     Icon.texture = textura;

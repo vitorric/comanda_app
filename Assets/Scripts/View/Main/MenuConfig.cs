@@ -157,8 +157,8 @@ public class MenuConfig : MonoBehaviour
     {
         TxtPctSomFundo.text = Mathf.FloorToInt(value * 100) + "%";
 
-        if (!Application.isEditor)
-            EasyAudioUtility.Instance.AjustarSomBG(value);
+        //if (!Application.isEditor)
+        EasyAudioUtility.Instance.AjustarSomBG(value);
     }
     #endregion
 
@@ -167,8 +167,8 @@ public class MenuConfig : MonoBehaviour
     {
         TxtPctSomGeral.text = Mathf.FloorToInt(value * 100) + "%";
 
-        if (!Application.isEditor)
-            EasyAudioUtility.Instance.AjustarSomSFX(value);
+        //if (!Application.isEditor)
+        EasyAudioUtility.Instance.AjustarSomSFX(value);
     }
     #endregion
 

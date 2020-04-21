@@ -18,33 +18,39 @@ namespace FirebaseModel
         public Action<ItemLoja, TipoAcao> AcaoItemLoja;
         public Action<Desafio, TipoAcao> AcaoDesafio;
 
-        public void Watch_TelaEstabelecimento(string estabelecimentoId, bool ehParaAdicionar)
-        {
-            var estabelecimentosLoja = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId + "/itensLoja");
-            var estabelecimentosDesafios = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId + "/desafios");
+        DatabaseReference dbRefEstabLoja;
+        DatabaseReference dbRefEstabDesafios;
 
+        public EstabelecimentoFirebase(string estabelecimentoId)
+        {
+            dbRefEstabDesafios = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId + "/desafios");
+            dbRefEstabLoja = FirebaseDatabase.DefaultInstance.GetReference("estabelecimentos/" + estabelecimentoId + "/itensLoja");
+        }
+
+        public void Watch_TelaEstabelecimento(bool ehParaAdicionar)
+        {           
             if (ehParaAdicionar)
             {
-                estabelecimentosLoja.ChildAdded += itensLojaAdicionar;
-                estabelecimentosLoja.ChildChanged += itensLojaModificar;
-                estabelecimentosLoja.ChildRemoved += itensLojaRemover;
+                dbRefEstabLoja.ChildAdded += itensLojaAdicionar;
+                dbRefEstabLoja.ChildChanged += itensLojaModificar;
+                dbRefEstabLoja.ChildRemoved += itensLojaRemover;
 
-                estabelecimentosDesafios.ChildAdded += desafioAdicionar;
-                estabelecimentosDesafios.ChildChanged += desafioModificar;
-                estabelecimentosDesafios.ChildRemoved += desafioRemover;
+                dbRefEstabDesafios.ChildAdded += desafioAdicionar;
+                dbRefEstabDesafios.ChildChanged += desafioModificar;
+                dbRefEstabDesafios.ChildRemoved += desafioRemover;
 
                 return;
             }
 
             if (!ehParaAdicionar)
             {
-                estabelecimentosLoja.ChildAdded -= itensLojaAdicionar;
-                estabelecimentosLoja.ChildChanged -= itensLojaModificar;
-                estabelecimentosLoja.ChildChanged -= itensLojaRemover;
+                dbRefEstabLoja.ChildAdded -= itensLojaAdicionar;
+                dbRefEstabLoja.ChildChanged -= itensLojaModificar;
+                dbRefEstabLoja.ChildChanged -= itensLojaRemover;
 
-                estabelecimentosDesafios.ChildAdded -= desafioAdicionar;
-                estabelecimentosDesafios.ChildChanged -= desafioModificar;
-                estabelecimentosDesafios.ChildRemoved -= desafioRemover;
+                dbRefEstabDesafios.ChildAdded -= desafioAdicionar;
+                dbRefEstabDesafios.ChildChanged -= desafioModificar;
+                dbRefEstabDesafios.ChildRemoved -= desafioRemover;
                 AcaoItemLoja = null;
                 AcaoDesafio = null;
                 return;
@@ -89,7 +95,7 @@ namespace FirebaseModel
             }
             catch (Exception x)
             {
-                Debug.LogError(x.Message);
+                Debug.LogError(x.StackTrace);
                 throw x;
             }
         }

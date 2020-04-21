@@ -208,7 +208,7 @@ public class Intro : MonoBehaviour
     private void criarDiretoriosImagens()
     {
         FileManager.CreateFileDirectory(FileManager.Directories.desafio);
-        FileManager.CreateFileDirectory(FileManager.Directories.item_Loja);
+        FileManager.CreateFileDirectory(FileManager.Directories.item_loja);
         FileManager.CreateFileDirectory(FileManager.Directories.produto);
         FileManager.CreateFileDirectory(FileManager.Directories.estabelecimento);
     }

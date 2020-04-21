@@ -167,7 +167,7 @@ namespace FirebaseModel
                     {
                         _id = Convert.ToString(ds.Child("premio").Child("produto").Child("_id").Value),
                         nome = Convert.ToString(ds.Child("premio").Child("produto").Child("nome").Value),
-                        icon = Convert.ToString(ds.Child("premio").Child("produto").Child("nome").Value)
+                        icon = Convert.ToString(ds.Child("premio").Child("produto").Child("icon").Value)
                     };
                 }
             }

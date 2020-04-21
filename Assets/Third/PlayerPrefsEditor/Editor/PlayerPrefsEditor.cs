@@ -92,11 +92,17 @@ public class PlayerPrefsEditor : EditorWindow
         editor.importProductName = PlayerSettings.productName;
     }
 
-	/// <summary>
-	/// This returns an array of the stored PlayerPrefs from the file system (OSX) or registry (Windows), to allow 
-	/// us to to look up what's actually in the PlayerPrefs. This is used as a kind of lookup table.
-	/// </summary>
-	private PlayerPrefPair[] RetrieveSavedPrefs(string companyName, string productName)
+    [MenuItem("Window/PlayerPrefs DeleteAll")]
+    private static void DeleteAll()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
+    /// <summary>
+    /// This returns an array of the stored PlayerPrefs from the file system (OSX) or registry (Windows), to allow 
+    /// us to to look up what's actually in the PlayerPrefs. This is used as a kind of lookup table.
+    /// </summary>
+    private PlayerPrefPair[] RetrieveSavedPrefs(string companyName, string productName)
     {
 		if(Application.platform == RuntimePlatform.OSXEditor)
 		{

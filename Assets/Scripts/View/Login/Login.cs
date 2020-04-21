@@ -82,11 +82,11 @@ public class Login : MonoBehaviour
     #region Awake
     void Awake()
     {
-        if (Application.isEditor)
-        {
-            TxtEmail.text = "@email.com";
-            TxtSenha.text = "123456";
-        }
+        //if (Application.isEditor)
+        //{
+        //    TxtEmail.text = "@email.com";
+        //    TxtSenha.text = "123456";
+        //}
 
         fbManager = new FacebookManager() { cadastrar = cadastroSocial };
 

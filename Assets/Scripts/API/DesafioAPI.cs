@@ -36,6 +36,7 @@ namespace Network
                                    JsonConvert.DeserializeObject<Retorno<Desafio>>
                                    (request.downloadHandler.text);
 
+
                         if (retornoAPI.sucesso)
                         {
                             done(retornoAPI.retorno, null);
@@ -46,8 +47,8 @@ namespace Network
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log(ex.Message);
-                        done(null, ex.Message);
+                        Debug.Log(ex.StackTrace);
+                        //done(null, ex.Message);
                     }
                 });
         }

@@ -214,7 +214,7 @@ public class MenuEstabelecimento : MonoBehaviour
             PnlEstabInfo,
             () =>
             {
-                estabelecimentoFirebase = new EstabelecimentoFirebase
+                estabelecimentoFirebase = new EstabelecimentoFirebase(estabelecimento._id)
                 {
                     AcaoItemLoja = (item, tipoAcao) =>
                     {
@@ -259,7 +259,7 @@ public class MenuEstabelecimento : MonoBehaviour
                     }
                 };
 
-                estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimento._id, true);
+                estabelecimentoFirebase.Watch_TelaEstabelecimento(true);
 
                 //Main.Instance.ResgatarConquistasUsuario(estabelecimento.conquistas, estabelecimento._id);
             });
@@ -286,14 +286,14 @@ public class MenuEstabelecimento : MonoBehaviour
     public void PararWatch()
     {
         if (estabelecimentoFirebase != null)
-            estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimentoId_aberto, false);
+            estabelecimentoFirebase.Watch_TelaEstabelecimento(false);
     }
     #endregion
 
     #region limparPnlEstabInfo
     private void limparPnlEstabInfo()
     {
-        estabelecimentoFirebase.Watch_TelaEstabelecimento(estabelecimentoId_aberto, false);
+        estabelecimentoFirebase.Watch_TelaEstabelecimento(false);
         estabelecimentoId_aberto = string.Empty;
         lstItensLoja.Clear();
         lstDesafios.Clear();
@@ -308,8 +308,8 @@ public class MenuEstabelecimento : MonoBehaviour
         if (item._id != null)
         {
             ItemObj objItemShop = Instantiate(ItemShopRef, ScvShop.transform);
-
-            Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) =>
+            
+            Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_loja, (textura) =>
             {
                 if (textura != null)
                     objItemShop.PreencherIcone(textura);
@@ -435,7 +435,7 @@ public class MenuEstabelecimento : MonoBehaviour
                    TxtCustoCompraItem.text = "- " + item.preco.ToString();
                    TxtSaldoCompraItem.text = (dinheiroEstab - item.preco).ToString();
 
-                   Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_Loja, (textura) =>
+                   Main.Instance.ObterIcones(item.icon, FileManager.Directories.item_loja, (textura) =>
                    {
                        if (textura != null)
                        {

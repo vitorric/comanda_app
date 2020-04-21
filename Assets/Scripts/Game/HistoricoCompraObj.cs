@@ -36,7 +36,7 @@ public class HistoricoCompraObj : MonoBehaviour {
             TxtNomeItem.text = historico.itemLoja.nome;
             TxtCusto.text = "- " + historico.precoItem;
             TxtTipoHistorico.text = "<color=lightblue>Item da Loja</color>";
-            Main.Instance.ObterIcones(historico.itemLoja.icon, FileManager.Directories.item_Loja, (textura) =>
+            Main.Instance.ObterIcones(historico.itemLoja.icon, FileManager.Directories.item_loja, (textura) =>
             {
                 if (textura != null)
                 {

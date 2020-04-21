@@ -15,7 +15,7 @@ public class HistoricoComandaObj : MonoBehaviour
 
     public void PreencherInfo(HistoricoComanda historicoComanda)
     {
-        Main.Instance.ObterIcones(historicoComanda.iconProduto, FileManager.Directories.item_Loja, (textura) =>
+        Main.Instance.ObterIcones(historicoComanda.iconProduto, FileManager.Directories.item_loja, (textura) =>
         {
             if (textura != null)
             {

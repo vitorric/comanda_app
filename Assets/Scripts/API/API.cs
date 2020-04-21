@@ -112,6 +112,7 @@ namespace Network
                             Action<UnityWebRequest> doneCallback = null)
         {
             string urlBase = urlBaseDownloadIcon + url;
+
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(urlBase);
 
             yield return request.SendWebRequest();

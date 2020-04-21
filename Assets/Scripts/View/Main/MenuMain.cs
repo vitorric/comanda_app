@@ -39,6 +39,8 @@ public class MenuMain : MonoBehaviour
         HorizontalScrollSnap.OnSelectionPageChangedEvent.AddListener(trocarPainel);
         HorizontalScrollSnap.OnSelectionChangeEndEvent.AddListener(checarTutorial);
         tocarSom = true;
+
+        TutorialManager.ChecarTutorial((int) TutorialManager.TiposTutorial.Geral, 1);
     }
 
     #region adicionarListener
